@@ -8,6 +8,7 @@ def setup_package_template(package_name: str):
 
     package_setup.setup_gitignore()
     package_setup.setup_source_files()
+    package_setup.setup_tests()
 
     for line in tree(package_setup.path):
         print(line)
