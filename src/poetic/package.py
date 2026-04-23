@@ -13,13 +13,14 @@ PATH_TO_TEMPLATES: Path = PATH_TO_RESOURCES / "templates"
 
 class Package:
     def __init__(self, package_name: str) -> None:
-        self._package_name = package_name
-        self.path = Path(self._package_name)
+        self.name = package_name
+        self._inner_name = self.name.replace("-", "_")
+        self.path = Path(self.name)
 
-        logg.info(f"Setting up package: {self._package_name}")
-        os.system(f"poetry new {self._package_name}")
+        logg.info(f"Setting up package: {self.name}")
+        os.system(f"poetry new {self.name}")
 
-        self._path_to_src: Path = self.path / "src" / self._package_name
+        self._path_to_src: Path = self.path / "src" / self._inner_name
 
     def setup_gitignore(self):
         """
@@ -41,7 +42,7 @@ class Package:
         f.close()
 
         with open(self._path_to_src / "__init__.py", "a") as f:
-            f.write(f"from {self._package_name}.core import *")
+            f.write(f"from {self._inner_name}.core import *")
 
         self._copy_template("foo.py")
 
@@ -60,7 +61,7 @@ class Package:
 
         with open(PATH_TO_TEMPLATES / "test_foo.py") as f:
             test_foo_lines = f.readlines()
-        test_foo_lines[0] = test_foo_lines[0].replace("$PACKAGE", self._package_name)
+        test_foo_lines[0] = test_foo_lines[0].replace("$PACKAGE", self._inner_name)
         with open(path_to_tests / "test_foo.py", "w") as f:
             f.writelines(test_foo_lines)
 
