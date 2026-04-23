@@ -39,7 +39,7 @@ class PackageSetup:
         f.close()
 
         with open(self._path_to_src / "__init__.py", "a") as f:
-            f.write("from core import *")
+            f.write(f"from {self._package_name}.core import *")
 
         self._copy_template("foo.py")
 
