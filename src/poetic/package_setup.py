@@ -50,6 +50,7 @@ class PackageSetup:
         Create conftest.py that allows testing in dev mode without installing the package.
         Create dummy test corresponding to the dummy source file.
         Add pytest to package.
+        Set up VSCode Testing suite.
         """
         path_to_tests: Path = self.path / "tests"
 
@@ -70,6 +71,10 @@ class PackageSetup:
                 "POETRY_VIRTUALENVS_CREATE": "false",
             },
         )
+
+        path_to_vscode = self.path / ".vscode"
+        os.mkdir(path_to_vscode)
+        self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
 
     def _copy_template(
         self,
