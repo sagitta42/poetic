@@ -13,5 +13,6 @@ def setup_package_template(package_name: str):
     package.setup_logger()
     package.init_commit()
 
+    logg.info(package.name)
     for line in tree(package.path):
         logg.info(line)
