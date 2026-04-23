@@ -74,6 +74,11 @@ class Package:
         shutil.copy(PATH_TO_RESOURCES / "logger.py", self._path_to_src / "logger.py")
         self._poetry_add("dotenv")
 
+    def init_commit(self):
+        subprocess.run(["git", "init"], cwd=self.path)
+        subprocess.run(["git", "add", "*"], cwd=self.path)
+        subprocess.run(["git", "commit", "-am", "template"], cwd=self.path)
+
     def _copy_template(
         self,
         template_filename: str,
