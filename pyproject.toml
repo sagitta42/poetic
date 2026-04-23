@@ -5,7 +5,7 @@ description = ""
 authors = [{ name = "sagitta42", email = "mariia.redchuk@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
-dependencies = ["poetry (>=2.3.4,<3.0.0)"]
+dependencies = ["poetry (>=2.3.4,<3.0.0)", "dotenv (>=0.9.9,<0.10.0)"]
 
 [tool.poetry]
 packages = [{ include = "poetic", from = "src" }]

@@ -5,19 +5,21 @@ import shutil
 import subprocess
 import venv
 
+from poetic.logger import logg
+
+PATH_TO_RESOURCES = Path(resources.files(__package__).__str__())
+PATH_TO_TEMPLATES: Path = PATH_TO_RESOURCES / "templates"
+
 
 class PackageSetup:
     def __init__(self, package_name: str) -> None:
         self._package_name = package_name
         self.path = Path(self._package_name)
 
-        print(f"Setting up package: {self._package_name}")
+        logg.info(f"Setting up package: {self._package_name}")
         os.system(f"poetry new {self._package_name}")
 
         self._path_to_src: Path = self.path / "src" / self._package_name
-        self._path_to_templates: Path = (
-            Path(resources.files(__package__).__str__()) / "templates"
-        )
 
     def setup_gitignore(self):
         """
@@ -56,25 +58,21 @@ class PackageSetup:
 
         self._copy_template("conftest.py", path_to_tests)
 
-        with open(self._path_to_templates / "test_foo.py") as f:
+        with open(PATH_TO_TEMPLATES / "test_foo.py") as f:
             test_foo_lines = f.readlines()
         test_foo_lines[0] = test_foo_lines[0].replace("$PACKAGE", self._package_name)
         with open(path_to_tests / "test_foo.py", "w") as f:
             f.writelines(test_foo_lines)
 
-        subprocess.run(
-            ["poetry", "add", "--group", "dev", "pytest"],
-            cwd=self.path,
-            env={
-                **os.environ,
-                "PATH": str(self.venv / "bin") + ":" + os.environ["PATH"],
-                "POETRY_VIRTUALENVS_CREATE": "false",
-            },
-        )
+        self._poetry_add("pytest", "dev")
 
         path_to_vscode = self.path / ".vscode"
         os.mkdir(path_to_vscode)
         self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
+
+    def setup_logger(self):
+        shutil.copy(PATH_TO_RESOURCES / "logger.py", self._path_to_src / "logger.py")
+        self._poetry_add("dotenv")
 
     def _copy_template(
         self,
@@ -85,8 +83,24 @@ class PackageSetup:
         path_in_package = path_in_package or self._path_to_src
         package_filename = package_filename or template_filename
         shutil.copy(
-            self._path_to_templates / template_filename,
+            PATH_TO_TEMPLATES / template_filename,
             path_in_package / package_filename,
+        )
+
+    def _poetry_add(self, package: str, group: str | None = None):
+        args = ["poetry", "add"]
+        if group is not None:
+            args += ["--group", group]
+        args.append(package)
+
+        subprocess.run(
+            args,
+            cwd=self.path,
+            env={
+                **os.environ,
+                "PATH": str(self.venv / "bin") + ":" + os.environ["PATH"],
+                "POETRY_VIRTUALENVS_CREATE": "false",
+            },
         )
 
     @property
