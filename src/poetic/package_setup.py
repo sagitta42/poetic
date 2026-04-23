@@ -17,6 +17,15 @@ class PackageSetup:
             Path(resources.files(__package__).__str__()) / "templates"
         )
 
+    def setup_gitignore(self):
+        """
+        Set up .gitignore.
+
+        Python .gitignore covering everything:
+        https://github.com/github/gitignore/blob/main/Python.gitignore
+        """
+        self._copy_template("Python.gitignore", self.path, ".gitignore")
+
     def setup_source_files(self):
         """
         Set up source files.
@@ -30,4 +39,17 @@ class PackageSetup:
         with open(self._path_to_src / "__init__.py", "a") as f:
             f.write("from core import *")
 
-        shutil.copy(self._path_to_templates / "foo.py", self._path_to_src / "foo.py")
+        self._copy_template("foo.py")
+
+    def _copy_template(
+        self,
+        template_filename: str,
+        path_in_package: Path | None = None,
+        package_filename: str | None = None,
+    ):
+        path_in_package = path_in_package or self._path_to_src
+        package_filename = package_filename or template_filename
+        shutil.copy(
+            self._path_to_templates / template_filename,
+            path_in_package / package_filename,
+        )
