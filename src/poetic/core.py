@@ -1,16 +1,16 @@
 from poetic.logger import logg
-from poetic.package_setup import PackageSetup
+from poetic.package import Package
 from poetic.tree import tree
 
 
 def setup_package_template(package_name: str):
 
-    package_setup = PackageSetup(package_name)
+    package = Package(package_name)
 
-    package_setup.setup_gitignore()
-    package_setup.setup_source_files()
-    package_setup.setup_tests()
-    package_setup.setup_logger()
+    package.setup_gitignore()
+    package.setup_source_files()
+    package.setup_tests()
+    package.setup_logger()
 
-    for line in tree(package_setup.path):
+    for line in tree(package.path):
         logg.info(line)

@@ -11,7 +11,7 @@ PATH_TO_RESOURCES = Path(resources.files(__package__).__str__())
 PATH_TO_TEMPLATES: Path = PATH_TO_RESOURCES / "templates"
 
 
-class PackageSetup:
+class Package:
     def __init__(self, package_name: str) -> None:
         self._package_name = package_name
         self.path = Path(self._package_name)
