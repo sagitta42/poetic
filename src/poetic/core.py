@@ -1,5 +1,7 @@
+from importlib import resources
 import os
 from pathlib import Path
+import shutil
 
 from poetic.tree import tree
 
@@ -15,6 +17,11 @@ def setup_package_template(package_name: str):
 
     with open(path_to_src / "__init__.py", "a") as f:
         f.write("from core import *")
+
+    shutil.copy(
+        Path(resources.files(__package__).__str__()) / "templates" / "foo.py",
+        path_to_src / "foo.py",
+    )
 
     for line in tree(package_path):
         print(line)
