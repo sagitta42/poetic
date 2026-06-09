@@ -98,6 +98,7 @@ class Package:
         if group is not None:
             args += ["--group", group]
         args.append(package)
+        args.append("--lock")
 
         subprocess.run(
             args,
