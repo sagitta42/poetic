@@ -83,7 +83,10 @@ class Package:
 
     def init_commit(self):
         subprocess.run(["git", "init"], cwd=self.path)
-        subprocess.run(["git", "add", "*"], cwd=self.path)
+        stuff_to_commit = ["README.md", "src/", ".vscode/", ".gitignore", ".env.template", "pyproject.toml", "tests/"]
+        for stuff in stuff_to_commit:
+            stuff_to_add = f"{stuff}*" if stuff.endswith("/") else stuff
+            subprocess.run(["git", "add", stuff_to_add], cwd=self.path)
         subprocess.run(["git", "commit", "-am", "template"], cwd=self.path)
 
     def _copy_template(
