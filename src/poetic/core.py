@@ -8,9 +8,13 @@ def setup_package_template(package_name: str):
     package = Package(package_name)
 
     package.setup_gitignore()
+    package.setup_dotenv_template()
+
     package.setup_source_files()
+
     package.setup_tests()
     package.setup_logger()
+    
     package.init_commit()
 
     logg.info(package.name)

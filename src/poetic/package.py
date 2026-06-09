@@ -31,6 +31,12 @@ class Package:
         """
         self._copy_template("Python.gitignore", self.path, ".gitignore")
 
+    def setup_dotenv_template(self):
+        """
+        Set up .env.template
+        """
+        self._copy_template(".env.template", self.path)
+
     def setup_source_files(self):
         """
         Set up source files.
