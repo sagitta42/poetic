@@ -14,7 +14,8 @@ def setup_package_template(package_name: str):
 
     package.setup_tests()
     package.setup_logger()
-    
+
+    package.setup_vscode()
     package.init_commit()
 
     logg.info(package.name)

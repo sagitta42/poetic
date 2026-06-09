@@ -73,9 +73,11 @@ class Package:
 
         self._poetry_add("pytest", "dev")
 
+    def setup_vscode(self):
         path_to_vscode = self.path / ".vscode"
         os.mkdir(path_to_vscode)
         self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
+        self._copy_template("VSCode.launch.json", path_to_vscode, "launch.json")
 
     def setup_logger(self):
         shutil.copy(PATH_TO_RESOURCES / "logger.py", self._path_to_src / "logger.py")
@@ -83,7 +85,15 @@ class Package:
 
     def init_commit(self):
         subprocess.run(["git", "init"], cwd=self.path)
-        stuff_to_commit = ["README.md", "src/", ".vscode/", ".gitignore", ".env.template", "pyproject.toml", "tests/"]
+        stuff_to_commit = [
+            "README.md",
+            "src/",
+            ".vscode/",
+            ".gitignore",
+            ".env.template",
+            "pyproject.toml",
+            "tests/",
+        ]
         for stuff in stuff_to_commit:
             stuff_to_add = f"{stuff}*" if stuff.endswith("/") else stuff
             subprocess.run(["git", "add", stuff_to_add], cwd=self.path)
