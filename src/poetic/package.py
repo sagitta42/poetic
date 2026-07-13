@@ -5,21 +5,20 @@ import shutil
 import subprocess
 import venv
 
+from poetic.general import GeneralSetup
 from poetic.logger import logg
 
 PATH_TO_RESOURCES = Path(resources.files(__package__).__str__())
 PATH_TO_TEMPLATES: Path = PATH_TO_RESOURCES / "templates"
 
 
-class Package:
-    def __init__(self, package_name: str) -> None:
-        self.name = package_name
-        self._inner_name = self.name.replace("-", "_")
-        self.path = Path(self.name)
+class PackageSetup(GeneralSetup):
+    _TYPE: str = "package"
 
-        logg.info(f"Setting up package: {self.name}")
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+
         os.system(f"poetry new {self.name}")
-
         self._path_to_src: Path = self.path / "src" / self._inner_name
 
     def setup_gitignore(self):

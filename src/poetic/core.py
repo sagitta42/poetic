@@ -1,11 +1,11 @@
+from poetic.api import APISetup
 from poetic.logger import logg
-from poetic.package import Package
+from poetic.package import PackageSetup
 from poetic.tree import tree
 
 
 def setup_package_template(name: str):
-
-    package = Package(name)
+    package = PackageSetup(name)
 
     package.setup_gitignore()
     package.setup_dotenv_template()
@@ -24,5 +24,4 @@ def setup_package_template(name: str):
 
 
 def setup_api_template(name: str):
-    raise NotImplementedError("API init with poetic not implemented yet")
-
+    api = APISetup(name)
