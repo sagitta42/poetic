@@ -1,7 +1,5 @@
 from poetic.api import APISetup
-from poetic.logger import logg
 from poetic.package import PackageSetup
-from poetic.tree import tree
 
 
 def setup_package_template(name: str):
@@ -18,10 +16,15 @@ def setup_package_template(name: str):
     package.setup_vscode()
     package.init_commit()
 
-    logg.info(package.name)
-    for line in tree(package.path):
-        logg.info(line)
+    package.display()
 
 
 def setup_api_template(name: str):
     api = APISetup(name)
+
+    api.setup_gitignore()
+    api.setup_dotenv_template()
+
+    api.setup_subfolders()
+
+    api.display()

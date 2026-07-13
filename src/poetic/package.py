@@ -1,4 +1,3 @@
-from importlib import resources
 import os
 from pathlib import Path
 import shutil
@@ -7,9 +6,6 @@ import venv
 
 from poetic.general import GeneralSetup
 from poetic.logger import logg
-
-PATH_TO_RESOURCES = Path(resources.files(__package__).__str__())
-PATH_TO_TEMPLATES: Path = PATH_TO_RESOURCES / "templates"
 
 
 class PackageSetup(GeneralSetup):
@@ -20,21 +16,6 @@ class PackageSetup(GeneralSetup):
 
         os.system(f"poetry new {self.name}")
         self._path_to_src: Path = self.path / "src" / self._inner_name
-
-    def setup_gitignore(self):
-        """
-        Set up .gitignore.
-
-        Python .gitignore covering everything:
-        https://github.com/github/gitignore/blob/main/Python.gitignore
-        """
-        self._copy_template("Python.gitignore", self.path, ".gitignore")
-
-    def setup_dotenv_template(self):
-        """
-        Set up .env.template
-        """
-        self._copy_template(".env.template", self.path)
 
     def setup_source_files(self):
         """
@@ -99,19 +80,6 @@ class PackageSetup(GeneralSetup):
             stuff_to_add = f"{stuff}*" if stuff.endswith("/") else stuff
             subprocess.run(["git", "add", stuff_to_add], cwd=self.path)
         subprocess.run(["git", "commit", "-am", "template"], cwd=self.path)
-
-    def _copy_template(
-        self,
-        template_filename: str,
-        path_in_package: Path | None = None,
-        package_filename: str | None = None,
-    ):
-        path_in_package = path_in_package or self._path_to_src
-        package_filename = package_filename or template_filename
-        shutil.copy(
-            PATH_TO_TEMPLATES / template_filename,
-            path_in_package / package_filename,
-        )
 
     def _poetry_add(self, package: str, group: str | None = None):
         args = ["poetry", "add"]
