@@ -30,7 +30,7 @@ class PackageSetup(GeneralSetup):
         with open(self._path_to_src / "__init__.py", "a") as f:
             f.write(f"from {self._inner_name}.core import *")
 
-        self._copy_template("foo.py")
+        self._copy_template("foo.py", path_in_package=self._path_to_src)
 
         self._create_source_file("py.typed")
 
@@ -47,7 +47,7 @@ class PackageSetup(GeneralSetup):
 
         self._copy_template("conftest.py", path_to_tests)
 
-        with open(PATH_TO_TEMPLATES / "test_foo.py") as f:
+        with open(self._path_to_type_templates / "test_foo.py") as f:
             test_foo_lines = f.readlines()
         test_foo_lines[0] = test_foo_lines[0].replace("$PACKAGE", self._inner_name)
         with open(path_to_tests / "test_foo.py", "w") as f:
@@ -62,7 +62,9 @@ class PackageSetup(GeneralSetup):
         self._copy_template("VSCode.launch.json", path_to_vscode, "launch.json")
 
     def setup_logger(self):
-        shutil.copy(PATH_TO_RESOURCES / "logger.py", self._path_to_src / "logger.py")
+        shutil.copy(
+            self._path_to_resources / "logger.py", self._path_to_src / "logger.py"
+        )
         self._poetry_add("dotenv")
 
     def init_commit(self):

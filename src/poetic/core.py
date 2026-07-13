@@ -26,5 +26,6 @@ def setup_api_template(name: str):
     api.setup_dotenv_template()
 
     api.setup_subfolders()
+    api.setup_source_files()
 
     api.display()

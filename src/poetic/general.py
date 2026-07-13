@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from importlib import resources
 from pathlib import Path
 import shutil
@@ -5,18 +6,18 @@ import shutil
 from poetic.logger import logg
 from poetic.tree import tree
 
-PATH_TO_RESOURCES = Path(resources.files(__package__).__str__())
-PATH_TO_TEMPLATES: Path = PATH_TO_RESOURCES / "templates"
 
-
-class GeneralSetup:
+class GeneralSetup(ABC):
     _TYPE: str
 
     def __init__(self, name: str) -> None:
         self.name = name
         self._inner_name = self.name.replace("-", "_")
         self.path = Path(self.name)
-        self._path_to_src = self.path
+
+        self._path_to_resources = Path(resources.files(__package__).__str__())
+        self._path_to_templates = self._path_to_resources / "templates"
+        self._path_to_type_templates = self._path_to_templates / self._TYPE
 
         logg.info(f"Setting up {self._TYPE}: {self.name}")
 
@@ -27,28 +28,49 @@ class GeneralSetup:
         Python .gitignore covering everything:
         https://github.com/github/gitignore/blob/main/Python.gitignore
         """
-        self._copy_template("Python.gitignore", self.path, ".gitignore")
+        self._copy_template("Python.gitignore", package_filename=".gitignore")
 
     def setup_dotenv_template(self):
         """
         Set up .env.template
         """
-        self._copy_template(".env.template", self.path)
+        self._copy_template(".env.template")
 
     def display(self):
         logg.info(self.name)
         for line in tree(self.path):
             logg.info(line)
 
+    @abstractmethod
+    def setup_source_files(self):
+        """
+        Set up source files.
+        """
+        pass
+
     def _copy_template(
         self,
         template_filename: str,
         path_in_package: Path | None = None,
         package_filename: str | None = None,
+        generic: bool = True,
     ):
-        path_in_package = path_in_package or self._path_to_src
+        """
+        Copy template into package source code.
+
+        template_filename (str): name of template to copy contained under templates of this package
+        generic (bool): template is generic (independent of setup type)
+        path_in_package (Path | None): path where to copy in package; default = root path
+        package_filename (str | None): filename of template in package; default = same as original template
+        """
+        path_in_package = path_in_package or self.path
         package_filename = package_filename or template_filename
+
+        path_to_templates = (
+            self._path_to_templates if generic else self._path_to_type_templates
+        )
+
         shutil.copy(
-            PATH_TO_TEMPLATES / template_filename,
+            path_to_templates / template_filename,
             path_in_package / package_filename,
         )

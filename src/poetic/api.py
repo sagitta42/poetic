@@ -1,15 +1,13 @@
 import os
-from pathlib import Path
 import subprocess
 
-from dulwich import F
 
 from poetic.general import GeneralSetup
 from poetic.pyproject_handler import PyProjectHandler
 
 
 class APISetup(GeneralSetup):
-    _TYPE: str = "API"
+    _TYPE: str = "api"
 
     def __init__(self, name: str) -> None:
         super().__init__(name)
@@ -37,8 +35,8 @@ class APISetup(GeneralSetup):
         """
         Set up subfolders.
 
-        app: app code
-        code: code logic/engine code
+        app: app code (api, schemas, serviecs)
+        core: code logic/engine code
         """
 
         for subfolder in ["app", "core"]:
@@ -48,3 +46,36 @@ class APISetup(GeneralSetup):
             os.mkdir(self.path / "app" / app_subfolder)
 
         os.mkdir(self.path / "app" / "api" / "routes")
+
+    def setup_source_files(self):
+        """
+        Set up dummy source files
+        """
+        package_filename = "dummy.py"
+        self._copy_template(
+            "core.py",
+            path_in_package=self.path / "core",
+            package_filename=package_filename,
+            generic=False,
+        )
+        path_to_app = self.path / "app"
+        self._copy_template(
+            "service.py",
+            path_in_package=path_to_app / "services",
+            package_filename=package_filename,
+            generic=False,
+        )
+        self._copy_template(
+            "schemas.py",
+            path_in_package=path_to_app / "schemas",
+            package_filename=package_filename,
+            generic=False,
+        )
+        path_to_api = path_to_app / "api"
+        self._copy_template(
+            "route.py",
+            path_in_package=path_to_api / "routes",
+            package_filename=package_filename,
+            generic=False,
+        )
+        self._copy_template("router.py", path_in_package=path_to_api, generic=False)
