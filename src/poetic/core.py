@@ -7,6 +7,7 @@ def setup_package_template(name: str):
 
     package.setup_gitignore()
     package.setup_dotenv_template()
+    package.setup_dependencies()
 
     package.setup_source_files()
 
@@ -24,6 +25,7 @@ def setup_api_template(name: str):
 
     api.setup_gitignore()
     api.setup_dotenv_template()
+    api.setup_dependencies()
 
     api.setup_subfolders()
     api.setup_source_files()

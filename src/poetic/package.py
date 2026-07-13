@@ -65,7 +65,6 @@ class PackageSetup(GeneralSetup):
         shutil.copy(
             self._path_to_resources / "logger.py", self._path_to_src / "logger.py"
         )
-        self._poetry_add("dotenv")
 
     def init_commit(self):
         subprocess.run(["git", "init"], cwd=self.path)
@@ -83,34 +82,9 @@ class PackageSetup(GeneralSetup):
             subprocess.run(["git", "add", stuff_to_add], cwd=self.path)
         subprocess.run(["git", "commit", "-am", "template"], cwd=self.path)
 
-    def _poetry_add(self, package: str, group: str | None = None):
-        args = ["poetry", "add"]
-        if group is not None:
-            args += ["--group", group]
-        args.append(package)
-        args.append("--lock")
-
-        subprocess.run(
-            args,
-            cwd=self.path,
-            env={
-                **os.environ,
-                "PATH": str(self.venv / "bin") + ":" + os.environ["PATH"],
-                "POETRY_VIRTUALENVS_CREATE": "false",
-            },
-        )
-
     def _create_source_file(self, filepath: str | Path):
         """
         Create empty source file with given name or path.
         """
         f = open(self._path_to_src / filepath, "w")
         f.close()
-
-    @property
-    def venv(self) -> Path:
-        path_to_venv = self.path / "venv"
-        if not os.path.exists(path_to_venv):
-            venv.create(path_to_venv, with_pip=True)
-            subprocess.run([path_to_venv / "bin" / "pip", "install", "poetry"])
-        return path_to_venv

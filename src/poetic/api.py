@@ -31,6 +31,13 @@ class APISetup(GeneralSetup):
         pyproject_handler.del_section("build-system")
         pyproject_handler.save_toml()
 
+    def setup_dependencies(self):
+        super().setup_dependencies()
+
+        self._poetry_add("fastapi")
+        self._poetry_add("pydantic")
+        self._poetry_add("uvicorn")
+
     def setup_subfolders(self):
         """
         Set up subfolders.
