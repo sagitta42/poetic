@@ -25,7 +25,8 @@ awesome-package
 │       ├── __init__.py
 │       ├── foo.py # example source file
 │       ├── logger.py # log with levels based on .env
-│       └── core.py # everything here is imported in __init__ as core functionality
+│       ├── core.py # everything here is imported in __init__ as core functionality
+|       └── py.typed # empty file that enables import suggestions in IDE
 ├── .vscode
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...

@@ -43,14 +43,16 @@ class Package:
 
         Set up core.py: contains core routines to be imported directly from package.
         Create a dummy source file (convenient for tests)
+        Set up py.typed enabling package imports.
         """
-        f = open(self._path_to_src / "core.py", "w")
-        f.close()
+        self._create_source_file("core.py")
 
         with open(self._path_to_src / "__init__.py", "a") as f:
             f.write(f"from {self._inner_name}.core import *")
 
         self._copy_template("foo.py")
+
+        self._create_source_file("py.typed")
 
     def setup_tests(self):
         """
@@ -128,6 +130,13 @@ class Package:
                 "POETRY_VIRTUALENVS_CREATE": "false",
             },
         )
+
+    def _create_source_file(self, filepath: str | Path):
+        """
+        Create empty source file with given name or path.
+        """
+        f = open(self._path_to_src / filepath, "w")
+        f.close()
 
     @property
     def venv(self) -> Path:
