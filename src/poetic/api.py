@@ -43,22 +43,6 @@ class APITemplate(GeneralTemplate):
         self._poetry_add("pydantic_settings")
         self._poetry_add("uvicorn")
 
-    def _setup_subfolders(self):
-        """
-        Set up subfolders.
-
-        app: app code (api, schemas, serviecs)
-        core: code logic/engine code
-        """
-
-        for subfolder in ["app", "core"]:
-            os.mkdir(self.path / subfolder)
-
-        for app_subfolder in ["api", "schemas", "services"]:
-            os.mkdir(self.path / "app" / app_subfolder)
-
-        os.mkdir(self.path / "app" / "api" / "routes")
-
     def setup_source_files(self):
         """
         Set up dummy source files
@@ -67,6 +51,7 @@ class APITemplate(GeneralTemplate):
 
         self._copy_template("config.py")
         self._copy_template("main.py")
+        self._copy_template("docker-compose.yml")
 
         package_filename = "dummy.py"
         self._copy_template(
@@ -92,3 +77,19 @@ class APITemplate(GeneralTemplate):
             package_filename=package_filename,
         )
         self._copy_template("router.py", path_in_package=path_to_api)
+
+    def _setup_subfolders(self):
+        """
+        Set up subfolders.
+
+        app: app code (api, schemas, serviecs)
+        core: code logic/engine code
+        """
+
+        for subfolder in ["app", "core"]:
+            os.mkdir(self.path / subfolder)
+
+        for app_subfolder in ["api", "schemas", "services"]:
+            os.mkdir(self.path / "app" / app_subfolder)
+
+        os.mkdir(self.path / "app" / "api" / "routes")
