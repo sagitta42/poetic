@@ -1,9 +1,10 @@
 import enum
-from typing import Any
-from pydantic import BaseModel, Field
+from typing import Any, Self
+from pydantic import BaseModel, Field, model_validator
 
 from poetic.api import APITemplate
 from poetic.base import Template
+from poetic.logger import logg
 from poetic.package import PackageTemplate
 
 
@@ -30,6 +31,7 @@ class TemplateSettings(BaseModel):
     type: TemplateType = Field(
         default=TemplateType.package, description="Template type"
     )
+    db: bool = Field(default=False, description="Create/update DB functionalities")
 
     @classmethod
     def description(cls, field_name: str) -> str:
@@ -50,9 +52,21 @@ class TemplateSettings(BaseModel):
             return [item.value for item in field_type]
         return None
 
+    @model_validator(mode="after")
+    def check_db(self) -> Self:
+        if self.db and self.type != TemplateType.api:
+            logg.warning(
+                f"DB functionalities not supported for {self.type.value} type; ignoring",
+                important=True,
+            )
+        return self
+
+
 class TemplateBuilder:
     def build(self, settings: TemplateSettings) -> Template:
         template_type = TemplateType(settings.type)
         template_class = TemplateClass.from_template_type(template_type).value
+        if settings.db:
+            logg.warning("DB functionalities not implemented yet; ignoring")
         ret = template_class(settings.name)
         return ret
