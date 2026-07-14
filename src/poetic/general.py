@@ -50,6 +50,21 @@ class GeneralTemplate(ABC):
         """
         Update existing template.
 
+        Attempt an update, switch to original branch in case of fail.
+        """
+        current_branch = self._git_template.get_active_branch()
+        logg.info(f"Active branch: {current_branch}")
+
+        try:
+            self._update(current_branch)
+        except Exception as e:
+            self._git_template.run("switch", current_branch)
+            raise e
+
+    def _update(self, current_branch: str):
+        """
+        Update existing template.
+
         Switch to branch dev-poetic-update.
             If does not exist, create starting from first repo commit.
             NOTE: assumes the first commit is the poetic template commit.
@@ -59,10 +74,7 @@ class GeneralTemplate(ABC):
         Switch to current branch.
         Merge dev-poetic-update.
         """
-        current_branch = self._git_template.get_active_branch()
-        logg.info(f"Active branch: {current_branch}")
         update_branch = "dev-poetic-update"
-
         if not self._git_template.branch_exists(update_branch):
             first_commit = self._git_template.get_first_commit()
             logg.info(
