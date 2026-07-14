@@ -9,9 +9,13 @@ from poetic.pyproject_handler import PyProjectHandler
 class APITemplate(GeneralTemplate):
     _TYPE: str = "api"
 
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
+    def poetry_init(self):
+        """
+        Initialize package with poetry.
 
+        Basic setup with only pyproject.toml.
+        Disable package mode.
+        """
         os.mkdir(self.name)
         subprocess.run(
             [
@@ -23,7 +27,7 @@ class APITemplate(GeneralTemplate):
                 "--description",
                 "",
             ],
-            cwd=name,
+            cwd=self.name,
         )
 
         pyproject_handler = PyProjectHandler(self.path)

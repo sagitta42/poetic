@@ -1,11 +1,8 @@
 import os
 from pathlib import Path
 import shutil
-import subprocess
-import venv
 
 from poetic.general import GeneralTemplate
-from poetic.logger import logg
 
 
 class PackageTemplate(GeneralTemplate):
@@ -14,8 +11,15 @@ class PackageTemplate(GeneralTemplate):
     def __init__(self, name: str) -> None:
         super().__init__(name)
 
-        os.system(f"poetry new {self.name}")
         self._path_to_src: Path = self.path / "src" / self._inner_name
+
+    def poetry_init(self):
+        """
+        Initialize package with poetry.
+
+        Standard setup with src/package_name structure.
+        """
+        os.system(f"poetry new {self.name}")
 
     def setup_source_files(self):
         """

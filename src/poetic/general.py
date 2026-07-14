@@ -25,6 +25,8 @@ class GeneralTemplate(ABC):
         logg.info(f"Setting up {self._TYPE}: {self.name}")
 
     def setup(self):
+        self.poetry_init()
+
         self.setup_gitignore()
         self.setup_dotenv_template()
         self.setup_dependencies()
@@ -111,6 +113,13 @@ class GeneralTemplate(ABC):
         logg.info(self.name)
         for line in tree(self.path):
             logg.info(line)
+
+    @abstractmethod
+    def poetry_init(self):
+        """
+        Initialize package with poetry
+        """
+        pass
 
     @abstractmethod
     def setup_source_files(self):
