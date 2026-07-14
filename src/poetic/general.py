@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import venv
 
+from poetic.git import Git
 from poetic.logger import logg
 from poetic.tree import tree
 
@@ -22,11 +23,69 @@ class GeneralTemplate(ABC):
         self._path_to_templates = self._path_to_resources / "templates"
         self._path_to_type_templates = self._path_to_templates / self._TYPE
 
+        self._git_auto = Git(self._path_to_resources.parent.parent)
+        self._git_template = Git(self.path)
+
         logg.info(f"Setting up {self._TYPE}: {self.name}")
 
-    def setup(self):
-        self.poetry_init()
+    def init(self):
+        """
+        Initial setup of the template.
 
+        Initialize package with poetry.
+        Set up files.
+        Make initial commit.
+        """
+        self.poetry_init()
+        self.setup()
+
+        self._git_template.run("init")
+        self._git_template.commit_all("template made with poetic")
+
+        self.display()
+
+    def update(self):
+        """
+        Update existing template.
+
+        Switch to branch dev-poetic-update.
+            If does not exist, create starting from first repo commit.
+            NOTE: assumes the first commit is the poetic template commit.
+            NOTE: this branch is expected to be reserved for poetic updates.
+        Run setup.
+        Commit updates.
+        Switch to current branch.
+        Merge dev-poetic-update.
+        """
+        current_branch = self._git_template.get_active_branch()
+        update_branch = "dev-poetic-update"
+
+        if not self._git_template.branch_exists(update_branch):
+            first_commit = self._git_template.get_first_commit()
+            self._git_template.run("branch", update_branch, first_commit)
+
+        self._git_template.run("switch", update_branch)
+
+        self.setup()
+
+        last_poetic_commit = self._git_auto.get_last_commit()
+        last_poetic_commit_message = self._git_auto.get_commit_message(
+            last_poetic_commit
+        )
+        self._git_template.commit_all(
+            f"poetic update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
+        )
+
+        self._git_template.run("switch", current_branch)
+        self._git_template.run("merge", update_branch)
+
+    def setup(self):
+        """
+        Template setup.
+
+        Set up common files.
+        Set up extra/specific files.
+        """
         self.setup_gitignore()
         self.setup_dotenv_template()
         self.setup_dependencies()
@@ -35,9 +94,6 @@ class GeneralTemplate(ABC):
         self.setup_readme()
 
         self.setup_extra()
-
-        self.init_commit("template made with poetic")
-        self.display()
 
     def setup_dependencies(self):
         self._poetry_add("dotenv")
@@ -101,14 +157,6 @@ class GeneralTemplate(ABC):
         """
         pass
 
-    def init_commit(self, commit_message: str):
-        """
-        Make initial commit for the created template.
-        """
-        subprocess.run(["git", "init"], cwd=self.path)
-        subprocess.run(["git", "add", "*"], cwd=self.path)
-        subprocess.run(["git", "commit", "-am", commit_message], cwd=self.path)
-
     def display(self):
         logg.info(self.name)
         for line in tree(self.path):
@@ -171,6 +219,12 @@ class GeneralTemplate(ABC):
                 "POETRY_VIRTUALENVS_CREATE": "false",
             },
         )
+
+    def _run(self, commands: list[str]):
+        """
+        Simple command run in template root directory.
+        """
+        subprocess.run(commands, cwd=self.path)
 
     @property
     def venv(self) -> Path:

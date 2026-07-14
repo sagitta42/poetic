@@ -27,7 +27,7 @@ def main():
         raise NotImplementedError
 
     template = template_class(args.name)
-    template.setup()
+    template.init()
 
 
 main()
