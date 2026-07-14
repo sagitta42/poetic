@@ -12,6 +12,7 @@ def main():
     parser.add_argument(
         "--api", action="store_true", help="Initialize API service template"
     )
+    parser.add_argument("--update", action="store_true", help="Update existing package")
     args = parser.parse_args()
 
     if (not args.package and not args.api) or (args.package and args.api):
@@ -27,7 +28,7 @@ def main():
         raise NotImplementedError
 
     template = template_class(args.name)
-    template.init()
+    template.update() if args.update else template.init()
 
 
 main()
