@@ -11,7 +11,7 @@ from poetic.logger import logg
 from poetic.tree import tree
 
 
-class GeneralTemplate(ABC):
+class Template(ABC):
     _TYPE: str
 
     def __init__(self, name: str) -> None:

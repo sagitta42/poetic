@@ -1,33 +1,23 @@
 import argparse
-from poetic.api import APITemplate
-from poetic.package import PackageTemplate
+from poetic.builder import TemplateBuilder, TemplateType
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("name", type=str)
     parser.add_argument(
-        "--package", action="store_true", help="Initialize package template"
-    )
-    parser.add_argument(
-        "--api", action="store_true", help="Initialize API service template"
+        "--type",
+        type=str,
+        default=TemplateType.package,
+        help="Template type",
+        choices=TemplateType.values(),
     )
     parser.add_argument("--update", action="store_true", help="Update existing package")
     args = parser.parse_args()
 
-    if (not args.package and not args.api) or (args.package and args.api):
-        parser.error(
-            "Provide either --package or --api flag for the type of poetic init"
-        )
+    template_builder = TemplateBuilder()
+    template = template_builder.build(args.name, args.type)
 
-    if args.package:
-        template_class = PackageTemplate
-    elif args.api:
-        template_class = APITemplate
-    else:
-        raise NotImplementedError
-
-    template = template_class(args.name)
     template.update() if args.update else template.init()
 
 

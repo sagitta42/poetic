@@ -2,10 +2,10 @@ import os
 from pathlib import Path
 import shutil
 
-from poetic.general import GeneralTemplate
+from poetic.base import Template
 
 
-class PackageTemplate(GeneralTemplate):
+class PackageTemplate(Template):
     _TYPE: str = "package"
 
     def __init__(self, name: str) -> None:

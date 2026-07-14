@@ -2,11 +2,11 @@ import os
 import subprocess
 import yaml
 
-from poetic.general import GeneralTemplate
+from poetic.base import Template
 from poetic.pyproject_handler import PyProjectHandler
 
 
-class APITemplate(GeneralTemplate):
+class APITemplate(Template):
     _TYPE: str = "api"
 
     def poetry_init(self):

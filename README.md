@@ -13,43 +13,14 @@ pip install git+https://github.com/sagitta42/poetic.git
 ### Command line
 
 ```python
-$ python -m poetic <package-name> --<package-type> [--update]
+$ python -m poetic <package-name> --type <package-type> [--update]
 ```
 
-Available package type flags:
-- `--package` to create a package template
-- `--api` to create an API template
+Available package types:
+- `package` to create a package template (default)
+- `api` to create an API template
 
-Add `--update` flag to update existing poetic-made package repository after a poetic update.
-
-### Update
-
-On the first update, will create a branch dedicated to poetic updates starting from the first commit.
-
-```bash
-$ git branch
-  dev-poetic-update
-* main
-```
-
-The standard setup is run in the update branch, and the differences/additions are committed and merged with the active branch.
-
-```bash
-commit cac874d5f2cf07199f00890c4d4cefbb57d3206b (HEAD -> main)
-Merge: a01eefc b4bb541
-    Merge branch 'dev-poetic-update'
-
-commit b4bb54109bf78b85618566c3df082128a3f93dd8 (dev-poetic-update)
-    poetic update
-    commit: d68f600af54ae2410557d19a5f72b09ed63aadbe
-    message: <last poetic commit message>
-
-commit a01eefcfe8fff4372c9ad337d40e9ad991b32f9d
-    readme update
-
-commit d68f600af54ae2410557d19a5f72b09ed63aadbe
-    template made with poetic
-```
+Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update.
 
 ### In code
 
@@ -125,4 +96,33 @@ awesome-api
 ├── pyproject.toml
 ├── README.md
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev); fastapi, pydantic, pydantic-settings, uvicorn
+```
+
+### Update
+
+On the first update, will create a branch dedicated to poetic updates starting from the first commit.
+
+```bash
+$ git branch
+  dev-poetic-update
+* main
+```
+
+The standard setup is run in the update branch, and the differences/additions are committed and merged with the active branch.
+
+```bash
+commit cac874d5f2cf07199f00890c4d4cefbb57d3206b (HEAD -> main)
+Merge: a01eefc b4bb541
+    Merge branch 'dev-poetic-update'
+
+commit b4bb54109bf78b85618566c3df082128a3f93dd8 (dev-poetic-update)
+    poetic update
+    commit: d68f600af54ae2410557d19a5f72b09ed63aadbe
+    message: <last poetic commit message>
+
+commit a01eefcfe8fff4372c9ad337d40e9ad991b32f9d
+    readme update
+
+commit d68f600af54ae2410557d19a5f72b09ed63aadbe
+    template made with poetic
 ```
