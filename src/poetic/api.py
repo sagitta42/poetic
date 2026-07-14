@@ -1,6 +1,6 @@
 import os
 import subprocess
-
+import yaml
 
 from poetic.general import GeneralTemplate
 from poetic.pyproject_handler import PyProjectHandler
@@ -50,15 +50,15 @@ class APITemplate(GeneralTemplate):
         self._setup_subfolders()
 
         self._copy_template("config.py")
-        self._copy_template("main.py")
-        self._copy_template("docker-compose.yml")
 
         package_filename = "dummy.py"
+
         self._copy_template(
             "core.py",
             path_in_package=self.path / "core",
             package_filename=package_filename,
         )
+
         path_to_app = self.path / "app"
         self._copy_template(
             "service.py",
@@ -70,6 +70,7 @@ class APITemplate(GeneralTemplate):
             path_in_package=path_to_app / "schemas",
             package_filename=package_filename,
         )
+
         path_to_api = path_to_app / "api"
         self._copy_template(
             "route.py",
@@ -77,6 +78,9 @@ class APITemplate(GeneralTemplate):
             package_filename=package_filename,
         )
         self._copy_template("router.py", path_in_package=path_to_api)
+
+        self._copy_template("main.py")
+        self._setup_docker_compose()
 
     def _setup_subfolders(self):
         """
@@ -93,3 +97,19 @@ class APITemplate(GeneralTemplate):
             os.makedirs(self.path / "app" / app_subfolder, exist_ok=True)
 
         os.makedirs(self.path / "app" / "api" / "routes", exist_ok=True)
+
+    def _setup_docker_compose(self):
+        """
+        Set up docker compose.
+
+        Copy template and update app name.
+        """
+        path_to_yml = self._copy_template("docker-compose.yml", generic=False)
+
+        with open(path_to_yml) as f:
+            yml_info = yaml.safe_load(f)
+
+        yml_info["api"]["environment"]["APP_NAME"] = self.name
+
+        with open(path_to_yml, "w"):
+            yaml.dump(yml_info, f)

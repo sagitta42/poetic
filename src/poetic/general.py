@@ -189,7 +189,7 @@ class GeneralTemplate(ABC):
         path_in_package: Path | None = None,
         package_filename: str | None = None,
         generic: bool = False,
-    ):
+    ) -> Path:
         """
         Copy template into package source code.
 
@@ -197,18 +197,18 @@ class GeneralTemplate(ABC):
         generic (bool): template is generic (independent of setup type)
         path_in_package (Path | None): path where to copy in package; default = root path
         package_filename (str | None): filename of template in package; default = same as original template
+
+        Returns path to file in package.
         """
+        path_to_template = self._get_template_path(template_filename, generic)
+
         path_in_package = path_in_package or self.path
         package_filename = package_filename or template_filename
+        path_to_package_file = path_in_package / package_filename
 
-        path_to_templates = (
-            self._path_to_templates if generic else self._path_to_type_templates
-        )
+        shutil.copy(path_to_template, path_to_package_file)
 
-        shutil.copy(
-            path_to_templates / template_filename,
-            path_in_package / package_filename,
-        )
+        return path_to_package_file
 
     def _poetry_add(self, package: str, group: str | None = None):
         args = ["poetry", "add"]
@@ -227,11 +227,15 @@ class GeneralTemplate(ABC):
             },
         )
 
-    def _run(self, commands: list[str]):
+    def _get_template_path(self, template_filename: str, generic: bool) -> Path:
         """
-        Simple command run in template root directory.
+        Get path given template.
         """
-        subprocess.run(commands, cwd=self.path)
+        path_to_templates = (
+            self._path_to_templates if generic else self._path_to_type_templates
+        )
+        ret = path_to_templates / template_filename
+        return ret
 
     @property
     def venv(self) -> Path:
