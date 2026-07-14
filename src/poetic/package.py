@@ -4,11 +4,11 @@ import shutil
 import subprocess
 import venv
 
-from poetic.general import GeneralSetup
+from poetic.general import GeneralTemplate
 from poetic.logger import logg
 
 
-class PackageSetup(GeneralSetup):
+class PackageTemplate(GeneralTemplate):
     _TYPE: str = "package"
 
     def __init__(self, name: str) -> None:
@@ -34,14 +34,20 @@ class PackageSetup(GeneralSetup):
 
         self._create_source_file("py.typed")
 
+    def setup_extra(self):
+        """
+        Additional setup.
+        """
+        self.setup_tests()
+        self.setup_logger()
+
     def setup_tests(self):
         """
         Set up tests.
 
         Create conftest.py that allows testing in dev mode without installing the package.
         Create dummy test corresponding to the dummy source file.
-        Add pytest to package.
-        Set up VSCode Testing suite.
+        Add pytest as dev dependency.
         """
         path_to_tests: Path = self.path / "tests"
 
@@ -55,32 +61,10 @@ class PackageSetup(GeneralSetup):
 
         self._poetry_add("pytest", "dev")
 
-    def setup_vscode(self):
-        path_to_vscode = self.path / ".vscode"
-        os.mkdir(path_to_vscode)
-        self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
-        self._copy_template("VSCode.launch.json", path_to_vscode, "launch.json")
-
     def setup_logger(self):
         shutil.copy(
             self._path_to_resources / "logger.py", self._path_to_src / "logger.py"
         )
-
-    def init_commit(self):
-        subprocess.run(["git", "init"], cwd=self.path)
-        stuff_to_commit = [
-            "README.md",
-            "src/",
-            ".vscode/",
-            ".gitignore",
-            ".env.template",
-            "pyproject.toml",
-            "tests/",
-        ]
-        for stuff in stuff_to_commit:
-            stuff_to_add = f"{stuff}*" if stuff.endswith("/") else stuff
-            subprocess.run(["git", "add", stuff_to_add], cwd=self.path)
-        subprocess.run(["git", "commit", "-am", "template"], cwd=self.path)
 
     def _create_source_file(self, filepath: str | Path):
         """

@@ -1,5 +1,6 @@
 import argparse
-from poetic.core import setup_api_template, setup_package_template
+from poetic.api import APITemplate
+from poetic.package import PackageTemplate
 
 
 def main():
@@ -19,11 +20,14 @@ def main():
         )
 
     if args.package:
-        setup_package_template(args.name)
+        template_class = PackageTemplate
     elif args.api:
-        setup_api_template(args.name)
+        template_class = APITemplate
     else:
         raise NotImplementedError
+
+    template = template_class(args.name)
+    template.setup()
 
 
 main()

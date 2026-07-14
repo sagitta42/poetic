@@ -2,11 +2,11 @@ import os
 import subprocess
 
 
-from poetic.general import GeneralSetup
+from poetic.general import GeneralTemplate
 from poetic.pyproject_handler import PyProjectHandler
 
 
-class APISetup(GeneralSetup):
+class APITemplate(GeneralTemplate):
     _TYPE: str = "api"
 
     def __init__(self, name: str) -> None:
@@ -38,7 +38,7 @@ class APISetup(GeneralSetup):
         self._poetry_add("pydantic")
         self._poetry_add("uvicorn")
 
-    def setup_subfolders(self):
+    def _setup_subfolders(self):
         """
         Set up subfolders.
 
@@ -58,6 +58,8 @@ class APISetup(GeneralSetup):
         """
         Set up dummy source files
         """
+        self._setup_subfolders()
+
         package_filename = "dummy.py"
         self._copy_template(
             "core.py",

@@ -10,7 +10,7 @@ from poetic.logger import logg
 from poetic.tree import tree
 
 
-class GeneralSetup(ABC):
+class GeneralTemplate(ABC):
     _TYPE: str
 
     def __init__(self, name: str) -> None:
@@ -23,6 +23,18 @@ class GeneralSetup(ABC):
         self._path_to_type_templates = self._path_to_templates / self._TYPE
 
         logg.info(f"Setting up {self._TYPE}: {self.name}")
+
+    def setup(self):
+        self.setup_gitignore()
+        self.setup_dotenv_template()
+        self.setup_dependencies()
+        self.setup_source_files()
+        self.setup_vscode()
+
+        self.setup_extra()
+
+        self.init_commit("template made with poetic")
+        self.display()
 
     def setup_dependencies(self):
         self._poetry_add("dotenv")
@@ -41,6 +53,29 @@ class GeneralSetup(ABC):
         Set up .env.template
         """
         self._copy_template(".env.template")
+
+    def setup_vscode(self):
+        path_to_vscode = self.path / ".vscode"
+        os.mkdir(path_to_vscode)
+        self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
+        self._copy_template("VSCode.launch.json", path_to_vscode, "launch.json")
+
+    def setup_extra(self):
+        """
+        Additional setup.
+        """
+        pass
+
+    def setup_logging(self):
+        """ """
+
+    def init_commit(self, commit_message: str):
+        """
+        Make initial commit for the created template.
+        """
+        subprocess.run(["git", "init"], cwd=self.path)
+        subprocess.run(["git", "add", "*"], cwd=self.path)
+        subprocess.run(["git", "commit", "-am", commit_message], cwd=self.path)
 
     def display(self):
         logg.info(self.name)
