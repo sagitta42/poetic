@@ -58,10 +58,14 @@ class GeneralTemplate(ABC):
         Merge dev-poetic-update.
         """
         current_branch = self._git_template.get_active_branch()
+        logg.info(f"Active branch: {current_branch}")
         update_branch = "dev-poetic-update"
 
         if not self._git_template.branch_exists(update_branch):
             first_commit = self._git_template.get_first_commit()
+            logg.info(
+                f"Creating {update_branch} starting from first commit {first_commit}"
+            )
             self._git_template.run("branch", update_branch, first_commit)
 
         self._git_template.run("switch", update_branch)

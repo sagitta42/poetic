@@ -2,6 +2,8 @@ from pathlib import Path
 import subprocess
 from typing import Callable
 
+from poetic.logger import logg
+
 
 class Git:
     """
@@ -102,5 +104,6 @@ class Git:
         return ret
 
     def _run_subprocess(self, subprocess_func: Callable, *args, **kwargs) -> str | None:
+        logg.debug(args)
         ret = subprocess_func(["git"] + list(args), cwd=self.path, **kwargs)
         return ret
