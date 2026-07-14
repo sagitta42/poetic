@@ -154,7 +154,7 @@ class GeneralTemplate(ABC):
         Add a made with poetic line.
         """
         title = f"# {self.name}"
-        readme_lines = [title + "\n"]
+        readme_lines = [title + "\n\n"]
         readme_template_path = self._path_to_type_templates / "README.md"
         if readme_template_path.exists():
             with open(readme_template_path) as f:

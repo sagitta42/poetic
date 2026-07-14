@@ -119,6 +119,7 @@ awesome-api
 ├── .gitignore  # standard comprehensive Python .gitignore
 ├── .env.template
 ├── config.py # app info and settings
+├── docker-compose.yml # API service
 ├── main.py # main API launcher
 ├── poetry.lock
 ├── pyproject.toml

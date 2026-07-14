@@ -109,7 +109,7 @@ class APITemplate(GeneralTemplate):
         with open(path_to_yml) as f:
             yml_info = yaml.safe_load(f)
 
-        yml_info["api"]["environment"]["APP_NAME"] = self.name
+        yml_info["services"]["api"]["environment"]["APP_NAME"] = self.name
 
-        with open(path_to_yml, "w"):
+        with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
