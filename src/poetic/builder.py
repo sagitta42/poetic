@@ -1,5 +1,6 @@
 import enum
-from tempfile import template
+from typing import Any
+from pydantic import BaseModel, Field
 
 from poetic.api import APITemplate
 from poetic.base import Template
@@ -24,13 +25,34 @@ class TemplateClass(enum.Enum):
         return cls[template_type.name]
 
 
+class TemplateSettings(BaseModel):
+    name: str = Field(description="Package name")
+    type: TemplateType = Field(
+        default=TemplateType.package, description="Template type"
+    )
+
+    @classmethod
+    def description(cls, field_name: str) -> str:
+        ret = cls.model_fields[field_name].description
+        assert ret is not None
+        return ret
+
+    @classmethod
+    def default(cls, field_name: str) -> Any:
+        ret = cls.model_fields[field_name].default
+        return ret
+
+    @classmethod
+    def options(cls, field_name: str) -> list | None:
+        field_type = cls.model_fields[field_name].annotation
+        assert field_type is not None
+        if issubclass(field_type, enum.Enum):
+            return [item.value for item in field_type]
+        return None
+
 class TemplateBuilder:
-    def build(
-        self,
-        name: str,
-        template_type: TemplateType,
-    ) -> Template:
-        template_type = TemplateType(template_type)
+    def build(self, settings: TemplateSettings) -> Template:
+        template_type = TemplateType(settings.type)
         template_class = TemplateClass.from_template_type(template_type).value
-        ret = template_class(name)
+        ret = template_class(settings.name)
         return ret
