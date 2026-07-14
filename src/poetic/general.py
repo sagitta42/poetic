@@ -30,6 +30,7 @@ class GeneralTemplate(ABC):
         self.setup_dependencies()
         self.setup_source_files()
         self.setup_vscode()
+        self.setup_readme()
 
         self.setup_extra()
 
@@ -66,14 +67,37 @@ class GeneralTemplate(ABC):
             "VSCode.launch.json", path_to_vscode, "launch.json", generic=True
         )
 
+    def setup_readme(self):
+        """
+        Set up README.md
+
+        Use package name as title.
+        Include template if exists
+        Add a made with poetic line.
+        """
+        title = f"# {self.name}"
+        readme_lines = [title + "\n"]
+        readme_template_path = self._path_to_type_templates / "README.md"
+        if readme_template_path.exists():
+            with open(readme_template_path) as f:
+                readme_lines += f.readlines()
+
+        poetic_lines = []
+        poetic_lines.append("\n-----\n")
+        poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
+        poetic_lines.append(f"*Made with {poetic_link}*\n")
+
+        readme_lines += poetic_lines
+
+        path_to_readme = self.path / "README.md"
+        with open(path_to_readme, "w") as f:
+            f.writelines(readme_lines)
+
     def setup_extra(self):
         """
         Additional setup.
         """
         pass
-
-    def setup_logging(self):
-        """ """
 
     def init_commit(self, commit_message: str):
         """
@@ -142,7 +166,7 @@ class GeneralTemplate(ABC):
     @property
     def venv(self) -> Path:
         path_to_venv = self.path / "venv"
-        if not os.path.exists(path_to_venv):
+        if not path_to_venv.exists():
             venv.create(path_to_venv, with_pip=True)
             subprocess.run([path_to_venv / "bin" / "pip", "install", "poetry"])
         return path_to_venv
