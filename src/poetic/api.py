@@ -87,9 +87,9 @@ class APITemplate(GeneralTemplate):
         """
 
         for subfolder in ["app", "core"]:
-            os.mkdir(self.path / subfolder)
+            os.makedirs(self.path / subfolder, exist_ok=True)
 
         for app_subfolder in ["api", "schemas", "services"]:
-            os.mkdir(self.path / "app" / app_subfolder)
+            os.makedirs(self.path / "app" / app_subfolder, exist_ok=True)
 
-        os.mkdir(self.path / "app" / "api" / "routes")
+        os.makedirs(self.path / "app" / "api" / "routes", exist_ok=True)

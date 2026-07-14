@@ -117,7 +117,7 @@ class GeneralTemplate(ABC):
 
     def setup_vscode(self):
         path_to_vscode = self.path / ".vscode"
-        os.mkdir(path_to_vscode)
+        os.makedirs(path_to_vscode, exist_ok=True)
         self._copy_template(
             "VSCode.settings.json", path_to_vscode, "settings.json", generic=True
         )
