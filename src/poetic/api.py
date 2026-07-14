@@ -36,6 +36,7 @@ class APITemplate(GeneralTemplate):
 
         self._poetry_add("fastapi")
         self._poetry_add("pydantic")
+        self._poetry_add("pydantic_settings")
         self._poetry_add("uvicorn")
 
     def _setup_subfolders(self):
@@ -60,31 +61,30 @@ class APITemplate(GeneralTemplate):
         """
         self._setup_subfolders()
 
+        self._copy_template("config.py")
+        self._copy_template("main.py")
+
         package_filename = "dummy.py"
         self._copy_template(
             "core.py",
             path_in_package=self.path / "core",
             package_filename=package_filename,
-            generic=False,
         )
         path_to_app = self.path / "app"
         self._copy_template(
             "service.py",
             path_in_package=path_to_app / "services",
             package_filename=package_filename,
-            generic=False,
         )
         self._copy_template(
             "schemas.py",
             path_in_package=path_to_app / "schemas",
             package_filename=package_filename,
-            generic=False,
         )
         path_to_api = path_to_app / "api"
         self._copy_template(
             "route.py",
             path_in_package=path_to_api / "routes",
             package_filename=package_filename,
-            generic=False,
         )
-        self._copy_template("router.py", path_in_package=path_to_api, generic=False)
+        self._copy_template("router.py", path_in_package=path_to_api)

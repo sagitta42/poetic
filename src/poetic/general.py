@@ -46,19 +46,25 @@ class GeneralTemplate(ABC):
         Python .gitignore covering everything:
         https://github.com/github/gitignore/blob/main/Python.gitignore
         """
-        self._copy_template("Python.gitignore", package_filename=".gitignore")
+        self._copy_template(
+            "Python.gitignore", package_filename=".gitignore", generic=True
+        )
 
     def setup_dotenv_template(self):
         """
         Set up .env.template
         """
-        self._copy_template(".env.template")
+        self._copy_template(".env.template", generic=True)
 
     def setup_vscode(self):
         path_to_vscode = self.path / ".vscode"
         os.mkdir(path_to_vscode)
-        self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
-        self._copy_template("VSCode.launch.json", path_to_vscode, "launch.json")
+        self._copy_template(
+            "VSCode.settings.json", path_to_vscode, "settings.json", generic=True
+        )
+        self._copy_template(
+            "VSCode.launch.json", path_to_vscode, "launch.json", generic=True
+        )
 
     def setup_extra(self):
         """
@@ -94,7 +100,7 @@ class GeneralTemplate(ABC):
         template_filename: str,
         path_in_package: Path | None = None,
         package_filename: str | None = None,
-        generic: bool = True,
+        generic: bool = False,
     ):
         """
         Copy template into package source code.
