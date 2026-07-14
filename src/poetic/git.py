@@ -20,7 +20,7 @@ class Git:
         check (bool): check and return command output
         """
         action = self._get_command_output if check else self._run_command
-        ret = action(args)
+        ret = action(*args)
         return ret
 
     def get_active_branch(self) -> str:
