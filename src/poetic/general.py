@@ -23,6 +23,8 @@ class GeneralTemplate(ABC):
         self._path_to_templates = self._path_to_resources / "templates"
         self._path_to_type_templates = self._path_to_templates / self._TYPE
 
+        self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
+
         self._git_auto = Git(self._path_to_resources.parent.parent)
         self._git_template = Git(self.path)
 
@@ -40,7 +42,7 @@ class GeneralTemplate(ABC):
         self.setup()
 
         self._git_template.run("init")
-        self._git_template.commit_all("template made with poetic")
+        self._git_template.commit_all(f"template made with {self._poetic_link}")
 
         self.display()
 
@@ -77,7 +79,7 @@ class GeneralTemplate(ABC):
             last_poetic_commit
         )
         self._git_template.commit_all(
-            f"poetic update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
+            f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
         )
 
         self._git_template.run("switch", current_branch)
@@ -146,8 +148,7 @@ class GeneralTemplate(ABC):
 
         poetic_lines = []
         poetic_lines.append("\n-----\n")
-        poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
-        poetic_lines.append(f"*Made with {poetic_link}*\n")
+        poetic_lines.append(f"*Made with {self._poetic_link}*\n")
 
         readme_lines += poetic_lines
 
