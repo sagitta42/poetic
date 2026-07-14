@@ -74,13 +74,15 @@ class GeneralTemplate(ABC):
 
         self.setup()
 
-        last_poetic_commit = self._git_auto.get_last_commit()
-        last_poetic_commit_message = self._git_auto.get_commit_message(
-            last_poetic_commit
-        )
-        self._git_template.commit_all(
-            f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
-        )
+        # FIXME: correctly get poetic commits
+        # last_poetic_commit = self._git_auto.get_last_commit()
+        # last_poetic_commit_message = self._git_auto.get_commit_message(
+        # last_poetic_commit
+        # )
+        # message = f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
+
+        message = f"{self._poetic_link} update"
+        self._git_template.commit_all(message)
 
         self._git_template.run("switch", current_branch)
         self._git_template.run("merge", update_branch)
