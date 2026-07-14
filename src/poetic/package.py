@@ -3,13 +3,13 @@ from pathlib import Path
 import shutil
 
 from poetic.base import Template
+from poetic.settings import TemplateSettings
 
 
 class PackageTemplate(Template):
-    _TYPE: str = "package"
 
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
+    def __init__(self, settings: TemplateSettings) -> None:
+        super().__init__(settings)
 
         self._path_to_src: Path = self.path / "src" / self._inner_name
 

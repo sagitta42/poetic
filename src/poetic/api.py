@@ -3,11 +3,19 @@ import subprocess
 import yaml
 
 from poetic.base import Template
+from poetic.logger import logg
 from poetic.pyproject_handler import PyProjectHandler
+from poetic.settings import APITemplateSettings
 
 
-class APITemplate(Template):
-    _TYPE: str = "api"
+class APITemplate(Template[APITemplateSettings]):
+    def __init__(self, settings: APITemplateSettings) -> None:
+        super().__init__(settings)
+
+        if settings.db:
+            logg.warning(
+                "DB functionalities not implemented yet; ignoring", important=True
+            )
 
     def poetry_init(self):
         """

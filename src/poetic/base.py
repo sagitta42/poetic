@@ -4,31 +4,35 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+from typing import Generic, TypeVar
 import venv
 
 from poetic.git import Git
 from poetic.logger import logg
+from poetic.settings import TemplateSettings
 from poetic.tree import tree
 
+T_Settings = TypeVar("T_Settings", bound=TemplateSettings)
 
-class Template(ABC):
-    _TYPE: str
 
-    def __init__(self, name: str) -> None:
-        self.name = name
+class Template(Generic[T_Settings]):
+    def __init__(self, settings: T_Settings) -> None:
+        self.name = settings.name
+        self._type: str = settings.type.value
+
         self._inner_name = self.name.replace("-", "_")
         self.path = Path(self.name)
 
         self._path_to_resources = Path(resources.files(__package__).__str__())
         self._path_to_templates = self._path_to_resources / "templates"
-        self._path_to_type_templates = self._path_to_templates / self._TYPE
+        self._path_to_type_templates = self._path_to_templates / self._type
 
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
         self._git_auto = Git(self._path_to_resources.parent.parent)
         self._git_template = Git(self.path)
 
-        logg.info(f"Setting up {self._TYPE}: {self.name}")
+        logg.info(f"Setting up {self._type}: {self.name}")
 
     def init(self):
         """
