@@ -13,12 +13,18 @@ pip install git+https://github.com/sagitta42/poetic.git
 ### Command line
 
 ```python
-$ python -m poetic <package-name> --<flag>
+$ python -m poetic <package-name> --<package-type> [--update]
 ```
 
-Available flags:
+Available package type flags:
 - `--package` to create a package template
 - `--api` to create an API template
+
+Add `--update` flag to update existing poetic-made package repository after a poetic update.
+
+On the first update, will create a branch dedicated to poetic updates starting from the first commit.
+
+The standard setup is run in the update branch, and the differences/additions are committed and merged with the active branch.
 
 ### In code
 
@@ -28,10 +34,12 @@ For package template:
 from poetic import PackageTemplate
 
 package_template = PackageTemplate("awesome-package")
-package_template.setup()
+package_template.init()
 ```
 
 Use `APITemplate` instead for API template.
+
+Use `packge_template.update()` instead to update existing package.
 
 ## Examples
 
