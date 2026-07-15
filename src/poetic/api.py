@@ -113,9 +113,10 @@ class APITemplate(Template[APITemplateSettings]):
         Add alembic upgrade debugger configuration to launch.json
         """
         self._copy_template("alembic.ini.template", package_filename="alembic.ini")
-        path_to_alembic = self.path / "alembic"
+        alembic_dir = "alembic_migrations"
+        path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
-            self._run(self.venv("alembic"), "init", "alembic", env=True)
+            self._run(self.venv("alembic"), "init", alembic_dir, env=True)
         self._copy_template("env.py", path_in_package=path_to_alembic)
 
         db_dir = Path("db")

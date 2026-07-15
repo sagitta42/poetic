@@ -78,7 +78,7 @@ awesome-api
 ├── .vscode
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...
-├── alembic
+├── alembic_migrations
 │   ├── script.py.mako
 │   ├── versions
 │   ├── env.py
