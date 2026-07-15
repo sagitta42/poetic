@@ -94,7 +94,7 @@ class APITemplate(Template[APITemplateSettings]):
         """
         Set up alembic migrations
         """
-        self._copy_template("alembic.ini.example", package_filename="alembic.ini")
+        self._copy_template("alembic.ini.template", package_filename="alembic.ini")
         self._run(self.venv("alembic"), "init", "alembic", env=True)
 
     def _setup_subfolders(self):
