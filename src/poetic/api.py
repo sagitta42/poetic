@@ -2,7 +2,6 @@ import os
 import yaml
 
 from poetic.base import Template
-from poetic.logger import logg
 from poetic.pyproject_handler import PyProjectHandler
 from poetic.settings import APITemplateSettings
 
@@ -11,7 +10,7 @@ class APITemplate(Template[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._db = settings.db
+        self._has_db = settings.db is not None
 
     def poetry_init(self):
         """
@@ -44,7 +43,7 @@ class APITemplate(Template[APITemplateSettings]):
         self._poetry_add("pydantic")
         self._poetry_add("pydantic_settings")
         self._poetry_add("uvicorn")
-        if self._db:
+        if self._has_db:
             self._poetry_add("alembic")
 
     def setup_source_files(self):
@@ -87,7 +86,7 @@ class APITemplate(Template[APITemplateSettings]):
         self._setup_docker_compose()
 
     def setup_extra(self):
-        if self._db:
+        if self._has_db:
             self.setup_alembic()
 
     def setup_alembic(self):

@@ -1,7 +1,7 @@
 import enum
 from typing import Any, Self
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from poetic.logger import logg
 
@@ -16,6 +16,8 @@ class TemplateType(str, enum.Enum):
 
 
 class TemplateSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str = Field(description="Package name")
     type: TemplateType = Field(
         default=TemplateType.package, description="Template type"
@@ -41,14 +43,20 @@ class TemplateSettings(BaseModel):
         return None
 
 
+class DBType(str, enum.Enum):
+    sqlite = "sqlite"
+
+
 class APITemplateSettings(TemplateSettings):
-    db: bool = Field(default=False, description="Create/update DB functionalities")
+    db: DBType | None = Field(
+        description="Create/update DB functionalities of given DB type"
+    )
 
     @model_validator(mode="after")
     def check_db(self) -> Self:
-        if self.db and self.type != TemplateType.api:
+        if self.db is not None and self.type != TemplateType.api:
             logg.warning(
-                f"DB functionalities not supported for {self.type.value} type; ignoring",
+                f"DB functionalities not supported for {self.type.value} template; ignoring",
                 important=True,
             )
         return self
