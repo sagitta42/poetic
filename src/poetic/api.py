@@ -106,18 +106,35 @@ class APITemplate(Template[APITemplateSettings]):
         Set up DB.
 
         Set up alembic migrations.
+        Set up alembic utils.
         If not present, initialize database of given type.
             Git add the initial file.
         Set DB path in .env template.
         Update .gitignore to not track the DB file.
         Add alembic upgrade debugger configuration to launch.json
         """
-        self._copy_template("alembic.ini.template", package_filename="alembic.ini")
+        template_subdir = "alembic"
+
+        self._copy_template(
+            "alembic.ini.template",
+            package_filename="alembic.ini",
+            template_subdir=template_subdir,
+        )
+
         alembic_dir = "alembic_migrations"
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
-        self._copy_template("env.py", path_in_package=path_to_alembic)
+        self._copy_template(
+            "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
+        )
+
+        for filename in ["models.py", "utils.py"]:
+            self._copy_template(
+                filename,
+                path_in_package=self.path / alembic_dir,
+                template_subdir=template_subdir,
+            )
 
         db_dir = Path("db")
         path_to_db = self.path / db_dir
@@ -182,7 +199,9 @@ class APITemplate(Template[APITemplateSettings]):
         with open(path_to_launch) as f:
             launch_dct = json.load(f)
 
-        path_to_config = self._get_template_path(template_filename, generic=False)
+        path_to_config = self._get_template_path(
+            template_filename, generic=False, template_subdir="alembic"
+        )
         with open(path_to_config) as f:
             config = json.load(f)
 

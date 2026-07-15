@@ -219,6 +219,7 @@ class Template(Generic[T_Settings]):
         template_filename: str,
         path_in_package: Path | None = None,
         package_filename: str | None = None,
+        template_subdir: Path | str | None = None,
         generic: bool = False,
     ) -> Path:
         """
@@ -231,7 +232,9 @@ class Template(Generic[T_Settings]):
 
         Returns path to file in package.
         """
-        path_to_template = self._get_template_path(template_filename, generic)
+        path_to_template = self._get_template_path(
+            template_filename, generic, template_subdir=template_subdir
+        )
 
         path_in_package = path_in_package or self.path
         package_filename = package_filename or template_filename
@@ -249,13 +252,18 @@ class Template(Generic[T_Settings]):
 
         self._run(*args, env=True)
 
-    def _get_template_path(self, template_filename: str, generic: bool) -> Path:
+    def _get_template_path(
+        self, template_filename: str, generic: bool, template_subdir: Path | str | None
+    ) -> Path:
         """
         Get path given template.
         """
         path_to_templates = (
             self._path_to_templates if generic else self._path_to_type_templates
         )
+        if template_subdir is not None:
+            path_to_templates = path_to_templates / template_subdir
+
         ret = path_to_templates / template_filename
         return ret
 
