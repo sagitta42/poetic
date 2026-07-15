@@ -130,7 +130,9 @@ class APITemplate(Template[APITemplateSettings]):
 
             self._git_template.run("add", db_dir / db_file)
 
-        add_new_line_to_file(self.path / ".env.template", f"DB_URL=sqlite:///{db_file}")
+        add_new_line_to_file(
+            self.path / ".env.template", f"DB_URL=sqlite:///{db_dir / db_file}"
+        )
         add_new_line_to_file(
             self.path / ".gitignore", f"{db_dir / db_file}\n", prepend=True
         )
