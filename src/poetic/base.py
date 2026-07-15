@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from importlib import resources
 import os
 from pathlib import Path
@@ -40,13 +40,15 @@ class Template(Generic[T_Settings]):
         Initial setup of the template.
 
         Initialize package with poetry.
+        Initialize git repository.
         Set up files.
         Make initial commit.
         """
         self.poetry_init()
+        self._git_template.run("init")
+
         self.setup()
 
-        self._git_template.run("init")
         self._git_template.commit_all(f"template made with {self._poetic_link}")
 
         self.display()

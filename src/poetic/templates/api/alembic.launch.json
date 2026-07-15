@@ -1,0 +1,10 @@
+{
+    "name": "Python Debugger: alembic",
+    "type": "debugpy",
+    "request": "launch",
+    "module": "alembic",
+    "args": [
+        "upgrade",
+        "+1"
+    ]
+}

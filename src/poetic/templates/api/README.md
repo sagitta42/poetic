@@ -16,8 +16,18 @@ poetry install --no-root
 uvicorn main:app --reload
 ```
 
-## alembic
+## DB
+
+SQLite: `db/db.db`
+
+### alembic
 
 ```bash
 $ alembic revision -m "comment"
+$ alembic upgrade +1
+$ alembic upgrade head
+$ alembic downgrade -1
+$ alembic downgrade base
 ```
+
+VSCode debug configuration included for `upgrade +1`

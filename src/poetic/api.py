@@ -1,16 +1,21 @@
+import json
 import os
+from pathlib import Path
+import sqlite3
 import yaml
 
 from poetic.base import Template
 from poetic.pyproject_handler import PyProjectHandler
-from poetic.settings import APITemplateSettings
+from poetic.settings import APITemplateSettings, DBType
+from poetic.utils import add_new_line_to_file
 
 
 class APITemplate(Template[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._has_db = settings.db is not None
+        self._db = settings.db
+        self._has_db = self._db is not None
 
     def poetry_init(self):
         """
@@ -83,19 +88,53 @@ class APITemplate(Template[APITemplateSettings]):
         self._copy_template("router.py", path_in_package=path_to_api)
 
         self._copy_template("main.py")
-        self._setup_docker_compose()
 
     def setup_extra(self):
-        if self._has_db:
-            self.setup_alembic()
-
-    def setup_alembic(self):
         """
-        Set up alembic migrations
+        Additional setup.
+
+        Set up docker compose file.
+        Set up alembic migrations and DB if requested.
+        """
+        self._setup_docker_compose()
+
+        if self._has_db:
+            self.setup_db()
+
+    def setup_db(self):
+        """
+        Set up DB.
+
+        Set up alembic migrations.
+        If not present, initialize database of given type.
+            Git add the initial file.
+        Set DB path in .env template.
+        Update .gitignore to not track the DB file.
+        Add alembic upgrade debugger configuration to launch.json
         """
         self._copy_template("alembic.ini.template", package_filename="alembic.ini")
-        if not os.path.exists("alembic"):
+        path_to_alembic = self.path / "alembic"
+        if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", "alembic", env=True)
+        self._copy_template("env.py", path_in_package=path_to_alembic)
+
+        db_dir = Path("db")
+        path_to_db = self.path / db_dir
+        db_file = "db.db"
+        if self._db == DBType.sqlite and not os.path.exists(path_to_db):
+            os.mkdir(path_to_db)
+
+            conn = sqlite3.connect(path_to_db / db_file)
+            conn.close()
+
+            self._git_template.run("add", db_dir / db_file)
+
+        add_new_line_to_file(self.path / ".env.template", f"DB_URL=sqlite:///{db_file}")
+        add_new_line_to_file(
+            self.path / ".gitignore", f"{db_dir / db_file}\n", prepend=True
+        )
+
+        self._add_vscode_launch_configuration("alembic.launch.json")
 
     def _setup_subfolders(self):
         """
@@ -128,3 +167,23 @@ class APITemplate(Template[APITemplateSettings]):
 
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
+
+    def _add_vscode_launch_configuration(self, template_filename: str):
+        """
+        Add configuration to VSCode launch.json contained in given template.
+        """
+        path_to_launch = self.path / ".vscode" / "launch.json"
+        if not path_to_launch.exists():
+            return
+
+        with open(path_to_launch) as f:
+            launch_dct = json.load(f)
+
+        path_to_config = self._get_template_path(template_filename, generic=False)
+        with open(path_to_config) as f:
+            config = json.load(f)
+
+        launch_dct["configurations"].append(config)
+
+        with open(path_to_launch, "w") as f:
+            json.dump(launch_dct, f, indent=4)
