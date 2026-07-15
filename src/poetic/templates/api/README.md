@@ -15,3 +15,9 @@ source venv/bin/activate
 poetry install --no-root
 uvicorn main:app --reload
 ```
+
+## alembic
+
+```bash
+$ alembic revision -m "comment"
+```

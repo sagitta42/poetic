@@ -13,12 +13,14 @@ pip install git+https://github.com/sagitta42/poetic.git
 ### Command line
 
 ```python
-$ python -m poetic <package-name> --type <package-type> [--update]
+$ python -m poetic <package-name> --type <package-type> [--update] [--db]
 ```
 
 Available package types:
 - `package` to create a package template (default)
 - `api` to create an API template
+
+Add `--db` flag to set up `alembic` migrations (applies to `api` template type only)
 
 Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update.
 
@@ -67,7 +69,7 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-### `python -m poetic awesome-api --api`
+### `python -m poetic awesome-api --api --db`
 
 Result
 
@@ -76,6 +78,11 @@ awesome-api
 ├── .vscode
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...
+├── alembic
+│   ├── script.py.mako
+│   ├── versions
+│   ├── env.py
+│   └── README
 ├── app
 │   ├── services
 │   │   └── dummy.py # dummy service using dummy core logic
@@ -89,6 +96,7 @@ awesome-api
 │   └── dummy.py # dummy core logic
 ├── .gitignore  # standard comprehensive Python .gitignore
 ├── .env.template
+├── alembic.ini
 ├── config.py # app info and settings
 ├── docker-compose.yml # API service
 ├── main.py # main API launcher
