@@ -1,5 +1,4 @@
 import os
-import subprocess
 import yaml
 
 from poetic.base import Template
@@ -12,10 +11,7 @@ class APITemplate(Template[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        if settings.db:
-            logg.warning(
-                "DB functionalities not implemented yet; ignoring", important=True
-            )
+        self._db = settings.db
 
     def poetry_init(self):
         """
@@ -25,17 +21,15 @@ class APITemplate(Template[APITemplateSettings]):
         Disable package mode.
         """
         os.mkdir(self.name)
-        subprocess.run(
-            [
-                "poetry",
-                "init",
-                "--no-interaction",
-                "--name",
-                self.name,
-                "--description",
-                "",
-            ],
-            cwd=self.name,
+
+        self._run(
+            "poetry",
+            "init",
+            "--no-interaction",
+            "--name",
+            self.name,
+            "--description",
+            "",
         )
 
         pyproject_handler = PyProjectHandler(self.path)
@@ -50,6 +44,8 @@ class APITemplate(Template[APITemplateSettings]):
         self._poetry_add("pydantic")
         self._poetry_add("pydantic_settings")
         self._poetry_add("uvicorn")
+        if self._db:
+            self._poetry_add("alembic")
 
     def setup_source_files(self):
         """
@@ -89,6 +85,17 @@ class APITemplate(Template[APITemplateSettings]):
 
         self._copy_template("main.py")
         self._setup_docker_compose()
+
+    def setup_extra(self):
+        if self._db:
+            self.setup_alembic()
+
+    def setup_alembic(self):
+        """
+        Set up alembic migrations
+        """
+        self._copy_template("alembic.ini.example", package_filename="alembic.ini")
+        self._run(self.venv("alembic"), "init", "alembic", env=True)
 
     def _setup_subfolders(self):
         """

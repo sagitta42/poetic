@@ -22,6 +22,7 @@ class Template(Generic[T_Settings]):
 
         self._inner_name = self.name.replace("-", "_")
         self.path = Path(self.name)
+        self._path_to_venv = (self.path / "venv").resolve()
 
         self._path_to_resources = Path(resources.files(__package__).__str__())
         self._path_to_templates = self._path_to_resources / "templates"
@@ -112,12 +113,24 @@ class Template(Generic[T_Settings]):
         """
         self.setup_gitignore()
         self.setup_dotenv_template()
+        self.setup_venv()
         self.setup_dependencies()
         self.setup_source_files()
         self.setup_vscode()
         self.setup_readme()
 
         self.setup_extra()
+
+    def setup_venv(self):
+        """
+        Set up venv.
+
+        Create venv.
+        Install poetry into that venv.
+        """
+        if not self._path_to_venv.exists():
+            venv.create(self._path_to_venv, with_pip=True)
+        self._run(self.venv("pip"), "install", "poetry", env=True)
 
     def setup_dependencies(self):
         self._poetry_add("dotenv")
@@ -227,21 +240,12 @@ class Template(Generic[T_Settings]):
         return path_to_package_file
 
     def _poetry_add(self, package: str, group: str | None = None):
-        args = ["poetry", "add"]
+        args = [self.venv("poetry"), "add"]
         if group is not None:
             args += ["--group", group]
         args.append(package)
-        args.append("--lock")
 
-        subprocess.run(
-            args,
-            cwd=self.path,
-            env={
-                **os.environ,
-                "PATH": str(self.venv / "bin") + ":" + os.environ["PATH"],
-                "POETRY_VIRTUALENVS_CREATE": "false",
-            },
-        )
+        self._run(*args, env=True)
 
     def _get_template_path(self, template_filename: str, generic: bool) -> Path:
         """
@@ -253,10 +257,24 @@ class Template(Generic[T_Settings]):
         ret = path_to_templates / template_filename
         return ret
 
-    @property
-    def venv(self) -> Path:
-        path_to_venv = self.path / "venv"
-        if not path_to_venv.exists():
-            venv.create(path_to_venv, with_pip=True)
-            subprocess.run([path_to_venv / "bin" / "pip", "install", "poetry"])
-        return path_to_venv
+    def _run(self, *args, env: bool = False):
+        """
+        Run command in template root directory.
+        """
+        subprocess.run(
+            args,
+            cwd=self.path,
+            env=(
+                {
+                    **os.environ,
+                    "POETRY_VIRTUALENVS_CREATE": "false",
+                    "VIRTUAL_ENV": self._path_to_venv,
+                }
+                if env
+                else None
+            ),
+        )
+
+    def venv(self, exe: str) -> Path:
+        ret = self._path_to_venv / "bin" / exe
+        return ret

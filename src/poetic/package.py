@@ -3,12 +3,17 @@ from pathlib import Path
 import shutil
 
 from poetic.base import Template
-from poetic.settings import TemplateSettings
+from poetic.settings import TemplateSettings, TemplateType
 
 
 class PackageTemplate(Template):
 
-    def __init__(self, settings: TemplateSettings) -> None:
+    def __init__(self, init: TemplateSettings | str) -> None:
+        settings = (
+            init
+            if isinstance(init, TemplateSettings)
+            else TemplateSettings(name=init, type=TemplateType.package)
+        )
         super().__init__(settings)
 
         self._path_to_src: Path = self.path / "src" / self._inner_name
@@ -38,6 +43,11 @@ class PackageTemplate(Template):
 
         self._create_source_file("py.typed")
 
+    def setup_dependencies(self):
+        super().setup_dependencies()
+
+        self._poetry_add("pytest", "dev")
+
     def setup_extra(self):
         """
         Additional setup.
@@ -62,8 +72,6 @@ class PackageTemplate(Template):
         test_foo_lines[0] = test_foo_lines[0].replace("$PACKAGE", self._inner_name)
         with open(path_to_tests / "test_foo.py", "w") as f:
             f.writelines(test_foo_lines)
-
-        self._poetry_add("pytest", "dev")
 
     def setup_logger(self):
         shutil.copy(
