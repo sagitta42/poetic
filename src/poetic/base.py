@@ -15,7 +15,7 @@ from poetic.tree import tree
 T_Settings = TypeVar("T_Settings", bound=TemplateSettings)
 
 
-class Template(Generic[T_Settings]):
+class BaseTemplate(Generic[T_Settings]):
     def __init__(self, settings: T_Settings) -> None:
         self.name = settings.name
         self._type: str = settings.type.value
@@ -28,10 +28,10 @@ class Template(Generic[T_Settings]):
         self._path_to_templates = self._path_to_resources / "templates"
         self._path_to_type_templates = self._path_to_templates / self._type
 
-        self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
+        # self._git_auto = Git(self._path_to_resources.parent.parent)
+        self.git = Git(self.path)
 
-        self._git_auto = Git(self._path_to_resources.parent.parent)
-        self._git_template = Git(self.path)
+        self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
         logg.info(f"Setting up {self._type}: {self.name}")
 
@@ -43,29 +43,32 @@ class Template(Generic[T_Settings]):
         Initialize git repository.
         Set up files.
         Make initial commit.
+        Perform post-commit setup.
         """
         self.poetry_init()
-        self._git_template.run("init")
+        self.git.run("init")
 
         self.setup()
 
-        self._git_template.commit_all(f"template made with {self._poetic_link}")
+        self.git.commit_all(f"template made with {self._poetic_link}")
+
+        self.post_init_commit()
 
         self.display()
 
     def update(self):
         """
-        Update existing template.
+        (Safe) Update existing template.
 
         Attempt an update, switch to original branch in case of fail.
         """
-        current_branch = self._git_template.get_active_branch()
+        current_branch = self.git.get_active_branch()
         logg.info(f"Active branch: {current_branch}")
 
         try:
             self._update(current_branch)
         except Exception as e:
-            self._git_template.run("switch", current_branch)
+            self.git.run("switch", current_branch)
             raise e
 
     def _update(self, current_branch: str):
@@ -82,14 +85,14 @@ class Template(Generic[T_Settings]):
         Merge dev-poetic-update.
         """
         update_branch = "dev-poetic-update"
-        if not self._git_template.branch_exists(update_branch):
-            first_commit = self._git_template.get_first_commit()
+        if not self.git.branch_exists(update_branch):
+            first_commit = self.git.get_first_commit()
             logg.info(
                 f"Creating {update_branch} starting from first commit {first_commit}"
             )
-            self._git_template.run("branch", update_branch, first_commit)
+            self.git.run("branch", update_branch, first_commit)
 
-        self._git_template.run("switch", update_branch)
+        self.git.run("switch", update_branch)
 
         self.setup()
 
@@ -100,11 +103,11 @@ class Template(Generic[T_Settings]):
         # )
         # message = f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
 
-        message = f"{self._poetic_link} update"
-        self._git_template.commit_all(message)
+        message = f"updated with {self._poetic_link}"
+        self.git.commit_all(message)
 
-        self._git_template.run("switch", current_branch)
-        self._git_template.run("merge", update_branch)
+        self.git.run("switch", current_branch)
+        self.git.run("merge", update_branch)
 
     def setup(self):
         """
@@ -195,7 +198,16 @@ class Template(Generic[T_Settings]):
         """
         pass
 
+    def post_init_commit(self):
+        """
+        Actions to be done after the initial commit.
+        """
+        pass
+
     def display(self):
+        """
+        Display the template via tree.
+        """
         logg.info(self.name)
         for line in tree(self.path):
             logg.info(line)
@@ -245,6 +257,11 @@ class Template(Generic[T_Settings]):
         return path_to_package_file
 
     def _poetry_add(self, package: str, group: str | None = None):
+        """
+        Poetry add.
+
+        Invoke poetry add in template's venv to install added package while adding to pyproject.toml
+        """
         args = [self.venv("poetry"), "add"]
         if group is not None:
             args += ["--group", group]
@@ -286,5 +303,8 @@ class Template(Generic[T_Settings]):
         )
 
     def venv(self, exe: str) -> Path:
+        """
+        Get venv path to executable.
+        """
         ret = self._path_to_venv / "bin" / exe
         return ret

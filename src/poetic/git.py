@@ -12,8 +12,9 @@ class Git:
     Simple management utilizing subprocess.
     """
 
-    def __init__(self, path: Path | None = None) -> None:
+    def __init__(self, path: Path | None) -> None:
         self.path = path or Path.cwd()
+
 
     def run(self, *args, check: bool = False) -> str | None:
         """

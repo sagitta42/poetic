@@ -7,7 +7,7 @@ def file_has_line(filepath: Path, line: str) -> bool:
     """
     with open(filepath) as f:
         file_lines = [l.rstrip() for l in f.readlines()]
-    ret = line in file_lines
+    ret = line.rstrip() in file_lines
     return ret
 
 

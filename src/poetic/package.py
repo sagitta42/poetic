@@ -2,11 +2,11 @@ import os
 from pathlib import Path
 import shutil
 
-from poetic.base import Template
+from poetic.base import BaseTemplate
 from poetic.settings import TemplateSettings, TemplateType
 
 
-class PackageTemplate(Template):
+class PackageTemplate(BaseTemplate):
 
     def __init__(self, init: TemplateSettings | str) -> None:
         settings = (

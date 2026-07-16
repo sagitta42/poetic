@@ -4,18 +4,20 @@ from pathlib import Path
 import sqlite3
 import yaml
 
-from poetic.base import Template
+from poetic.base import BaseTemplate
+from poetic.db import DBSetup
 from poetic.pyproject_handler import PyProjectHandler
 from poetic.settings import APITemplateSettings, DBType
 from poetic.utils import add_new_line_to_file
 
 
-class APITemplate(Template[APITemplateSettings]):
+class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._db = settings.db
-        self._has_db = self._db is not None
+        self._db: DBSetup | None = (
+            None if settings.db is None else DBSetup(self.path, settings.db)
+        )
 
     def poetry_init(self):
         """
@@ -42,18 +44,26 @@ class APITemplate(Template[APITemplateSettings]):
         pyproject_handler.save_toml()
 
     def setup_dependencies(self):
+        """
+        Set up dependencies.
+        """
         super().setup_dependencies()
 
         self._poetry_add("fastapi")
         self._poetry_add("pydantic")
         self._poetry_add("pydantic_settings")
         self._poetry_add("uvicorn")
-        if self._has_db:
+        if self._db is not None:
             self._poetry_add("alembic")
 
     def setup_source_files(self):
         """
-        Set up dummy source files
+        Set up source files.
+
+        Set up subfolder structure.
+        Set up settings config.
+        Set up dummy source files for core logic, services, schemas, and routers.
+        Set up main uvicorn launchable script.
         """
         self._setup_subfolders()
 
@@ -94,86 +104,30 @@ class APITemplate(Template[APITemplateSettings]):
         Additional setup.
 
         Set up docker compose file.
-        Set up alembic migrations and DB if requested.
+        If DB requested:
+            Set up alembic migrations.
+            Set up DB.
         """
-        self._setup_docker_compose()
+        self.setup_docker_compose()
 
-        if self._has_db:
-            self.setup_db()
+        if self._db is not None:
+            self._db.setup()
+            self.setup_alembic()
 
-    def setup_db(self):
+    def setup_alembic(self):
         """
-        Set up DB and migrations.
-
-        Set up alembic.
-        If not present, initialize database of given type, git add the initial file.
-        Set DB path in .env template.
-        Update .gitignore to not track the DB file.
-        Add alembic upgrade debugger configuration to launch.json
-        """
-
-        self._setup_alembic()
-
-        db_dir = Path("db")
-        path_to_db = self.path / db_dir
-        db_file = "db.db"
-        if self._db == DBType.sqlite and not os.path.exists(path_to_db):
-            os.mkdir(path_to_db)
-
-            conn = sqlite3.connect(path_to_db / db_file)
-            conn.close()
-
-            self._git_template.run("add", db_dir / db_file)
-
-        add_new_line_to_file(
-            self.path / ".env.template", f"DB_URL=sqlite:///{db_dir / db_file}"
-        )
-        add_new_line_to_file(
-            self.path / ".gitignore", f"{db_dir / db_file}\n", prepend=True
-        )
-
-        self._add_vscode_launch_configurations("alembic.launch.json")
-
-    def _setup_subfolders(self):
-        """
-        Set up subfolders.
-
-        app: app code (api, schemas, serviecs)
-        core: code logic/engine code
-        """
-
-        for subfolder in ["app", "core"]:
-            os.makedirs(self.path / subfolder, exist_ok=True)
-
-        for app_subfolder in ["api", "schemas", "services"]:
-            os.makedirs(self.path / "app" / app_subfolder, exist_ok=True)
-
-        os.makedirs(self.path / "app" / "api" / "routes", exist_ok=True)
-
-    def _setup_docker_compose(self):
-        """
-        Set up docker compose.
-
-        Copy template and update app name.
-        """
-        path_to_yml = self._copy_template("docker-compose.yml", generic=False)
-
-        with open(path_to_yml) as f:
-            yml_info = yaml.safe_load(f)
-
-        yml_info["services"]["api"]["environment"]["APP_NAME"] = self.name
-
-        with open(path_to_yml, "w") as f:
-            yaml.dump(yml_info, f)
-
-    def _setup_alembic(self):
-        """
-        Set up alembic.
-
         Set up alembic migrations.
+
+        Set up alembic.ini.
+        Init alembic.
+        Set up alembic environment.
+        Add alembic upgrade debugger configuration to launch.json
         Set up alembdantic.
         Set up example alembdantic model.
         Set up example migration for alembdantic usage.
+
+        Note that alembic setup is independent from DB setup.
+        Note that providing DB URL in .env is not managed by this setup.
         """
         template_subdir = "alembic"
 
@@ -187,9 +141,12 @@ class APITemplate(Template[APITemplateSettings]):
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
+
         self._copy_template(
             "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
         )
+
+        self._add_vscode_launch_configurations("alembic.launch.json")
 
         alembdantic_subdir = "alembdantic"
         path_to_alembdandic = path_to_alembic / alembdantic_subdir
@@ -206,6 +163,7 @@ class APITemplate(Template[APITemplateSettings]):
             path_in_package=self.path / alembic_dir,
             template_subdir=template_subdir,
         )
+
         path_to_revisions = path_to_alembic / "versions"
         os.makedirs(path_to_revisions, exist_ok=True)
         self._copy_template(
@@ -213,6 +171,47 @@ class APITemplate(Template[APITemplateSettings]):
             path_in_package=path_to_revisions,
             template_subdir=template_subdir,
         )
+
+    def setup_docker_compose(self):
+        """
+        Set up docker compose.
+
+        Copy template and update app name.
+        """
+        path_to_yml = self._copy_template("docker-compose.yml", generic=False)
+
+        with open(path_to_yml) as f:
+            yml_info = yaml.safe_load(f)
+
+        yml_info["services"]["api"]["environment"]["APP_NAME"] = self.name
+
+        with open(path_to_yml, "w") as f:
+            yaml.dump(yml_info, f)
+
+    def post_init_commit(self):
+        """
+        Actions after initial commit.
+
+        If DB was requested, untrack DB file
+        """
+        if self._db is not None:
+            self._db.untrack_db()
+
+    def _setup_subfolders(self):
+        """
+        Set up subfolders.
+
+        app: app code (api, schemas, serviecs)
+        core: code logic/engine code
+        """
+
+        for subfolder in ["app", "core"]:
+            os.makedirs(self.path / subfolder, exist_ok=True)
+
+        for app_subfolder in ["api", "schemas", "services"]:
+            os.makedirs(self.path / "app" / app_subfolder, exist_ok=True)
+
+        os.makedirs(self.path / "app" / "api" / "routes", exist_ok=True)
 
     def _add_vscode_launch_configurations(self, template_filename: str):
         """
