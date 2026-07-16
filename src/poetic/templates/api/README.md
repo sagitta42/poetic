@@ -1,3 +1,11 @@
+## setup
+
+```bash
+source venv/bin/activate
+poetry install --no-root
+cp .env.template .env
+```
+
 ## api
 
 API docs: http://localhost:8000/docs
@@ -11,8 +19,6 @@ docker compose up --build
 ## app
 
 ```bash
-source venv/bin/activate
-poetry install --no-root
 uvicorn main:app --reload
 ```
 
@@ -30,4 +36,6 @@ $ alembic downgrade -1
 $ alembic downgrade base
 ```
 
-VSCode debug configuration included for `upgrade +1`
+`DB_URL` determined from `.env`
+
+VSCode debug configuration included for `upgrade +1` and `downgrade -1`
