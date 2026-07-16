@@ -154,7 +154,7 @@ class APITemplate(Template[APITemplateSettings]):
             self.path / ".gitignore", f"{db_dir / db_file}\n", prepend=True
         )
 
-        self._add_vscode_launch_configuration("alembic.launch.json")
+        self._add_vscode_launch_configurations("alembic.launch.json")
 
     def _setup_subfolders(self):
         """
@@ -188,9 +188,9 @@ class APITemplate(Template[APITemplateSettings]):
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
 
-    def _add_vscode_launch_configuration(self, template_filename: str):
+    def _add_vscode_launch_configurations(self, template_filename: str):
         """
-        Add configuration to VSCode launch.json contained in given template.
+        Add configurations to VSCode launch.json contained in given template.
         """
         path_to_launch = self.path / ".vscode" / "launch.json"
         if not path_to_launch.exists():
@@ -199,13 +199,19 @@ class APITemplate(Template[APITemplateSettings]):
         with open(path_to_launch) as f:
             launch_dct = json.load(f)
 
-        path_to_config = self._get_template_path(
+        path_to_template = self._get_template_path(
             template_filename, generic=False, template_subdir="alembic"
         )
-        with open(path_to_config) as f:
-            config = json.load(f)
+        with open(path_to_template) as f:
+            template_config = json.load(f)
 
-        launch_dct["configurations"].append(config)
+        configuration_names = [
+            config["name"] for config in launch_dct["configurations"]
+        ]
+
+        for config in template_config["configurations"]:
+            if config["name"] not in configuration_names:
+                launch_dct["configurations"].append(config)
 
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)

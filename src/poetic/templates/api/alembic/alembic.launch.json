@@ -1,10 +1,24 @@
 {
-    "name": "Python Debugger: alembic",
-    "type": "debugpy",
-    "request": "launch",
-    "module": "alembic",
-    "args": [
-        "upgrade",
-        "+1"
+    "configurations": [
+        {
+            "name": "alembic upgrade +1",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "alembic",
+            "args": [
+                "upgrade",
+                "+1"
+            ]
+        },
+        {
+            "name": "alembic downgrade -1",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "alembic",
+            "args": [
+                "downgrade",
+                "-1"
+            ]
+        }
     ]
 }
