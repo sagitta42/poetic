@@ -1,13 +1,11 @@
 import json
 import os
-from pathlib import Path
-import sqlite3
 import yaml
 
 from poetic.base import BaseTemplate
 from poetic.db import DBSetup
 from poetic.pyproject_handler import PyProjectHandler
-from poetic.settings import APITemplateSettings, DBType
+from poetic.settings import APITemplateSettings
 from poetic.utils import add_new_line_to_file
 
 
@@ -71,10 +69,17 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
 
         package_filename = "dummy.py"
 
+        path_to_core = self.path / "core"
         self._copy_template(
             "core.py",
-            path_in_package=self.path / "core",
+            path_in_package=path_to_core,
             package_filename=package_filename,
+        )
+        self._copy_template("db.py", path_in_package=path_to_core)
+        self._copy_template(
+            "model.py",
+            path_in_package=path_to_core / "models",
+            package_filename="example.py",
         )
 
         path_to_app = self.path / "app"
@@ -207,6 +212,8 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
 
         for subfolder in ["app", "core"]:
             os.makedirs(self.path / subfolder, exist_ok=True)
+
+        os.makedirs(self.path / "core" / "models", exist_ok=True)
 
         for app_subfolder in ["api", "schemas", "services"]:
             os.makedirs(self.path / "app" / app_subfolder, exist_ok=True)
