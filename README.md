@@ -13,14 +13,17 @@ pip install git+https://github.com/sagitta42/poetic.git
 ### Command line
 
 ```python
-$ python -m poetic <package-name> --type <package-type> [--update] [--db]
+$ python -m poetic <package-name> --type <package-type> [--db] [<db-type>] [--update] 
 ```
 
 Available package types:
 - `package` to create a package template (default)
 - `api` to create an API template
 
-Add `--db` flag to set up `alembic` migrations (applies to `api` template type only)
+Add `--db` flag to set up `alembic` migrations and DB of given type (applies to `api` template type only)
+
+Available DB types:
+- `sqlite` to set up a local SQLite DB (default)
 
 Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update.
 
@@ -79,10 +82,15 @@ awesome-api
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...
 ├── alembic_migrations
-│   ├── script.py.mako
+│   ├── alembdantic # pydantic controlled alembic
+│   │   ├── opd.py # pydantic controlled alembic.op
+│   │   └── table_model.py # base class for alembdantic tables
 │   ├── versions
-│   ├── env.py
-│   └── README
+|   |   └── 2026_07_15_143709-36648a63d305-example.py # example migration using alembdantic
+│   ├── env.py # alembic env with DB URL based on .env
+│   ├── models.py # example alembdantic table schema
+│   ├── README
+│   └── script.py.mako
 ├── app
 │   ├── services
 │   │   └── dummy.py # dummy service using dummy core logic
@@ -94,6 +102,8 @@ awesome-api
 │           └── dummy.py # dummy router with a single endpoint calling dummy service
 ├── core
 │   └── dummy.py # dummy core logic
+├── db
+│   └── db.db # initial committed SQLite DB file
 ├── .gitignore  # standard comprehensive Python .gitignore
 ├── .env.template
 ├── alembic.ini
