@@ -120,6 +120,7 @@ class TableModel(BaseModel):
     @model_validator(mode="after")
     def check_name(self) -> Self:
         # TODO: check that name is fixed Literal at model definition and is not provided in instances
+        # check that it has exclude=True / special method for column_dump()
         return self
 
     @model_validator(mode="before")

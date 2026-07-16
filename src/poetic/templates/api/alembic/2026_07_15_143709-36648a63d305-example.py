@@ -20,10 +20,13 @@ down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+data = ExampleTable(id=42, name="Alice", value=2.718)
+
 
 def upgrade() -> None:
     """Upgrade schema."""
     opd.create_table(ExampleTable)
+    opd.insert(data)
 
 
 def downgrade() -> None:

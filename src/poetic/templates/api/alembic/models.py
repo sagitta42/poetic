@@ -7,7 +7,7 @@ from alembic_migrations.alembdantic.table_model import TableModel
 
 class ExampleTable(TableModel):
     table_name_: Literal["examples"] = Field(
-        default="examples", description="Table name"
+        default="examples", description="Table name", exclude=True
     )
     id: int = Field(description="ID")
     name: str = Field(description="Name")
