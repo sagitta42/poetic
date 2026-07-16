@@ -103,38 +103,16 @@ class APITemplate(Template[APITemplateSettings]):
 
     def setup_db(self):
         """
-        Set up DB.
+        Set up DB and migrations.
 
-        Set up alembic migrations.
-        Set up alembic utils.
-        If not present, initialize database of given type.
-            Git add the initial file.
+        Set up alembic.
+        If not present, initialize database of given type, git add the initial file.
         Set DB path in .env template.
         Update .gitignore to not track the DB file.
         Add alembic upgrade debugger configuration to launch.json
         """
-        template_subdir = "alembic"
 
-        self._copy_template(
-            "alembic.ini.template",
-            package_filename="alembic.ini",
-            template_subdir=template_subdir,
-        )
-
-        alembic_dir = "alembic_migrations"
-        path_to_alembic = self.path / alembic_dir
-        if not os.path.exists(path_to_alembic):
-            self._run(self.venv("alembic"), "init", alembic_dir, env=True)
-        self._copy_template(
-            "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
-        )
-
-        for filename in ["models.py", "utils.py"]:
-            self._copy_template(
-                filename,
-                path_in_package=self.path / alembic_dir,
-                template_subdir=template_subdir,
-            )
+        self._setup_alembic()
 
         db_dir = Path("db")
         path_to_db = self.path / db_dir
@@ -187,6 +165,54 @@ class APITemplate(Template[APITemplateSettings]):
 
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
+
+    def _setup_alembic(self):
+        """
+        Set up alembic.
+
+        Set up alembic migrations.
+        Set up alembdantic.
+        Set up example alembdantic model.
+        Set up example migration for alembdantic usage.
+        """
+        template_subdir = "alembic"
+
+        self._copy_template(
+            "alembic.ini.template",
+            package_filename="alembic.ini",
+            template_subdir=template_subdir,
+        )
+
+        alembic_dir = "alembic_migrations"
+        path_to_alembic = self.path / alembic_dir
+        if not os.path.exists(path_to_alembic):
+            self._run(self.venv("alembic"), "init", alembic_dir, env=True)
+        self._copy_template(
+            "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
+        )
+
+        alembdantic_subdir = "alembdantic"
+        path_to_alembdandic = path_to_alembic / alembdantic_subdir
+        os.makedirs(path_to_alembdandic, exist_ok=True)
+        for filename in ["table_model.py", "opd.py"]:
+            self._copy_template(
+                filename,
+                path_in_package=path_to_alembdandic,
+                template_subdir=alembdantic_subdir,
+            )
+
+        self._copy_template(
+            "models.py",
+            path_in_package=self.path / alembic_dir,
+            template_subdir=template_subdir,
+        )
+        path_to_revisions = path_to_alembic / "versions"
+        os.makedirs(path_to_revisions, exist_ok=True)
+        self._copy_template(
+            "2026_07_15_143709-36648a63d305-example.py",
+            path_in_package=path_to_revisions,
+            template_subdir=template_subdir,
+        )
 
     def _add_vscode_launch_configurations(self, template_filename: str):
         """
