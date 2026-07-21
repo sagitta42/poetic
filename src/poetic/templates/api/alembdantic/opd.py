@@ -45,11 +45,25 @@ def insert(row: TableModel):
     Insert given row to the table corresponding to its schema.
 
     Read table based on table name.
-    Invoke alembic execute with model dump.
+    Invoke alembic execute() of table insert() with model dump.
     """
 
     table = read_table(row.table_name())
     op.execute(table.insert().values(row.model_dump()))
+
+
+def delete(row: TableModel):
+    """
+    Delete given row from the table corresponding to its schema.
+
+    Read t able based on table name.
+    Invoke alembic execute() with table delete() matching all fields in where()
+    """
+    table = read_table(row.table_name())
+    condition = sa.and_(
+        *[table.c[column] == value for column, value in row.model_dump().items()]
+    )
+    op.execute(table.delete().where(condition))
 
 
 def delete_row_by_id(row: TableModel):
