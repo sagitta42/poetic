@@ -28,6 +28,14 @@ class DBSettings(SetupSettings):
     )
 
 
+class DotenvSettings(SetupSettings):
+    """
+    Settings for .env settings reading setup
+    """
+
+    settings: bool = Field(default=False, description="Set up .env settings module")
+
+
 class TemplateType(str, enum.Enum):
     package = "package"
     api = "api"

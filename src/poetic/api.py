@@ -5,14 +5,16 @@ from poetic.base import BaseTemplate
 from poetic.setup.db import DBSetup
 from poetic.setup.settings import SettingsSetup
 from poetic.utils.pyproject_handler import PyProjectHandler
-from poetic.settings import APITemplateSettings, DBSettings
+from poetic.settings import APITemplateSettings, DBSettings, DotenvSettings
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._settings: SettingsSetup = SettingsSetup()
+        self._settings_setup: SettingsSetup = SettingsSetup(
+            DotenvSettings(settings=True), self.path
+        )
         self._db: DBSetup | None = (
             None
             if settings.db is None
@@ -43,7 +45,23 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         pyproject_handler.del_section("build-system")
         pyproject_handler.save_toml()
 
-    def setup_dependencies(self):
+    def setup(self) -> None:
+        """
+        API template setup.
+
+        In addition to standard template setup:
+            - docker compose file
+            - DB if requested
+        """
+        super().setup()
+
+        self._settings_setup.setup()
+        self.setup_docker_compose()
+
+        if self._db is not None:
+            self._db.setup()
+
+    def setup_dependencies(self) -> None:
         """
         Set up dependencies.
         """
@@ -51,7 +69,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
 
         self._poetry_add("fastapi")
         self._poetry_add("pydantic")
-        self._poetry_add("pydantic_settings")
         self._poetry_add("uvicorn")
 
     def setup_source_files(self):
@@ -65,7 +82,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         """
         self._setup_subfolders()
 
-        self._copy_template("settings.py", generic=True)
         self._copy_template("app_info.py")
 
         package_filename = "dummy.py"
@@ -104,21 +120,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         self._copy_template("router.py", path_in_package=path_to_api)
 
         self._copy_template("main.py")
-
-    def setup(self):
-        """
-        API template setup.
-
-        In addition to standard template setup:
-            - docker compose file
-            - DB if requested
-        """
-        super().setup()
-
-        self.setup_docker_compose()
-
-        if self._db is not None:
-            self._db.setup()
 
     def setup_docker_compose(self):
         """
