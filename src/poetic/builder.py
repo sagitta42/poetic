@@ -4,7 +4,7 @@ from poetic.api import APITemplate
 from poetic.base import BaseTemplate
 from poetic.logger import logg
 from poetic.package import PackageTemplate
-from poetic.settings import TemplateSettings, TemplateType
+from poetic.settings import BaseTemplateSettings, TemplateType
 
 
 class TemplateClass(enum.Enum):
@@ -17,7 +17,7 @@ class TemplateClass(enum.Enum):
 
 
 class TemplateBuilder:
-    def build(self, settings: TemplateSettings) -> BaseTemplate:
+    def build(self, settings: BaseTemplateSettings) -> BaseTemplate:
         template_class = TemplateClass.from_template_type(settings.type).value
 
         ret = template_class(settings)

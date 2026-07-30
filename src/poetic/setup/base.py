@@ -49,7 +49,7 @@ class BaseSetup(Generic[T_Settings]):
 
         self.git = Git(self.path)
 
-    def setup(self):
+    def setup(self) -> None:
         self.setup_dotenv_template()
         self.setup_venv()
         self.setup_dependencies()
@@ -76,7 +76,7 @@ class BaseSetup(Generic[T_Settings]):
         self._run(self.venv("pip"), "install", "poetry", env=True)
 
     @abstractmethod
-    def setup_dependencies(self):
+    def setup_dependencies(self) -> None:
         pass
 
     def _copy_template(

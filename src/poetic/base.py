@@ -5,10 +5,10 @@ from typing import TypeVar
 
 from poetic.setup.base import BaseSetup
 from poetic.logger import logg
-from poetic.settings import TemplateSettings
+from poetic.settings import BaseTemplateSettings
 from poetic.utils.tree import tree
 
-T_TemplateSettings = TypeVar("T_TemplateSettings", bound=TemplateSettings)
+T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
 
 class BaseTemplate(BaseSetup[T_TemplateSettings]):

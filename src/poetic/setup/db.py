@@ -36,10 +36,10 @@ class DBSetup(BaseSetup[DBSettings]):
 
         return path_to_dotenv
 
-    def setup_dependencies(self):
+    def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
 
-    def setup(self):
+    def setup(self) -> None:
         """
         DB setup.
 

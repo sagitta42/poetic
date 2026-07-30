@@ -3,16 +3,16 @@ from pathlib import Path
 import shutil
 
 from poetic.base import BaseTemplate
-from poetic.settings import TemplateSettings, TemplateType
+from poetic.settings import PackageTemplateSettings, TemplateType
 
 
-class PackageTemplate(BaseTemplate):
+class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
-    def __init__(self, init: TemplateSettings | str) -> None:
+    def __init__(self, init: PackageTemplateSettings | str) -> None:
         settings = (
             init
-            if isinstance(init, TemplateSettings)
-            else TemplateSettings(name=init, type=TemplateType.package)
+            if isinstance(init, PackageTemplateSettings)
+            else PackageTemplateSettings(name=init, type=TemplateType.package)
         )
         super().__init__(settings)
 
@@ -24,6 +24,7 @@ class PackageTemplate(BaseTemplate):
 
         Standard setup with src/package_name structure.
         """
+        # TODO: use subprocess
         os.system(f"poetry new {self.name}")
 
     def setup_source_files(self):

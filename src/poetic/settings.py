@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Self
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -11,7 +11,7 @@ class SetupSettings(BaseModel):
     Base class for settings for any type of setup.
     """
 
-    pass
+    model_config = ConfigDict(extra="ignore")
 
 
 class DBType(str, enum.Enum):
@@ -22,8 +22,6 @@ class DBSettings(SetupSettings):
     """
     Settings for DB setup.
     """
-
-    model_config = ConfigDict(extra="ignore")
 
     db: DBType | None = Field(
         description="Create/update DB functionalities of given DB type"
@@ -39,17 +37,15 @@ class TemplateType(str, enum.Enum):
         return [item.value for item in cls]
 
 
-class TemplateSettings(SetupSettings):
+class BaseTemplateSettings(SetupSettings):
     """
     Common settings for any template.
     """
 
-    model_config = ConfigDict(extra="forbid")
-
-    name: str = Field(description="Package name")
     type: TemplateType = Field(
         default=TemplateType.package, description="Template type"
     )
+    name: str = Field(description="Package name")
 
     @classmethod
     def description(cls, field_name: str) -> str:
@@ -71,22 +67,30 @@ class TemplateSettings(SetupSettings):
         return None
 
 
-# FIXME: DB template settings (not only for API); or just unite settings
-class APITemplateSettings(TemplateSettings, DBSettings):
+class PackageTemplateSettings(BaseTemplateSettings):
+    """
+    Package template settings.
+
+    Include option to set up .env pydantic settings.
+    """
+
+    type: Literal[TemplateType.package] = Field(description="Template type")
+
+
+class APITemplateSettings(BaseTemplateSettings, DBSettings):
     """
     API template settings.
 
     API template includes option to set up DB.
     """
 
-    @model_validator(mode="after")
-    def check_db(self) -> Self:
-        if self.db is not None and self.type != TemplateType.api:
-            logg.warning(
-                f"DB functionalities not supported for {self.type.value} template; ignoring",
-                important=True,
-            )
-        return self
+    type: Literal[TemplateType.api] = Field(description="Template type")
+
+
+TemplateSettings = Annotated[
+    PackageTemplateSettings | APITemplateSettings,
+    Field(discriminator="type"),
+]
 
 
 class SettingsCrutch(BaseModel):
@@ -94,4 +98,4 @@ class SettingsCrutch(BaseModel):
     Exists only for convenience of detecting type of settings
     """
 
-    settings: TemplateSettings | APITemplateSettings
+    settings: TemplateSettings

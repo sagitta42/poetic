@@ -1,19 +1,24 @@
 import argparse
-from poetic.builder import TemplateBuilder, TemplateSettings
+from poetic.builder import TemplateBuilder, BaseTemplateSettings
 from poetic.logger import logg
-from poetic.settings import APITemplateSettings, DBType, SettingsCrutch
+from poetic.settings import (
+    APITemplateSettings,
+    DBType,
+    PackageTemplateSettings,
+    SettingsCrutch,
+)
 
 
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("name", type=str, help=TemplateSettings.description("name"))
+    parser.add_argument("name", type=str, help=BaseTemplateSettings.description("name"))
     parser.add_argument(
         "--type",
         type=str,
-        default=TemplateSettings.default("type"),
-        help=TemplateSettings.description("type"),
-        choices=TemplateSettings.options("type"),
+        default=BaseTemplateSettings.default("type"),
+        help=BaseTemplateSettings.description("type"),
+        choices=BaseTemplateSettings.options("type"),
     )
     parser.add_argument(
         "--db",
