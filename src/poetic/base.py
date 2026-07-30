@@ -1,35 +1,46 @@
 from abc import abstractmethod
-from importlib import resources
 import os
 from pathlib import Path
-import shutil
-import subprocess
-from typing import Generic, TypeVar
-import venv
+from typing import TypeVar
 
-from poetic.utils.git import Git
+from poetic.setup.base import BaseSetup
 from poetic.logger import logg
 from poetic.settings import TemplateSettings
 from poetic.utils.tree import tree
 
-T_Settings = TypeVar("T_Settings", bound=TemplateSettings)
+T_TemplateSettings = TypeVar("T_TemplateSettings", bound=TemplateSettings)
 
 
-class BaseTemplate(Generic[T_Settings]):
-    def __init__(self, settings: T_Settings) -> None:
+class BaseTemplate(BaseSetup[T_TemplateSettings]):
+    """
+    General template setup.
+
+    Includes
+        - repository init (git, poetry)
+        - repository setup
+        - repository update
+
+    Repository setup (in addition to BaseSetup):
+        - gitignore
+        - source files
+        - VSCode
+        - README
+        - extra
+
+    Repository update: updating existing template with poetic updates.
+
+    """
+
+    def __init__(self, settings: T_TemplateSettings) -> None:
         self.name = settings.name
+        super().__init__(settings, Path(self.name))
+
         self._type: str = settings.type.value
-
         self._inner_name = self.name.replace("-", "_")
-        self.path = Path(self.name)
-        self._path_to_venv = (self.path / "venv").resolve()
 
-        self._path_to_resources = Path(resources.files(__package__).__str__())
-        self._path_to_templates = self._path_to_resources / "templates"
         self._path_to_type_templates = self._path_to_templates / self._type
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
-        self.git = Git(self.path)
 
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
@@ -110,32 +121,12 @@ class BaseTemplate(Generic[T_Settings]):
         self.git.run("merge", update_branch)
 
     def setup(self):
-        """
-        Template setup.
+        super().setup()
 
-        Set up common files.
-        Set up extra/specific files.
-        """
         self.setup_gitignore()
-        self.setup_dotenv_template()
-        self.setup_venv()
-        self.setup_dependencies()
         self.setup_source_files()
         self.setup_vscode()
         self.setup_readme()
-
-        self.setup_extra()
-
-    def setup_venv(self):
-        """
-        Set up venv.
-
-        Create venv.
-        Install poetry into that venv.
-        """
-        if not self._path_to_venv.exists():
-            venv.create(self._path_to_venv, with_pip=True)
-        self._run(self.venv("pip"), "install", "poetry", env=True)
 
     def setup_dependencies(self):
         self._poetry_add("dotenv")
@@ -150,12 +141,6 @@ class BaseTemplate(Generic[T_Settings]):
         self._copy_template(
             "Python.gitignore", package_filename=".gitignore", generic=True
         )
-
-    def setup_dotenv_template(self):
-        """
-        Set up .env.template
-        """
-        self._copy_template(".env.template", generic=True)
 
     def setup_vscode(self):
         path_to_vscode = self.path / ".vscode"
@@ -225,86 +210,3 @@ class BaseTemplate(Generic[T_Settings]):
         Set up source files.
         """
         pass
-
-    def _copy_template(
-        self,
-        template_filename: str,
-        path_in_package: Path | None = None,
-        package_filename: str | None = None,
-        template_subdir: Path | str | None = None,
-        generic: bool = False,
-    ) -> Path:
-        """
-        Copy template into package source code.
-
-        template_filename (str): name of template to copy contained under templates of this package
-        generic (bool): template is generic (independent of setup type)
-        path_in_package (Path | None): path where to copy in package; default = root path
-        package_filename (str | None): filename of template in package; default = same as original template
-
-        Returns path to file in package.
-        """
-        path_to_template = self._get_template_path(
-            template_filename, generic, template_subdir=template_subdir
-        )
-
-        path_in_package = path_in_package or self.path
-        package_filename = package_filename or template_filename
-        path_to_package_file = path_in_package / package_filename
-
-        shutil.copy(path_to_template, path_to_package_file)
-
-        return path_to_package_file
-
-    def _poetry_add(self, package: str, group: str | None = None):
-        """
-        Poetry add.
-
-        Invoke poetry add in template's venv to install added package while adding to pyproject.toml
-        """
-        args = [self.venv("poetry"), "add"]
-        if group is not None:
-            args += ["--group", group]
-        args.append(package)
-
-        self._run(*args, env=True)
-
-    def _get_template_path(
-        self, template_filename: str, generic: bool, template_subdir: Path | str | None
-    ) -> Path:
-        """
-        Get path given template.
-        """
-        path_to_templates = (
-            self._path_to_templates if generic else self._path_to_type_templates
-        )
-        if template_subdir is not None:
-            path_to_templates = path_to_templates / template_subdir
-
-        ret = path_to_templates / template_filename
-        return ret
-
-    def _run(self, *args, env: bool = False):
-        """
-        Run command in template root directory.
-        """
-        subprocess.run(
-            args,
-            cwd=self.path,
-            env=(
-                {
-                    **os.environ,
-                    "POETRY_VIRTUALENVS_CREATE": "false",
-                    "VIRTUAL_ENV": self._path_to_venv,
-                }
-                if env
-                else None
-            ),
-        )
-
-    def venv(self, exe: str) -> Path:
-        """
-        Get venv path to executable.
-        """
-        ret = self._path_to_venv / "bin" / exe
-        return ret

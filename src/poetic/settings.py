@@ -6,6 +6,30 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from poetic.logger import logg
 
 
+class SetupSettings(BaseModel):
+    """
+    Base class for settings for any type of setup.
+    """
+
+    pass
+
+
+class DBType(str, enum.Enum):
+    sqlite = "sqlite"
+
+
+class DBSettings(SetupSettings):
+    """
+    Settings for DB setup.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    db: DBType | None = Field(
+        description="Create/update DB functionalities of given DB type"
+    )
+
+
 class TemplateType(str, enum.Enum):
     package = "package"
     api = "api"
@@ -15,7 +39,11 @@ class TemplateType(str, enum.Enum):
         return [item.value for item in cls]
 
 
-class TemplateSettings(BaseModel):
+class TemplateSettings(SetupSettings):
+    """
+    Common settings for any template.
+    """
+
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(description="Package name")
@@ -43,14 +71,13 @@ class TemplateSettings(BaseModel):
         return None
 
 
-class DBType(str, enum.Enum):
-    sqlite = "sqlite"
+# FIXME: DB template settings (not only for API); or just unite settings
+class APITemplateSettings(TemplateSettings, DBSettings):
+    """
+    API template settings.
 
-
-class APITemplateSettings(TemplateSettings):
-    db: DBType | None = Field(
-        description="Create/update DB functionalities of given DB type"
-    )
+    API template includes option to set up DB.
+    """
 
     @model_validator(mode="after")
     def check_db(self) -> Self:
