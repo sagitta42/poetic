@@ -2,9 +2,9 @@ import os
 from pathlib import Path
 import sqlite3
 
-from poetic.git import Git
+from poetic.utils.git import Git
 from poetic.settings import DBType
-from poetic.utils import add_new_line_to_file
+from poetic.utils.utils import add_new_line_to_file
 
 
 class DBSetup:

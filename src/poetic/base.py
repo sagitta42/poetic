@@ -7,10 +7,10 @@ import subprocess
 from typing import Generic, TypeVar
 import venv
 
-from poetic.git import Git
+from poetic.utils.git import Git
 from poetic.logger import logg
 from poetic.settings import TemplateSettings
-from poetic.tree import tree
+from poetic.utils.tree import tree
 
 T_Settings = TypeVar("T_Settings", bound=TemplateSettings)
 

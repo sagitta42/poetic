@@ -3,10 +3,9 @@ import os
 import yaml
 
 from poetic.base import BaseTemplate
-from poetic.db import DBSetup
-from poetic.pyproject_handler import PyProjectHandler
+from poetic.setup.db import DBSetup
+from poetic.utils.pyproject_handler import PyProjectHandler
 from poetic.settings import APITemplateSettings
-from poetic.utils import add_new_line_to_file
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):

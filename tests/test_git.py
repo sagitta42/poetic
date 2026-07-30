@@ -1,4 +1,4 @@
-from poetic.git import Git
+from poetic.utils.git import Git
 
 from poetic.logger import logg
 
