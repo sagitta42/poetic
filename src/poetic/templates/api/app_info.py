@@ -2,14 +2,6 @@ from pathlib import Path
 import tomllib
 
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-
-    db_url: str
-    debug: bool = False
 
 
 class AppInfo(BaseModel):
@@ -46,4 +38,3 @@ class PyProjectInfoBuilder:
 
 
 app_info = PyProjectInfoBuilder().build()
-settings = Settings()

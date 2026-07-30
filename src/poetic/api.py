@@ -59,13 +59,14 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         Set up source files.
 
         Set up subfolder structure.
-        Set up settings config.
+        Set up settings and app info.
         Set up dummy source files for core logic, services, schemas, and routers.
         Set up main uvicorn launchable script.
         """
         self._setup_subfolders()
 
-        self._copy_template("config.py")
+        self._copy_template("settings.py", generic=True)
+        self._copy_template("app_info.py")
 
         package_filename = "dummy.py"
 
