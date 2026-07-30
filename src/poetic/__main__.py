@@ -28,6 +28,11 @@ def main():
         default=None,
         help=APITemplateSettings.description("db"),
     )
+    parser.add_argument(
+        "--settings",
+        action="store_true",
+        help=PackageTemplateSettings.description("settings"),
+    )
 
     parser.add_argument("--update", action="store_true", help="Update existing package")
 

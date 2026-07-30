@@ -15,7 +15,13 @@ class SettingsSetup(BaseSetup[DotenvSettings]):
     def setup(self) -> None:
         super().setup()
 
-        self._copy_template("settings.py", generic=True)
+        path_in_package = self.path
+        if self._settings.package_subdir is not None:
+            path_in_package = self.path / self._settings.package_subdir
+
+        self._copy_template(
+            "settings.py", path_in_package=path_in_package, generic=True
+        )
 
     def setup_dependencies(self) -> None:
         super().setup_dependencies()

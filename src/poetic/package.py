@@ -3,7 +3,8 @@ from pathlib import Path
 import shutil
 
 from poetic.base import BaseTemplate
-from poetic.settings import PackageTemplateSettings, TemplateType
+from poetic.settings import DotenvSettings, PackageTemplateSettings, TemplateType
+from poetic.setup.settings import SettingsSetup
 
 
 class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
@@ -16,7 +17,16 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         )
         super().__init__(settings)
 
-        self._path_to_src: Path = self.path / "src" / self._inner_name
+        src_subdir = Path("src") / self._inner_name
+        self._path_to_src: Path = self.path / src_subdir
+
+        dotenv_settings = DotenvSettings(**self._settings.model_dump())
+        dotenv_settings.package_subdir = src_subdir
+        self._dotenv_settings = (
+            SettingsSetup(dotenv_settings, self.path)
+            if self._settings.settings
+            else None
+        )
 
     def poetry_init(self):
         """

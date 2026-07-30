@@ -6,6 +6,7 @@ from typing import TypeVar
 from poetic.setup.base import BaseSetup
 from poetic.logger import logg
 from poetic.settings import BaseTemplateSettings
+from poetic.setup.settings import SettingsSetup
 from poetic.utils.tree import tree
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
@@ -43,6 +44,8 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
+
+        self._dotenv_settings: SettingsSetup | None = None
 
         logg.info(f"Setting up {self._type}: {self.name}")
 
@@ -125,6 +128,8 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
 
         self.setup_gitignore()
         self.setup_source_files()
+        if self._dotenv_settings is not None:
+            self._dotenv_settings.setup()
         self.setup_vscode()
         self.setup_readme()
 

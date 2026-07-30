@@ -12,9 +12,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._settings_setup: SettingsSetup = SettingsSetup(
-            DotenvSettings(settings=True), self.path
-        )
+        self._dotenv_settings = SettingsSetup(DotenvSettings(settings=True), self.path)
         self._db: DBSetup | None = (
             None
             if settings.db is None
@@ -55,7 +53,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         """
         super().setup()
 
-        self._settings_setup.setup()
         self.setup_docker_compose()
 
         if self._db is not None:

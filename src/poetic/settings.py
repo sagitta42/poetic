@@ -1,4 +1,5 @@
 import enum
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -34,6 +35,10 @@ class DotenvSettings(SetupSettings):
     """
 
     settings: bool = Field(default=False, description="Set up .env settings module")
+    package_subdir: Path | None = Field(
+        default=None,
+        description="Subdirectory in package where to set up the settings source file; None defaults to root path",
+    )
 
 
 class TemplateType(str, enum.Enum):
@@ -75,7 +80,7 @@ class BaseTemplateSettings(SetupSettings):
         return None
 
 
-class PackageTemplateSettings(BaseTemplateSettings):
+class PackageTemplateSettings(BaseTemplateSettings, DotenvSettings):
     """
     Package template settings.
 
