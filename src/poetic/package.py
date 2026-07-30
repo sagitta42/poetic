@@ -5,6 +5,7 @@ import shutil
 from poetic.base import BaseTemplate
 from poetic.settings import DotenvSettings, PackageTemplateSettings, TemplateType
 from poetic.setup.settings import SettingsSetup
+from poetic.utils.utils import add_new_line_to_file
 
 
 class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
@@ -47,8 +48,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         self._create_source_file("core.py")
 
-        with open(self._path_to_src / "__init__.py", "a") as f:
-            f.write(f"from {self._inner_name}.core import *")
+        add_new_line_to_file(
+            self._path_to_src / "__init__.py", f"from {self._inner_name}.core import *"
+        )
 
         self._copy_template("foo.py", path_in_package=self._path_to_src)
 
