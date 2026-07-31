@@ -49,7 +49,13 @@ class BaseSetup(Generic[T_Settings]):
 
         self.git = Git(self.path)
 
-    def setup(self) -> None:
+    def setup(self, skip_super: bool = False) -> None:
+        """
+        Main setup.
+
+        skip_super: do not perform superclass setup
+            (e.g. to skip for "assistive" internal setups)
+        """
         self.setup_dotenv_template()
         self.setup_venv()
         self.setup_dependencies()
@@ -100,10 +106,6 @@ class BaseSetup(Generic[T_Settings]):
         path_in_package = path_in_package or self.path
         package_filename = package_filename or template_filename
         path_to_package_file = path_in_package / package_filename
-
-        if path_to_package_file.exists():
-            logg.warning(f"File {path_to_package_file} already exists; not copying")
-            return path_to_package_file
 
         path_to_template = self._get_template_path(
             template_filename, generic, template_subdir=template_subdir

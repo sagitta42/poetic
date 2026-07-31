@@ -43,7 +43,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         pyproject_handler.del_section("build-system")
         pyproject_handler.save_toml()
 
-    def setup(self) -> None:
+    def setup(self, skip_super: bool = False) -> None:
         """
         API template setup.
 
@@ -51,12 +51,12 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
             - docker compose file
             - DB if requested
         """
-        super().setup()
+        super().setup(skip_super)
 
         self.setup_docker_compose()
 
         if self._db is not None:
-            self._db.setup()
+            self._db.setup(skip_super=True)
 
     def setup_dependencies(self) -> None:
         """

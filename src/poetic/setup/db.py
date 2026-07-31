@@ -39,7 +39,7 @@ class DBSetup(BaseSetup[DBSettings]):
     def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
 
-    def setup(self) -> None:
+    def setup(self, skip_super: bool = False) -> None:
         """
         DB setup.
 
@@ -47,7 +47,7 @@ class DBSetup(BaseSetup[DBSettings]):
             - DB
             - alembic migrations
         """
-        super().setup()
+        super().setup(skip_super)
 
         self.setup_db()
         self.setup_alembic()

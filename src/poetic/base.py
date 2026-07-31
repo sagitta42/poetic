@@ -123,13 +123,13 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         self.git.run("switch", current_branch)
         self.git.run("merge", update_branch)
 
-    def setup(self) -> None:
-        super().setup()
+    def setup(self, skip_super: bool = False) -> None:
+        super().setup(skip_super)
 
         self.setup_gitignore()
         self.setup_source_files()
         if self._dotenv_settings is not None:
-            self._dotenv_settings.setup()
+            self._dotenv_settings.setup(skip_super=True)
         self.setup_vscode()
         self.setup_readme()
 

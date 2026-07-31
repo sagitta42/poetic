@@ -12,8 +12,8 @@ class SettingsSetup(BaseSetup[DotenvSettings]):
     def __init__(self, settings: DotenvSettings, path: Path) -> None:
         super().__init__(settings, path)
 
-    def setup(self) -> None:
-        super().setup()
+    def setup(self, skip_super: bool = False) -> None:
+        super().setup(skip_super)
 
         path_in_package = self.path
         if self._settings.package_subdir is not None:
