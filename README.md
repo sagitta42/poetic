@@ -63,7 +63,7 @@ awesome-package
 ├── tests
 |   ├── __init__.py
 │   ├── conftest.py # set up to be able to run tests in dev mode
-│   └──  test_foo.py # test of src/awesome_package/foo.py
+│   └──  test_unit.py # unit tests of awesome_package.foo and awesome_package.models.MyBaseModel
 ├── .gitignore # standard comprehensive Python .gitignore
 ├── .env.template
 ├── poetry.lock

@@ -89,7 +89,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._copy_template("conftest.py", path_to_tests)
 
         source_file_path = self._copy_template(
-            "test_foo.py", path_in_package=path_to_tests
+            "test_unit.py", path_in_package=path_to_tests
         )
         self._replace_package_placeholder(source_file_path)
 
