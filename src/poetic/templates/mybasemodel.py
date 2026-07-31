@@ -2,7 +2,7 @@ import enum
 
 from pydantic import BaseModel
 
-from $PACKAGE import logg
+from $PACKAGE.logger import logg
 
 
 class Tree(str, enum.Enum):
