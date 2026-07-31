@@ -65,7 +65,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         super().setup_dependencies()
 
         self._poetry_add("fastapi")
-        self._poetry_add("pydantic")
         self._poetry_add("uvicorn")
 
     def setup_source_files(self):

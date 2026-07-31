@@ -123,7 +123,7 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         self.git.run("switch", current_branch)
         self.git.run("merge", update_branch)
 
-    def setup(self):
+    def setup(self) -> None:
         super().setup()
 
         self.setup_gitignore()
@@ -135,6 +135,7 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
 
     def setup_dependencies(self):
         self._poetry_add("dotenv")
+        self._poetry_add("pydantic")
 
     def setup_gitignore(self):
         """
@@ -181,12 +182,6 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         path_to_readme = self.path / "README.md"
         with open(path_to_readme, "w") as f:
             f.writelines(readme_lines)
-
-    def setup_extra(self):
-        """
-        Additional setup.
-        """
-        pass
 
     def post_init_commit(self):
         """

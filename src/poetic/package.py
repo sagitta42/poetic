@@ -44,6 +44,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         Set up core.py: contains core routines to be imported directly from package.
         Create a dummy source file (convenient for tests)
+        Set up MyBaseModel.
         Set up py.typed enabling package imports.
         """
         self._create_source_file("core.py")
@@ -54,6 +55,14 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._copy_template("foo.py", path_in_package=self._path_to_src)
 
+        source_file_path = self._copy_template(
+            "mybasemodel.py",
+            path_in_package=self._path_to_src,
+            package_filename="models.py",
+            generic=True,
+        )
+        self._replace_package_placeholder(source_file_path)
+
         self._create_source_file("py.typed")
 
     def setup_dependencies(self):
@@ -61,10 +70,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._poetry_add("pytest", "dev")
 
-    def setup_extra(self):
-        """
-        Additional setup.
-        """
+    def setup(self):
+        super().setup()
+
         self.setup_tests()
         self.setup_logger()
 
@@ -80,11 +88,10 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._copy_template("conftest.py", path_to_tests)
 
-        with open(self._path_to_type_templates / "test_foo.py") as f:
-            test_foo_lines = f.readlines()
-        test_foo_lines[0] = test_foo_lines[0].replace("$PACKAGE", self._inner_name)
-        with open(path_to_tests / "test_foo.py", "w") as f:
-            f.writelines(test_foo_lines)
+        source_file_path = self._copy_template(
+            "test_foo.py", path_in_package=path_to_tests
+        )
+        self._replace_package_placeholder(source_file_path)
 
     def setup_logger(self):
         shutil.copy(
@@ -97,3 +104,17 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         f = open(self._path_to_src / filepath, "w")
         f.close()
+
+    def _replace_package_placeholder(self, filepath: Path):
+        """
+        Replace $PACKAGE with package name in given source file.
+        """
+        with open(filepath) as f:
+            source_file_lines = f.readlines()
+
+        source_file_lines = [
+            line.replace("$PACKAGE", self._inner_name) for line in source_file_lines
+        ]
+
+        with open(filepath, "w") as f:
+            f.writelines(source_file_lines)
