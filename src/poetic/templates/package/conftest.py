@@ -1,8 +1,12 @@
+import json
 from pathlib import Path
+import pytest
 import sys
 import os
 
 from dotenv import dotenv_values
+
+from $PACKAGE.models import ExampleModel
 
 env_config = dotenv_values()
 is_debug = env_config.get("DEBUG", "").lower() in ("true", "1")
@@ -17,3 +21,20 @@ if is_debug:
 
 PATH_TO_ASSETS = Path(os.path.dirname(__file__))
 PATH_TO_CONFIGS = PATH_TO_ASSETS / "configs"
+
+def get_example_model(filename: str) -> ExampleModel:
+    model_config_path = PATH_TO_CONFIGS / f"{filename}.json"
+    with open(model_config_path) as f:
+        dataset_info = ExampleModel(**json.load(f))
+    return dataset_info
+
+
+def get_example_test_case(filename: str = "test_model"):
+    example_model = get_example_model(filename)
+    ret = [pytest.param(example_model, id=filename)]
+    return ret
+
+
+@pytest.fixture(params=get_example_test_case())
+def test_case_example(request) -> ExampleModel:
+    return request.param

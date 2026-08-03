@@ -56,9 +56,8 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._copy_template("foo.py", path_in_package=self._path_to_src)
 
         source_file_path = self._copy_template(
-            "mybasemodel.py",
+            "models.py",
             path_in_package=self._path_to_src,
-            package_filename="models.py",
             generic=True,
         )
         self._replace_package_placeholder(source_file_path)
@@ -88,13 +87,15 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         path_to_configs = path_to_tests / "configs"
         os.mkdir(path_to_configs)
 
-        self._copy_template("conftest.py", path_to_tests)
+        conftest_filepath = self._copy_template("conftest.py", path_to_tests)
+        self._replace_package_placeholder(conftest_filepath)
+
         self._copy_template("test_model.json", path_in_package=path_to_configs)
 
-        source_file_path = self._copy_template(
+        test_unit_filepath = self._copy_template(
             "test_unit.py", path_in_package=path_to_tests
         )
-        self._replace_package_placeholder(source_file_path)
+        self._replace_package_placeholder(test_unit_filepath)
 
     def setup_logger(self):
         shutil.copy(
