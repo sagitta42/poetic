@@ -1,7 +1,10 @@
+import json
+
 import $PACKAGE.foo as foo
 from $PACKAGE.logger import logg
 from $PACKAGE.models import MyBaseModel
 
+from tests.conftest import PATH_TO_CONFIGS
 
 def test_foo():
     input = 21
@@ -15,6 +18,9 @@ def test_mybasemodel():
         answer: int
         message: str
 
-    test_model = TestModel(answer=42, message="The answer to the question of life, universe, and everything")
+    path_to_model = PATH_TO_CONFIGS / "test_model.json"
+    with open(path_to_model) as f:
+        test_model = TestModel(**json.load(f))
+
     logg.info("Test model")
     test_model.display()

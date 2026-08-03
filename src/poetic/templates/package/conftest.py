@@ -1,3 +1,4 @@
+from pathlib import Path
 import sys
 import os
 
@@ -13,3 +14,6 @@ if is_debug:
     path_to_src = os.path.join(path_current, "..", "src")
     path_to_src_absolute = os.path.abspath(path_to_src)
     sys.path.insert(0, path_to_src_absolute)
+
+PATH_TO_ASSETS = Path(os.path.dirname(__file__))
+PATH_TO_CONFIGS = PATH_TO_ASSETS / "configs"

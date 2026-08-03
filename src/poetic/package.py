@@ -85,8 +85,11 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         Add pytest as dev dependency.
         """
         path_to_tests: Path = self.path / "tests"
+        path_to_configs = path_to_tests / "configs"
+        os.mkdir(path_to_configs)
 
         self._copy_template("conftest.py", path_to_tests)
+        self._copy_template("test_model.json", path_in_package=path_to_configs)
 
         source_file_path = self._copy_template(
             "test_unit.py", path_in_package=path_to_tests
