@@ -3,6 +3,7 @@ from poetic.builder import TemplateBuilder, BaseTemplateSettings
 from poetic.logger import logg
 from poetic.settings import (
     APITemplateSettings,
+    DBSettings,
     DBType,
     PackageTemplateSettings,
     SettingsCrutch,
@@ -26,6 +27,7 @@ def main():
         nargs="?",
         const=DBType.sqlite.value,
         default=None,
+        choices=DBSettings.options("db"),
         help=APITemplateSettings.description("db"),
     )
     parser.add_argument(

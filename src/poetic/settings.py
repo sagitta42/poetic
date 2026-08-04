@@ -14,9 +14,18 @@ class SetupSettings(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
+    @classmethod
+    def options(cls, field_name: str) -> list | None:
+        field_type = cls.model_fields[field_name].annotation
+        assert field_type is not None
+        if issubclass(field_type, enum.Enum):
+            return [item.value for item in field_type if not item.name == "none"]
+        return None
+
 
 class DBType(str, enum.Enum):
     sqlite = "sqlite"
+    none = "none"
 
 
 class DBSettings(SetupSettings):
@@ -24,9 +33,7 @@ class DBSettings(SetupSettings):
     Settings for DB setup.
     """
 
-    db: DBType | None = Field(
-        description="Create/update DB functionalities of given DB type"
-    )
+    db: DBType = Field(description="Create/update DB functionalities of given DB type")
 
 
 class DotenvSettings(SetupSettings):
@@ -70,14 +77,6 @@ class BaseTemplateSettings(SetupSettings):
     def default(cls, field_name: str) -> Any:
         ret = cls.model_fields[field_name].default
         return ret
-
-    @classmethod
-    def options(cls, field_name: str) -> list | None:
-        field_type = cls.model_fields[field_name].annotation
-        assert field_type is not None
-        if issubclass(field_type, enum.Enum):
-            return [item.value for item in field_type]
-        return None
 
 
 class PackageTemplateSettings(BaseTemplateSettings, DotenvSettings):
