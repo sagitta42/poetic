@@ -82,6 +82,7 @@ class BaseSetup(Generic[T_Settings]):
             template_filename, generic, template_subdir=template_subdir
         )
 
+        logg.debug(f"Copying {path_to_template} -> {path_to_package_file}")
         shutil.copy(path_to_template, path_to_package_file)
 
         return path_to_package_file

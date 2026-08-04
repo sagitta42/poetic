@@ -129,7 +129,7 @@ class APITemplateSettings(BaseTemplateSettings, DBSettings):
 
 
 TemplateSettings = Annotated[
-    PackageTemplateSettings | APITemplateSettings,
+    PackageTemplateSettings | APITemplateSettings | VSCodeSetupSettings,
     Field(discriminator="type"),
 ]
 

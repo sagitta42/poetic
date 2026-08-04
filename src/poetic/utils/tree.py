@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from poetic.logger import logg
+
 space = "    "
 branch = "│   "
 tee = "├── "
@@ -22,3 +24,10 @@ def tree(path: Path, prefix: str = ""):
         if path.is_dir() and not path.name in ["venv", ".git", "poetry.lock"]:
             extension = branch if pointer == tee else space
             yield from tree(path, prefix=prefix + extension)
+
+def display(path: Path):
+    """
+    Display tree in given path.
+    """
+    for line in tree(path):
+        logg.info(line)    

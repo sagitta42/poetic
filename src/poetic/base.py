@@ -9,7 +9,7 @@ from poetic.logger import logg
 from poetic.settings import BaseTemplateSettings, VSCodeSetupSettings
 from poetic.setup.settings import SettingsSetup
 from poetic.setup.vscode import VSCodeSetup
-from poetic.utils.tree import tree
+from poetic.utils.tree import display, tree
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
@@ -196,8 +196,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         Display the template via tree.
         """
         logg.info(self.name)
-        for line in tree(self.path):
-            logg.info(line)
+        display(self.path)
 
     @abstractmethod
     def poetry_init(self):
