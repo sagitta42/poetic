@@ -51,4 +51,5 @@ def main():
     template.update() if args.update else template.init()
 
 
-main()
+if __name__ == "__main__":
+    main()
