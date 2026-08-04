@@ -1,0 +1,2 @@
+class PoeticException(Exception):
+    pass

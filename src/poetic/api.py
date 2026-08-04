@@ -26,6 +26,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         Basic setup with only pyproject.toml.
         Disable package mode.
         """
+        super().poetry_init()
         os.mkdir(self.name)
 
         self._run(

@@ -35,6 +35,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         Standard setup with src/package_name structure.
         """
+        super().poetry_init()
         # TODO: use subprocess
         os.system(f"poetry new {self.name}")
 

@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import TypeVar
 
+from poetic.exceptions import PoeticException
 from poetic.setup.base import BaseSetup
 from poetic.logger import logg
 from poetic.settings import BaseTemplateSettings
@@ -199,7 +200,10 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         """
         Initialize package with poetry
         """
-        pass
+        if os.path.exists(self.name):
+            raise PoeticException(
+                f"{self.name} exists! Change name of new or existing package; or run with --update flag if you wish to update existing package."
+            )
 
     @abstractmethod
     def setup_source_files(self):

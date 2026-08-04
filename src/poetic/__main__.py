@@ -1,5 +1,6 @@
 import argparse
 from poetic.builder import TemplateBuilder, BaseTemplateSettings
+from poetic.exceptions import PoeticException
 from poetic.logger import logg
 from poetic.settings import (
     APITemplateSettings,
@@ -48,7 +49,11 @@ def main():
     template_builder = TemplateBuilder()
     template = template_builder.build(template_settings)
 
-    template.update() if args.update else template.init()
+    try:
+        template.update() if args.update else template.init()
+    except PoeticException as e:
+        logg.error(str(e))
+        return
 
 
 if __name__ == "__main__":
