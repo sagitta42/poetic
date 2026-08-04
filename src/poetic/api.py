@@ -12,11 +12,15 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._dotenv_settings = SettingsSetup(DotenvSettings(type=SetupType.dotenv, settings=True), self.path)
+        self._dotenv_settings = SettingsSetup(
+            DotenvSettings(type=SetupType.dotenv, settings=True), self.path
+        )
         self._db: DBSetup | None = (
             None
             if settings.db is None
-            else DBSetup(DBSettings(type=SetupType.db, **settings.model_dump()), self.path)
+            else DBSetup(
+                DBSettings(type=SetupType.db, **settings.model_dump()), self.path
+            )
         )
 
     def poetry_init(self):

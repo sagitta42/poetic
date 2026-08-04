@@ -27,7 +27,7 @@ def main():
         type=str,
         nargs="?",
         const=DBType.sqlite.value,
-        default=None,
+        default=DBType.none.value,
         choices=DBSettings.options("db"),
         help=APITemplateSettings.description("db"),
     )

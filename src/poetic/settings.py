@@ -1,6 +1,6 @@
 import enum
 from pathlib import Path
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -28,12 +28,12 @@ class SetupSettings(BaseModel):
     type: SetupType = Field(description="Setup type")
 
     @classmethod
-    def options(cls, field_name: str) -> list | None:
+    def options(cls, field_name: str) -> list:
         field_type = cls.model_fields[field_name].annotation
         assert field_type is not None
         if issubclass(field_type, enum.Enum):
             return [item.value for item in field_type if not item.name == "none"]
-        return None
+        return []
 
 
 class DBType(str, enum.Enum):
@@ -71,6 +71,11 @@ class BaseTemplateSettings(SetupSettings):
     type: SetupType = Field(default=SetupType.package, description="Template type")
     name: str = Field(description="Package name")
 
+    # FIXME: improve
+    @classmethod
+    def type_options(cls) -> list[SetupType]:
+        return [SetupType.package, SetupType.api]
+
     @classmethod
     def description(cls, field_name: str) -> str:
         ret = cls.model_fields[field_name].description
@@ -81,6 +86,18 @@ class BaseTemplateSettings(SetupSettings):
     def default(cls, field_name: str) -> Any:
         ret = cls.model_fields[field_name].default
         return ret
+
+    @classmethod
+    def options(cls, field_name: str) -> list:
+        if field_name == "type":
+            return [type.value for type in cls.type_options()]
+        return super().options(field_name)
+
+    @model_validator(mode="after")
+    def check_type(self) -> Self:
+        if self.type not in self.__class__.type_options():
+            raise ValueError(f"Template type {self.type} not supported!")
+        return self
 
 
 class PackageTemplateSettings(BaseTemplateSettings, DotenvSettings):
