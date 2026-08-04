@@ -14,11 +14,12 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ```bash
 $ poetic -h
-usage: poetic [-h] {template} ...
+usage: poetic [-h] {template,add} ...
 
 positional arguments:
-  {template}
-    template  create/update template
+  {template,add}
+    template      create/update template
+    add  
 ```
 
 #### Create/update template
@@ -57,6 +58,25 @@ Add `--settings` flag to set up `pydantic_settings` based `Settings` class conta
 
 Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update.
 
+#### Add functionality
+
+```bash
+$ poetic add -h
+usage: poetic add [-h] {vscode,gitignore}
+
+positional arguments:
+  {vscode,gitignore}  Type of functionality
+
+options:
+  -h, --help          show this help message and exit
+```
+
+Single functionalities added to current directory:
+- `poetic add vscode` - creates/updates `.vscode` setup
+- `poetic add gitignore` - creates/updates `.gitignore`
+
+If directory is a git repository, will commit if new setup or suggest commit if modified.
+
 ### In code
 
 For package template:
@@ -72,9 +92,10 @@ Use `APITemplate` instead for API template.
 
 Use `packge_template.update()` instead to update existing package.
 
+
 ## Examples
 
-### `poetic awesome-package --package --settings`
+### `poetic template awesome-package --package --settings`
 
 Result
 
@@ -103,7 +124,7 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-### `poetic awesome-api --api --db`
+### `poetic template awesome-api --api --db`
 
 Result
 
@@ -148,7 +169,9 @@ awesome-api
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev); fastapi, pydantic, pydantic-settings, uvicorn
 ```
 
-### Update
+### Update template
+
+Add `--update` flag to `poetic template` call.
 
 On the first update, will create a branch dedicated to poetic updates starting from the first commit.
 
@@ -175,4 +198,13 @@ commit a01eefcfe8fff4372c9ad337d40e9ad991b32f9d
 
 commit d68f600af54ae2410557d19a5f72b09ed63aadbe
     template made with poetic
+```
+
+### Add functionality
+
+```bash
+$ poetic add vscode
+VSCode update with [poetic](https://github.com/sagitta42/poetic)
+├── settings.json
+└── launch.json
 ```
