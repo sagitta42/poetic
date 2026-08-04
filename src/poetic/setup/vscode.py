@@ -14,3 +14,6 @@ class VSCodeSetup(BaseSetup[VSCodeSetupSettings]):
         os.makedirs(path_to_vscode, exist_ok=True)
         self._copy_template("VSCode.settings.json", path_to_vscode, "settings.json")
         self._copy_template("VSCode.launch.json", path_to_vscode, "launch.json")
+
+    def launch(self) -> None:
+        self.setup()

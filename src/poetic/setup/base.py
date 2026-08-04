@@ -49,6 +49,13 @@ class BaseSetup(Generic[T_Settings]):
         """
         pass
 
+    @abstractmethod
+    def launch(self) -> None:
+        """
+        Launch action of this setup
+        """
+        pass
+
     def _copy_template(
         self,
         template_filename: str,

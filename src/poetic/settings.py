@@ -77,6 +77,7 @@ class BaseTemplateSettings(SetupSettings):
 
     type: SetupType = Field(default=SetupType.package, description="Template type")
     name: str = Field(description="Package name")
+    update: bool = Field(description="Update template rather than create new")
 
     # FIXME: improve
     @classmethod

@@ -1,5 +1,5 @@
 import argparse
-from poetic.builder import TemplateBuilder, BaseTemplateSettings
+from poetic.builder import PoeticFactory, BaseTemplateSettings
 from poetic.exceptions import PoeticException
 from poetic.logger import logg
 from poetic.settings import (
@@ -8,6 +8,7 @@ from poetic.settings import (
     DBType,
     PackageTemplateSettings,
     SettingsCrutch,
+    SetupType,
 )
 
 
@@ -54,14 +55,14 @@ def main():
     logg.debug(vars(args))
 
     settings_args = vars(args).copy()
-    settings_args.pop("update")
 
-    template_settings = SettingsCrutch(**{"settings": settings_args}).settings
-    template_builder = TemplateBuilder()
-    template = template_builder.build(template_settings)
+    setup_settings = SettingsCrutch(**{"settings": settings_args}).settings
+
+    poetic_factory = PoeticFactory()
+    setupper = poetic_factory.build(setup_settings)
 
     try:
-        template.update() if args.update else template.init()
+        setupper.launch()
     except PoeticException as e:
         logg.error(str(e))
         return

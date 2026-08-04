@@ -31,7 +31,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         - extra
 
     Repository update: updating existing template with poetic updates.
-
     """
 
     def __init__(self, settings: T_TemplateSettings) -> None:
@@ -48,6 +47,17 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._vscode = VSCodeSetup(VSCodeSetupSettings(), self.path)
 
         logg.info(f"Setting up {self._type}: {self.name}")
+
+    def launch(self) -> None:
+        """
+        Template launch action.
+
+        Update/create based on request.
+        """
+        if self._settings.update:
+            self.update()
+        else:
+            self.init()
 
     def init(self):
         """
