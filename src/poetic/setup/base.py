@@ -37,13 +37,13 @@ class BaseSetup(Generic[T_Settings]):
         self._settings = settings
         self.path = path
 
+        self._type: str = settings.type.value
         # FIXME: changes if source file folder depth does
         self._path_to_resources = Path(__file__).resolve().parent.parent
         # TODO: try to use resources - Path() does not convert MultiplexedPath
         # self._path_to_resources = Path(resources.files(__package__).__str__()).parent
         self._path_to_templates = self._path_to_resources / "templates"
-        # FIXME: improve
-        self._path_to_type_templates = self._path_to_templates
+        self._path_to_type_templates = self._path_to_templates / self._type
 
         self._path_to_venv = (self.path / "venv").resolve()
 
@@ -56,6 +56,7 @@ class BaseSetup(Generic[T_Settings]):
         skip_super: do not perform superclass setup
             (e.g. to skip for "assistive" internal setups)
         """
+        # FIXME: improve
         self.setup_dotenv_template()
         self.setup_venv()
         self.setup_dependencies()

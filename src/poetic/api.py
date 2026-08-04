@@ -5,18 +5,18 @@ from poetic.base import BaseTemplate
 from poetic.setup.db import DBSetup
 from poetic.setup.settings import SettingsSetup
 from poetic.utils.pyproject_handler import PyProjectHandler
-from poetic.settings import APITemplateSettings, DBSettings, DotenvSettings
+from poetic.settings import APITemplateSettings, DBSettings, DotenvSettings, SetupType
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._dotenv_settings = SettingsSetup(DotenvSettings(settings=True), self.path)
+        self._dotenv_settings = SettingsSetup(DotenvSettings(type=SetupType.dotenv, settings=True), self.path)
         self._db: DBSetup | None = (
             None
             if settings.db is None
-            else DBSetup(DBSettings(**settings.model_dump()), self.path)
+            else DBSetup(DBSettings(type=SetupType.db, **settings.model_dump()), self.path)
         )
 
     def poetry_init(self):

@@ -7,6 +7,9 @@ from poetic.setup.base import BaseSetup
 class SettingsSetup(BaseSetup[DotenvSettings]):
     """
     Settings setup.
+
+    Set up settings source file / class with pydantic-settings based class
+        containing .env variables.
     """
 
     def __init__(self, settings: DotenvSettings, path: Path) -> None:
@@ -19,9 +22,7 @@ class SettingsSetup(BaseSetup[DotenvSettings]):
         if self._settings.package_subdir is not None:
             path_in_package = self.path / self._settings.package_subdir
 
-        self._copy_template(
-            "settings.py", path_in_package=path_in_package, generic=True
-        )
+        self._copy_template("settings.py", path_in_package=path_in_package)
 
     def setup_dependencies(self) -> None:
         super().setup_dependencies()

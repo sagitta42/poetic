@@ -36,10 +36,7 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         self.name = settings.name
         super().__init__(settings, Path(self.name))
 
-        self._type: str = settings.type.value
         self._inner_name = self.name.replace("-", "_")
-
-        self._path_to_type_templates = self._path_to_templates / self._type
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 

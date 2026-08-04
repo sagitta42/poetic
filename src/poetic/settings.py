@@ -7,12 +7,25 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from poetic.logger import logg
 
 
+class SetupType(str, enum.Enum):
+    package = "package"
+    api = "api"
+    db = "db"
+    dotenv = "dotenv"
+
+    @classmethod
+    def values(cls) -> list[str]:
+        return [item.value for item in cls]
+
+
 class SetupSettings(BaseModel):
     """
     Base class for settings for any type of setup.
     """
 
     model_config = ConfigDict(extra="ignore")
+
+    type: SetupType = Field(description="Setup type")
 
     @classmethod
     def options(cls, field_name: str) -> list | None:
@@ -33,6 +46,7 @@ class DBSettings(SetupSettings):
     Settings for DB setup.
     """
 
+    type: Literal[SetupType.db] = Field(description="Setup type")
     db: DBType = Field(description="Create/update DB functionalities of given DB type")
 
 
@@ -41,6 +55,7 @@ class DotenvSettings(SetupSettings):
     Settings for .env settings reading setup
     """
 
+    type: Literal[SetupType.dotenv] = Field(description="Setup type")
     settings: bool = Field(default=False, description="Set up .env settings module")
     package_subdir: Path | None = Field(
         default=None,
@@ -48,23 +63,12 @@ class DotenvSettings(SetupSettings):
     )
 
 
-class TemplateType(str, enum.Enum):
-    package = "package"
-    api = "api"
-
-    @classmethod
-    def values(cls) -> list[str]:
-        return [item.value for item in cls]
-
-
 class BaseTemplateSettings(SetupSettings):
     """
     Common settings for any template.
     """
 
-    type: TemplateType = Field(
-        default=TemplateType.package, description="Template type"
-    )
+    type: SetupType = Field(default=SetupType.package, description="Template type")
     name: str = Field(description="Package name")
 
     @classmethod
@@ -86,7 +90,7 @@ class PackageTemplateSettings(BaseTemplateSettings, DotenvSettings):
     Include option to set up .env pydantic settings.
     """
 
-    type: Literal[TemplateType.package] = Field(description="Template type")
+    type: Literal[SetupType.package] = Field(description="Template type", exclude=True)
 
 
 class APITemplateSettings(BaseTemplateSettings, DBSettings):
@@ -96,7 +100,7 @@ class APITemplateSettings(BaseTemplateSettings, DBSettings):
     API template includes option to set up DB.
     """
 
-    type: Literal[TemplateType.api] = Field(description="Template type")
+    type: Literal[SetupType.api] = Field(description="Template type", exclude=True)
 
 
 TemplateSettings = Annotated[

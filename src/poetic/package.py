@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 from poetic.base import BaseTemplate
-from poetic.settings import DotenvSettings, PackageTemplateSettings, TemplateType
+from poetic.settings import DotenvSettings, PackageTemplateSettings, SetupType
 from poetic.setup.settings import SettingsSetup
 from poetic.utils.utils import add_new_line_to_file
 
@@ -14,14 +14,14 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         settings = (
             init
             if isinstance(init, PackageTemplateSettings)
-            else PackageTemplateSettings(name=init, type=TemplateType.package)
+            else PackageTemplateSettings(name=init, type=SetupType.package)
         )
         super().__init__(settings)
 
         src_subdir = Path("src") / self._inner_name
         self._path_to_src: Path = self.path / src_subdir
 
-        dotenv_settings = DotenvSettings(**self._settings.model_dump())
+        dotenv_settings = DotenvSettings(type=SetupType.dotenv, **self._settings.model_dump())
         dotenv_settings.package_subdir = src_subdir
         self._dotenv_settings = (
             SettingsSetup(dotenv_settings, self.path)
@@ -69,8 +69,8 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._poetry_add("pytest", "dev")
 
-    def setup(self):
-        super().setup()
+    def setup(self, skip_super: bool = False):
+        super().setup(skip_super)
 
         self.setup_tests()
         self.setup_logger()
