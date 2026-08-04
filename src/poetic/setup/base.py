@@ -147,11 +147,15 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         existed_before = self.setup()
         assert existed_before is not None
 
-        if self.git.is_git_repo and not existed_before:
-            self.git.commit_all(self.commit_message("setup"))
-            self.display()
+        # FIXME: improve
+        if self.git.is_git_repo:
+            if not existed_before:
+                self.git.commit_all(self.commit_message("setup"))
+                self.display()
+            else:
+                self.display(self.commit_message("update"))
         else:
-            self.display(self.commit_message("update"))
+            self.display()
 
     def display(self, suggest_commit: str | None = None):
         """
