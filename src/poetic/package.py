@@ -85,7 +85,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         path_to_tests: Path = self.path / "tests"
         path_to_configs = path_to_tests / "configs"
-        os.mkdir(path_to_configs)
+        os.makedirs(path_to_configs, exist_ok=True)
 
         conftest_filepath = self._copy_template("conftest.py", path_to_tests)
         self._replace_package_placeholder(conftest_filepath)
