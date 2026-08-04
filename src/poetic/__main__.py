@@ -49,7 +49,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     parser.add_argument(
         "type",
         type=str,
-        choices=[SetupType.vscode.value],
+        choices=[SetupType.vscode.value, SetupType.gitignore.value],
         help="Type of functionality",
     )
 

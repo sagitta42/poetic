@@ -12,6 +12,7 @@ from poetic.settings import SetupSettings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
+from poetic.utils.tree import display
 
 T_Settings = TypeVar("T_Settings", bound=SetupSettings)
 
@@ -109,6 +110,47 @@ class BaseSetup(Generic[T_Settings]):
         return ret
 
 
+class BaseFunctionalitySetup(BaseSetup[T_Settings]):
+    """
+    General setup for functionalities.
+
+    Standard launch action:
+    - set up
+    - if git repo and fresh seutp, commit
+    """
+
+    # FIXME: improve
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        """
+        Functionality name for commit
+        """
+        pass
+
+    def launch(self) -> None:
+        """
+        Launch functionality setup.
+
+        Perform setup.
+        Commit setup if in git repository and files did not exist before.
+        """
+        existed_before = self.setup()
+        assert existed_before is not None
+
+        if self.git.is_git_repo and not existed_before:
+            message = f"{self.name} setup with {self._poetic_link}"
+            self.git.commit_all(message)
+
+        self.display()
+
+    def display(self):
+        """
+        Display setup
+        """
+        logg.info(f"{self.name} functionality setup")
+
+
 class BaseDependencySetup(BaseSetup[T_Settings]):
     """
     General setup with dependencies.
@@ -142,9 +184,10 @@ class BaseDependencySetup(BaseSetup[T_Settings]):
 
         Return path to template.
         """
-        return self._copy_template(
+        ret, _ = self._copy_template(
             "env.template", package_filename=".env.template", generic=True
         )
+        return ret
 
     def setup_venv(self):
         """

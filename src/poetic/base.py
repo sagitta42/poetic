@@ -6,7 +6,12 @@ from typing import TypeVar
 from poetic.exceptions import PoeticException
 from poetic.setup.base import BaseDependencySetup
 from poetic.logger import logg
-from poetic.settings import BaseTemplateSettings, VSCodeSetupSettings
+from poetic.settings import (
+    BaseTemplateSettings,
+    GitignoreSetupSettings,
+    VSCodeSetupSettings,
+)
+from poetic.setup.gitignore import GitignoreSetup
 from poetic.setup.settings import SettingsSetup
 from poetic.setup.vscode import VSCodeSetup
 from poetic.utils.tree import display, tree
@@ -41,9 +46,9 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
-
         self._dotenv_settings: SettingsSetup | None = None
         self._vscode = VSCodeSetup(VSCodeSetupSettings(), self.path)
+        self._gitignore = GitignoreSetup(GitignoreSetupSettings(), self.path)
 
         logg.info(f"Setting up {self._type}: {self.name}")
 
@@ -135,7 +140,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     def setup(self, skip_super: bool = False) -> None:
         super().setup(skip_super)
 
-        self.setup_gitignore()
+        self._gitignore.setup()
         self.setup_source_files()
 
         if self._dotenv_settings is not None:
@@ -147,17 +152,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     def setup_dependencies(self):
         self._poetry_add("dotenv")
         self._poetry_add("pydantic")
-
-    def setup_gitignore(self):
-        """
-        Set up .gitignore.
-
-        Python .gitignore covering everything:
-        https://github.com/github/gitignore/blob/main/Python.gitignore
-        """
-        self._copy_template(
-            "Python.gitignore", package_filename=".gitignore", generic=True
-        )
 
     def setup_readme(self):
         """

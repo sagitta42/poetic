@@ -13,6 +13,7 @@ class SetupType(str, enum.Enum):
     db = "db"
     dotenv = "dotenv"
     vscode = "vscode"
+    gitignore = "gitignore"
 
     @classmethod
     def values(cls) -> list[str]:
@@ -40,6 +41,12 @@ class SetupSettings(BaseModel):
 class VSCodeSetupSettings(SetupSettings):
     type: Literal[SetupType.vscode] = Field(
         default=SetupType.vscode, description="Setup type"
+    )
+
+
+class GitignoreSetupSettings(SetupSettings):
+    type: Literal[SetupType.gitignore] = Field(
+        default=SetupType.gitignore, description="Setup type"
     )
 
 
@@ -129,7 +136,10 @@ class APITemplateSettings(BaseTemplateSettings, DBSettings):
 
 
 TemplateSettings = Annotated[
-    PackageTemplateSettings | APITemplateSettings | VSCodeSetupSettings,
+    PackageTemplateSettings
+    | APITemplateSettings
+    | VSCodeSetupSettings
+    | GitignoreSetupSettings,
     Field(discriminator="type"),
 ]
 

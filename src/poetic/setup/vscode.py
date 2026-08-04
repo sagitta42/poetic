@@ -3,11 +3,11 @@ from pathlib import Path
 
 from poetic.logger import logg
 from poetic.settings import VSCodeSetupSettings
-from poetic.setup.base import BaseSetup
+from poetic.setup.base import BaseFunctionalitySetup
 from poetic.utils.tree import display
 
 
-class VSCodeSetup(BaseSetup[VSCodeSetupSettings]):
+class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
     """
     VSCode settings and launch setup.
     """
@@ -16,6 +16,10 @@ class VSCodeSetup(BaseSetup[VSCodeSetupSettings]):
         super().__init__(settings, path)
 
         self._path_to_vscode = self.path / ".vscode"
+
+    @property
+    def name(self) -> str:
+        return "VSCode"
 
     def setup(self, skip_super: bool = False) -> bool:
         """
@@ -34,18 +38,6 @@ class VSCodeSetup(BaseSetup[VSCodeSetupSettings]):
 
         return any(existed)
 
-    def launch(self) -> None:
-        """
-        Launch VSCode setup.
-
-        Perform setup.
-        Commit setup if in git repository and files did not exist before.
-        """
-        existed_before = self.setup()
-
-        if self.git.is_git_repo and not existed_before:
-            message = f"VSCode setup with {self._poetic_link}"
-            self.git.commit_all(message)
-
-        logg.info("VSCode setup")
+    def display(self):
+        super().display()
         display(self._path_to_vscode)

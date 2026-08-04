@@ -7,11 +7,13 @@ from poetic.logger import logg
 from poetic.package import PackageTemplate
 from poetic.settings import BaseTemplateSettings, SetupSettings, SetupType
 from poetic.setup.base import BaseSetup
+from poetic.setup.gitignore import GitignoreSetup
 from poetic.setup.vscode import VSCodeSetup
 
 
 class SetupClass(enum.Enum):
     vscode = VSCodeSetup
+    gitignore = GitignoreSetup
 
     @classmethod
     def from_setup_tupe(cls, setup_type: SetupType):
