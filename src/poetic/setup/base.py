@@ -45,9 +45,11 @@ class BaseSetup(Generic[T_Settings]):
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
     @abstractmethod
-    def setup(self, skip_super: bool = False) -> None:
+    def setup(self, skip_super: bool = False) -> bool | None:
         """
         Main setup.
+
+        Optionally return a flag.
         """
         pass
 
@@ -65,20 +67,22 @@ class BaseSetup(Generic[T_Settings]):
         package_filename: str | None = None,
         template_subdir: Path | str | None = None,
         generic: bool = False,
-    ) -> Path:
+    ) -> tuple[Path, bool]:
         """
-        Copy template into package source code if does not yet exist.
+        Copy template into package source code.
 
         template_filename (str): name of template to copy contained under templates of this package
         generic (bool): template is generic (independent of setup type)
         path_in_package (Path | None): path where to copy in package; default = root path
         package_filename (str | None): filename of template in package; default = same as original template
 
-        Returns path to file in package.
+        Returns path to file in package and whether it existed before.
         """
         path_in_package = path_in_package or self.path
         package_filename = package_filename or template_filename
         path_to_package_file = path_in_package / package_filename
+
+        existed_before = path_to_package_file.exists()
 
         path_to_template = self._get_template_path(
             template_filename, generic, template_subdir=template_subdir
@@ -87,7 +91,7 @@ class BaseSetup(Generic[T_Settings]):
         logg.debug(f"Copying {path_to_template} -> {path_to_package_file}")
         shutil.copy(path_to_template, path_to_package_file)
 
-        return path_to_package_file
+        return path_to_package_file, existed_before
 
     def _get_template_path(
         self, template_filename: str, generic: bool, template_subdir: Path | str | None

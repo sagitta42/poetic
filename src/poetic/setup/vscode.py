@@ -17,17 +17,33 @@ class VSCodeSetup(BaseSetup[VSCodeSetupSettings]):
 
         self._path_to_vscode = self.path / ".vscode"
 
-    def setup(self, skip_super: bool = False) -> None:
+    def setup(self, skip_super: bool = False) -> bool:
+        """
+        Set up VSCode.
+
+        Return flag representing whether templates existed before.
+        """
         os.makedirs(self._path_to_vscode, exist_ok=True)
-        self._copy_template(
-            "VSCode.settings.json", self._path_to_vscode, "settings.json"
-        )
-        self._copy_template("VSCode.launch.json", self._path_to_vscode, "launch.json")
+
+        existed = []
+        for template in ["settings", "launch"]:
+            _, template_existed = self._copy_template(
+                f"VSCode.{template}.json", self._path_to_vscode, f"{template}.json"
+            )
+            existed.append(template_existed)
+
+        return any(existed)
 
     def launch(self) -> None:
-        self.setup()
+        """
+        Launch VSCode setup.
 
-        if self.git.is_git_repo:
+        Perform setup.
+        Commit setup if in git repository and files did not exist before.
+        """
+        existed_before = self.setup()
+
+        if self.git.is_git_repo and not existed_before:
             message = f"VSCode setup with {self._poetic_link}"
             self.git.commit_all(message)
 

@@ -56,7 +56,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._copy_template("foo.py", path_in_package=self._path_to_src)
 
-        source_file_path = self._copy_template(
+        source_file_path, _ = self._copy_template(
             "models.py",
             path_in_package=self._path_to_src,
             generic=True,
@@ -88,12 +88,12 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         path_to_configs = path_to_tests / "configs"
         os.makedirs(path_to_configs, exist_ok=True)
 
-        conftest_filepath = self._copy_template("conftest.py", path_to_tests)
+        conftest_filepath, _ = self._copy_template("conftest.py", path_to_tests)
         self._replace_package_placeholder(conftest_filepath)
 
         self._copy_template("test_model.json", path_in_package=path_to_configs)
 
-        test_unit_filepath = self._copy_template(
+        test_unit_filepath, _ = self._copy_template(
             "test_unit.py", path_in_package=path_to_tests
         )
         self._replace_package_placeholder(test_unit_filepath)
