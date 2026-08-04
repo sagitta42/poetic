@@ -1,10 +1,10 @@
 from pathlib import Path
 
 from poetic.settings import DotenvSettings
-from poetic.setup.base import BaseSetup
+from poetic.setup.base import BaseDependencySetup
 
 
-class SettingsSetup(BaseSetup[DotenvSettings]):
+class SettingsSetup(BaseDependencySetup[DotenvSettings]):
     """
     Settings setup.
 

@@ -4,16 +4,17 @@ from pathlib import Path
 from typing import TypeVar
 
 from poetic.exceptions import PoeticException
-from poetic.setup.base import BaseSetup
+from poetic.setup.base import BaseDependencySetup
 from poetic.logger import logg
-from poetic.settings import BaseTemplateSettings
+from poetic.settings import BaseTemplateSettings, VSCodeSetupSettings
 from poetic.setup.settings import SettingsSetup
+from poetic.setup.vscode import VSCodeSetup
 from poetic.utils.tree import tree
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
 
-class BaseTemplate(BaseSetup[T_TemplateSettings]):
+class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     """
     General template setup.
 
@@ -44,6 +45,7 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
         self._dotenv_settings: SettingsSetup | None = None
+        self._vscode = VSCodeSetup(VSCodeSetupSettings(), self.path)
 
         logg.info(f"Setting up {self._type}: {self.name}")
 
@@ -126,9 +128,11 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
 
         self.setup_gitignore()
         self.setup_source_files()
+
         if self._dotenv_settings is not None:
             self._dotenv_settings.setup(skip_super=True)
-        self.setup_vscode()
+        self._vscode.setup()
+
         self.setup_readme()
 
     def setup_dependencies(self):
@@ -144,16 +148,6 @@ class BaseTemplate(BaseSetup[T_TemplateSettings]):
         """
         self._copy_template(
             "Python.gitignore", package_filename=".gitignore", generic=True
-        )
-
-    def setup_vscode(self):
-        path_to_vscode = self.path / ".vscode"
-        os.makedirs(path_to_vscode, exist_ok=True)
-        self._copy_template(
-            "VSCode.settings.json", path_to_vscode, "settings.json", generic=True
-        )
-        self._copy_template(
-            "VSCode.launch.json", path_to_vscode, "launch.json", generic=True
         )
 
     def setup_readme(self):

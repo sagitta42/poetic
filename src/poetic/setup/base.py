@@ -25,12 +25,6 @@ class BaseSetup(Generic[T_Settings]):
     Includes basic operations:
         - git control
         - copying templates
-        - running subprocesses
-        - venv setup
-        - setting up dependencies with poetry
-        - .env template setup
-
-    NOTE: does not include venv or poetry setup
     """
 
     def __init__(self, settings: T_Settings, path: Path) -> None:
@@ -38,6 +32,7 @@ class BaseSetup(Generic[T_Settings]):
         self.path = path
 
         self._type: str = settings.type.value
+
         # FIXME: changes if source file folder depth does
         self._path_to_resources = Path(__file__).resolve().parent.parent
         # TODO: try to use resources - Path() does not convert MultiplexedPath
@@ -45,45 +40,13 @@ class BaseSetup(Generic[T_Settings]):
         self._path_to_templates = self._path_to_resources / "templates"
         self._path_to_type_templates = self._path_to_templates / self._type
 
-        self._path_to_venv = (self.path / "venv").resolve()
-
         self.git = Git(self.path)
 
+    @abstractmethod
     def setup(self, skip_super: bool = False) -> None:
         """
         Main setup.
-
-        skip_super: do not perform superclass setup
-            (e.g. to skip for "assistive" internal setups)
         """
-        # FIXME: improve
-        self.setup_dotenv_template()
-        self.setup_venv()
-        self.setup_dependencies()
-
-    def setup_dotenv_template(self) -> Path:
-        """
-        Set up .env.template.
-
-        Return path to template.
-        """
-        return self._copy_template(
-            "env.template", package_filename=".env.template", generic=True
-        )
-
-    def setup_venv(self):
-        """
-        Set up venv.
-
-        Create venv.
-        Install poetry into that venv.
-        """
-        if not self._path_to_venv.exists():
-            venv.create(self._path_to_venv, with_pip=True)
-        self._run(self.venv("pip"), "install", "poetry", env=True)
-
-    @abstractmethod
-    def setup_dependencies(self) -> None:
         pass
 
     def _copy_template(
@@ -130,6 +93,66 @@ class BaseSetup(Generic[T_Settings]):
 
         ret = path_to_templates / template_filename
         return ret
+
+
+class BaseDependencySetup(BaseSetup[T_Settings]):
+    """
+    General setup with dependencies.
+
+    Includes additional operations:
+        - running subprocesses
+        - venv setup
+        - setting up dependencies with poetry
+        - .env template setup
+    """
+
+    def __init__(self, settings: T_Settings, path: Path) -> None:
+        super().__init__(settings, path)
+
+        self._path_to_venv = (self.path / "venv").resolve()
+
+    def setup(self, skip_super: bool = False) -> None:
+        """
+        Main setup.
+
+        skip_super: do not perform superclass setup
+            (e.g. to skip for "assistive" internal setups)
+        """
+        self.setup_dotenv_template()
+        self.setup_venv()
+        self.setup_dependencies()
+
+    def setup_dotenv_template(self) -> Path:
+        """
+        Set up .env.template.
+
+        Return path to template.
+        """
+        return self._copy_template(
+            "env.template", package_filename=".env.template", generic=True
+        )
+
+    def setup_venv(self):
+        """
+        Set up venv.
+
+        Create venv.
+        Install poetry into that venv.
+        """
+        if not self._path_to_venv.exists():
+            venv.create(self._path_to_venv, with_pip=True)
+        self._run(self.venv("pip"), "install", "poetry", env=True)
+
+    def venv(self, exe: str) -> Path:
+        """
+        Get venv path to executable.
+        """
+        ret = self._path_to_venv / "bin" / exe
+        return ret
+
+    @abstractmethod
+    def setup_dependencies(self) -> None:
+        pass
 
     def _poetry_add(self, package: str, group: str | None = None):
         """
@@ -189,10 +212,3 @@ class BaseSetup(Generic[T_Settings]):
 
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)
-
-    def venv(self, exe: str) -> Path:
-        """
-        Get venv path to executable.
-        """
-        ret = self._path_to_venv / "bin" / exe
-        return ret

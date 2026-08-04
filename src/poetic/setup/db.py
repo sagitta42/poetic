@@ -2,12 +2,12 @@ import os
 from pathlib import Path
 import sqlite3
 
-from poetic.setup.base import BaseSetup
+from poetic.setup.base import BaseDependencySetup
 from poetic.settings import DBSettings, DBType
 from poetic.utils.utils import add_new_line_to_file
 
 
-class DBSetup(BaseSetup[DBSettings]):
+class DBSetup(BaseDependencySetup[DBSettings]):
     """
     DB setup.
     """

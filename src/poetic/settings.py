@@ -12,6 +12,7 @@ class SetupType(str, enum.Enum):
     api = "api"
     db = "db"
     dotenv = "dotenv"
+    vscode = "vscode"
 
     @classmethod
     def values(cls) -> list[str]:
@@ -34,6 +35,12 @@ class SetupSettings(BaseModel):
         if issubclass(field_type, enum.Enum):
             return [item.value for item in field_type if not item.name == "none"]
         return []
+
+
+class VSCodeSetupSettings(SetupSettings):
+    type: Literal[SetupType.vscode] = Field(
+        default=SetupType.vscode, description="Setup type"
+    )
 
 
 class DBType(str, enum.Enum):
