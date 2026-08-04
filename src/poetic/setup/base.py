@@ -128,6 +128,15 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         """
         pass
 
+    def commit_message(self, mod_type: str) -> str:
+        """
+        Suggested or utilized commit message.
+
+        mod_type: e.g. setup/update
+        """
+        message = f"{self.name} {mod_type} with {self._poetic_link}"
+        return message
+
     def launch(self) -> None:
         """
         Launch functionality setup.
@@ -139,16 +148,21 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         assert existed_before is not None
 
         if self.git.is_git_repo and not existed_before:
-            message = f"{self.name} setup with {self._poetic_link}"
-            self.git.commit_all(message)
+            self.git.commit_all(self.commit_message("setup"))
+            self.display()
+        else:
+            self.display(self.commit_message("update"))
 
-        self.display()
+    def display(self, suggest_commit: str | None = None):
+        """
+        Display setup.
 
-    def display(self):
+        suggest_commit: suggest commit message
         """
-        Display setup
-        """
-        logg.info(f"{self.name} functionality setup")
+        if suggest_commit is not None:
+            logg.info(suggest_commit)
+        else:
+            logg.info(f"{self.name} functionality setup")
 
 
 class BaseDependencySetup(BaseSetup[T_Settings]):

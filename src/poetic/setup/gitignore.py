@@ -26,6 +26,6 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
         )
         return existed
 
-    def display(self):
-        super().display()
+    def display(self, suggest_commit: str | None = None):
+        super().display(suggest_commit)
         logg.info("-> .gitignore")

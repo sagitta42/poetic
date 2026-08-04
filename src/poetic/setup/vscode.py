@@ -38,6 +38,6 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
 
         return any(existed)
 
-    def display(self):
-        super().display()
+    def display(self, suggest_commit: str | None = None):
+        super().display(suggest_commit)
         display(self._path_to_vscode)
