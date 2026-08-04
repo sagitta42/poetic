@@ -12,8 +12,25 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ### Command line
 
-```python
-$ python -m poetic <package-name> --type <package-type> [--db] [<db-type>] [--update] 
+```bash
+$ poetic -h
+usage: poetic [-h] [--type {package,api}] [--db [{sqlite}]] [--settings] [--update] name
+
+positional arguments:
+  name                  Package name
+
+options:
+  -h, --help            show this help message and exit
+  --type {package,api}  Template type
+  --db [{sqlite}]  Create/update DB functionalities of given DB type
+  --settings            Set up .env settings module
+  --update              Update existing package
+
+```
+
+Example:
+```bash
+$ poetic awesome-package --type pacakge --settings
 ```
 
 Available package types:
@@ -24,6 +41,8 @@ Add `--db` flag to set up `alembic` migrations and DB of given type (applies to 
 
 Available DB types:
 - `sqlite` to set up a local SQLite DB (default)
+
+Add `--settings` flag to set up `pydantic_settings` based `Settings` class containing `.env` variables (applies to `package` template only; API template always includes this class / source file)
 
 Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update.
 
@@ -44,7 +63,7 @@ Use `packge_template.update()` instead to update existing package.
 
 ## Examples
 
-### `python -m poetic awesome-package --package`
+### `poetic awesome-package --package --settings`
 
 Result
 
@@ -59,7 +78,8 @@ awesome-package
 │       ├── foo.py # example source file
 │       ├── logger.py # log with levels based on .env and color/bold functionalities
 │       ├── core.py # everything here is imported in __init__ as core functionality
-|       └── py.typed # empty file that enables import suggestions in IDE
+|       ├── py.typed # empty file that enables import suggestions in IDE
+│       └── settings.py # pydantic_settings based Settings class containing .env variables
 ├── tests
 |   ├── __init__.py
 │   ├── conftest.py # set up to be able to run tests in dev mode
@@ -72,7 +92,7 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-### `python -m poetic awesome-api --api --db`
+### `poetic awesome-api --api --db`
 
 Result
 
@@ -107,12 +127,13 @@ awesome-api
 ├── .gitignore  # standard comprehensive Python .gitignore
 ├── .env.template
 ├── alembic.ini
-├── config.py # app info and settings
+├── app_info.py # app info extraction from pyproject
 ├── docker-compose.yml # API service
 ├── main.py # main API launcher
 ├── poetry.lock
 ├── pyproject.toml
 ├── README.md
+├── settings.py # pydantic_settings based Settings class containing .env variables
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev); fastapi, pydantic, pydantic-settings, uvicorn
 ```
 
