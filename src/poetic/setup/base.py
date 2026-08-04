@@ -42,6 +42,8 @@ class BaseSetup(Generic[T_Settings]):
 
         self.git = Git(self.path)
 
+        self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
+
     @abstractmethod
     def setup(self, skip_super: bool = False) -> None:
         """

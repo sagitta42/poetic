@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import subprocess
 from typing import Callable
@@ -15,6 +16,12 @@ class Git:
     def __init__(self, path: Path | None) -> None:
         self.path = path or Path.cwd()
 
+    @property
+    def is_git_repo(self) -> bool:
+        """
+        Is current path a git repository.
+        """
+        return ".git" in os.listdir(self.path)
 
     def run(self, *args, check: bool = False) -> str | None:
         """

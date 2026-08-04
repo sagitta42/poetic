@@ -41,7 +41,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
-        self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
         self._dotenv_settings: SettingsSetup | None = None
         self._vscode = VSCodeSetup(VSCodeSetupSettings(), self.path)

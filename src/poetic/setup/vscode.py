@@ -27,5 +27,9 @@ class VSCodeSetup(BaseSetup[VSCodeSetupSettings]):
     def launch(self) -> None:
         self.setup()
 
+        if self.git.is_git_repo:
+            message = f"VSCode setup with {self._poetic_link}"
+            self.git.commit_all(message)
+
         logg.info("VSCode setup")
         display(self._path_to_vscode)
