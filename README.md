@@ -14,7 +14,18 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ```bash
 $ poetic -h
-usage: poetic [-h] [--type {package,api}] [--db [{sqlite}]] [--settings] [--update] name
+usage: poetic [-h] {template} ...
+
+positional arguments:
+  {template}
+    template  create/update template
+```
+
+#### Create/update template
+
+```bash
+$ poetic template -h
+usage: poetic template [-h] [--type {package,api}] [--db [{sqlite}]] [--settings] [--update] name
 
 positional arguments:
   name                  Package name

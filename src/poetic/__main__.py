@@ -11,9 +11,10 @@ from poetic.settings import (
 )
 
 
-def main():
-    parser = argparse.ArgumentParser()
-
+def add_template_arguments(parser: argparse.ArgumentParser):
+    """
+    Add arguments for template creation/update to given parser.
+    """
     parser.add_argument("name", type=str, help=BaseTemplateSettings.description("name"))
     parser.add_argument(
         "--type",
@@ -38,6 +39,16 @@ def main():
     )
 
     parser.add_argument("--update", action="store_true", help="Update existing package")
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+    
+    template_subparser = subparsers.add_parser(
+        "template", help="create/update template"
+    )
+    add_template_arguments(template_subparser)
 
     args = parser.parse_args()
     logg.debug(vars(args))
