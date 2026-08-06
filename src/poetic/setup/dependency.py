@@ -7,7 +7,7 @@ import venv
 
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
-from poetic.setup.base import T_Settings
+from poetic.settings.base import T_Settings
 from poetic.setup.functionality import BaseFunctionalitySetup
 
 
@@ -34,7 +34,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
 
     @abstractmethod
     def setup_dependencies(self) -> None:
-        pass
+        logg.info("...setting up dependencies", header=True)
 
     def setup(self) -> bool | None:
         """
@@ -43,12 +43,12 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         Do not perform core set up if this setup is not core/main setup.
             (e.g. is assistive item setup of template that sets this upstream)
         """
-        line = "-"*30
+        line = "-" * 60
         if self._core:
             logg.info(line, header=True)
         super().setup()
         if self._core:
-            logg.info(line, header=True)        
+            logg.info(line, header=True)
 
         existed = False
         if self._core:
@@ -65,6 +65,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
 
         Return bool on whether .env template existed before.
         """
+        logg.info("...setting up .env template", header=True)
         _, existed = self._copy_template(
             "env.template", package_filename=".env.template", generic=True
         )
@@ -78,6 +79,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         Install poetry into that venv.
         """
         if not self._path_to_venv.exists():
+            logg.info("...creating venv", header=True)
             venv.create(self._path_to_venv, with_pip=True)
         self._run(self.venv("pip"), "install", "poetry", env=True)
 
@@ -148,7 +150,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
             if config["name"] not in configuration_names:
                 launch_dct["configurations"].append(config)
             else:
-                existed = True    
+                existed = True
 
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)

@@ -22,20 +22,6 @@ class BaseTemplateSettings(SetupSettings):
         return [SetupType.package, SetupType.api]
 
     @classmethod
-    def description(cls, field_name: str, exclusive: bool = False) -> str:
-        """
-        Field description util for argparse.
-
-        exclusive: add note that it is exclusive for this type of template.
-        """
-        ret = cls.model_fields[field_name].description
-        assert ret is not None
-        if exclusive:
-            template_type = cls.default("type")
-            ret += f" ({template_type} only)"
-        return ret
-
-    @classmethod
     def options(cls, field_name: str) -> list:
         if field_name == "type":
             return [type.value for type in cls.type_options()]

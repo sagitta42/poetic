@@ -1,5 +1,5 @@
 import enum
-from typing import Any
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -41,3 +41,20 @@ class SetupSettings(BaseModel):
         if isinstance(ret, enum.Enum):
             ret = ret.value
         return ret
+
+    @classmethod
+    def description(cls, field_name: str, exclusive: bool = False) -> str:
+        """
+        Field description util for argparse.
+
+        exclusive: add note that it is exclusive for this type of template.
+        """
+        ret = cls.model_fields[field_name].description
+        assert ret is not None
+        if exclusive:
+            template_type = cls.default("type")
+            ret += f" ({template_type} only)"
+        return ret
+
+
+T_Settings = TypeVar("T_Settings", bound=SetupSettings)

@@ -220,7 +220,7 @@ VSCode update with [poetic](https://github.com/sagitta42/poetic)
 1. Create item setup class `FooSetup` under `poetic.item` inheriting from `BaseFunctionalitySetup` or `BaseDependencySetup` if item includes python library dependency setup
 1. Define `setup()` method, calling parent `setup()`, and adding specific setup actions for this item. This method must return `bool` representing whether this setup already existed before
 1. In case of dependency setup, add dependencies in `setup_dependencies()` using `_poetry_add("package-name")`
-1. Add `FooSetup` under `ItemSetupClass` enum in item builder, matching enum name wiht `SetupType` name (`foo`)
+1. Add `FooSetup` under `ItemSetupClass` enum in item builder, matching enum name with `SetupType` name (`foo`)
 
 After this, this setup is now usable with `poetic add foo`
 

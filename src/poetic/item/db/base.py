@@ -1,16 +1,16 @@
+from abc import abstractmethod
 import os
 from pathlib import Path
-import sqlite3
 
 from dotenv import dotenv_values, set_key
 
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DBSettings, DBType
+from poetic.logger import logg
+from poetic.settings.item import DBSettings
 from poetic.setup.dependency import BaseDependencySetup
-from poetic.utils.utils import add_new_line_to_file
 
 
-class DBSetup(BaseDependencySetup[DBSettings]):
+class BaseDBSetup(BaseDependencySetup[DBSettings]):
     """
     DB setup.
     """
@@ -18,17 +18,28 @@ class DBSetup(BaseDependencySetup[DBSettings]):
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
-        self._db_dir: Path = Path("db")
-        self._filename: str = "db.db"
-
-        self._db_path: Path = self.path / self._db_dir / self._filename
-        self._local_db_path: str = str(self._db_dir / self._filename)
-
-        # TODO: unity with APITemplate
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
 
-    def setup_dependencies(self) -> None:
-        self._poetry_add("alembic")
+    @property
+    def title(self) -> str:
+        return f"{super().title}: {self._settings.db.value}"
+
+    @abstractmethod
+    def setup_db(self) -> bool:
+        """
+        Set up DB.
+
+        Return bool flag to represent whether this setup already existed.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def db_url(self) -> str:
+        """
+        DB URL for .env
+        """
+        pass
 
     def setup(self) -> bool:
         """
@@ -41,33 +52,23 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         """
         existed = super().setup()
 
-        self.setup_db()
+        existed = existed or self.setup_db()
         existed = existed or self.setup_alembic()
-        existed = existed or self.update_dotenv_template()
 
         return existed
 
-    def setup_db(self):
-        """
-        Set up DB.
-
-        If not present, initialize database of given type, git add the initial file.
-        """
-        if self._settings.db == DBType.sqlite:
-            os.makedirs(self.path / self._db_dir, exist_ok=True)
-
-            if not self._db_path.exists():
-                conn = sqlite3.connect(self._db_path)
-                conn.close()
-
-            self.git.run("add", self._local_db_path)
+    def setup_dependencies(self) -> None:
+        super().setup_dependencies()
+        
+        self._poetry_add("alembic")
 
     def setup_alembic(self) -> bool:
         """
         Set up alembic migrations.
 
         Set up alembic.ini.
-        Init alembic.
+        Init alembic if not init already.
+        Update .env.template setting DB_URL.
         Set up .env Settings class if does not exist yet (used in alembic env.py for DB URL)
         Set up alembic environment (env.py).
         Add alembic upgrade debugger configuration to launch.json
@@ -77,6 +78,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
         Returns bool on whether this setup existed before.
         """
+        logg.info("...setting up alembic", header=True)
         template_subdir = "alembic"
 
         _, existed = self._copy_template(
@@ -91,6 +93,8 @@ class DBSetup(BaseDependencySetup[DBSettings]):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
         else:
             existed = True
+
+        existed = existed or self._update_dotenv_template()
 
         if not self._env_settings_setup.is_present():
             self._env_settings_setup.setup()
@@ -135,40 +139,20 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
         return existed
 
-    def untrack_db(self):
+    def _update_dotenv_template(self) -> bool:
         """
-        Untrack DB from git tracking.
+        Update .env.template
 
-        Add DB path to .gignore.
-        Remove from cached.
-        """
-
-        add_new_line_to_file(
-            self.path / ".gitignore", f"{self._local_db_path}\n", prepend=True
-        )
-
-        self.git.run("rm", "--cached", self._local_db_path)
-        self.git.commit_all("untrack database (poetic)")
-
-    def update_dotenv_template(self) -> bool:
-        """
         Add DB_URL to .env
-
         DB_URL variable is read in alembic env.py
-        In case of SQLite DB, it is path to .db file.
 
         Return flag reprsenting whether this variable already existed in .env
         """
         path_to_dotenv = self._get_filepath_in_package(".env.template")
 
-        db_url = (
-            f"sqlite:///{self._local_db_path}"
-            if self._settings.db == DBType.sqlite
-            else "changeme"
-        )
         var_name = "DB_URL"
 
         var_existed = dotenv_values(path_to_dotenv).get(var_name, None) is not None
-        set_key(path_to_dotenv, var_name, db_url)
+        set_key(path_to_dotenv, var_name, self.db_url)
 
         return var_existed

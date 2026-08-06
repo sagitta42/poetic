@@ -1,12 +1,28 @@
 import argparse
+from typing import Type
 from poetic.factory import PoeticFactory, BaseTemplateSettings
 from poetic.exceptions import PoeticException
 from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType
-from poetic.settings.base import SetupType
+from poetic.settings.base import SetupSettings, SetupType
 from poetic.settings.options import SettingsOptions
 from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
 
+def add_db_arguments(parser: argparse.ArgumentParser, description_source: Type[SetupSettings]):
+    """
+    Add arguments for DB setup to given parser.
+
+    description_source: pydantic model to use for description
+    """
+    parser.add_argument(
+        "--db",
+        type=str,
+        nargs="?",
+        const=DBSettings.default("db"),
+        default=None,
+        choices=DBSettings.options("db"),
+        help=description_source.description("db", exclusive=True),
+    )    
 
 def add_template_arguments(parser: argparse.ArgumentParser):
     """
@@ -20,15 +36,8 @@ def add_template_arguments(parser: argparse.ArgumentParser):
         help=BaseTemplateSettings.description("type"),
         choices=BaseTemplateSettings.options("type"),
     )
-    parser.add_argument(
-        "--db",
-        type=str,
-        nargs="?",
-        const=DBSettings.default("db"),
-        default=None,
-        choices=DBSettings.options("db"),
-        help=APITemplateSettings.description("db", exclusive=True),
-    )
+    add_db_arguments(parser, APITemplateSettings)
+
     parser.add_argument(
         "--settings",
         action="store_true",
@@ -48,7 +57,7 @@ def add_template_arguments(parser: argparse.ArgumentParser):
 
 def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     """
-    Add arguments for adding functionality to given parser
+    Add arguments for adding functionality to given parser.
     """
     parser.add_argument(
         "type",
@@ -56,6 +65,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         choices=[SetupType.vscode.value, SetupType.gitignore.value, SetupType.db.value],
         help="Type of functionality",
     )
+    add_db_arguments(parser, DBSettings)
 
 
 def main():

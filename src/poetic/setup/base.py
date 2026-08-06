@@ -1,14 +1,12 @@
 from abc import abstractmethod
 from pathlib import Path
 import shutil
-from typing import Generic, TypeVar
+from typing import Generic
 
-from poetic.settings.item import SetupSettings
+from poetic.settings.base import T_Settings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
-
-T_Settings = TypeVar("T_Settings", bound=SetupSettings)
 
 
 class BaseSetup(Generic[T_Settings]):

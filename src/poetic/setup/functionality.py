@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
 from poetic.logger import logg
-from poetic.setup.base import BaseSetup, T_Settings
+from poetic.settings.base import T_Settings
+from poetic.setup.base import BaseSetup
 
 
 class BaseFunctionalitySetup(BaseSetup[T_Settings]):

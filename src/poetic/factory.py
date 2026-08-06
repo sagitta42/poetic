@@ -1,4 +1,4 @@
-from poetic.item.builder import ItemSetupBuilder
+from poetic.item.factory import ItemSetupFactory
 from poetic.settings.item import SetupSettings
 from poetic.settings.template import BaseTemplateSettings
 from poetic.setup.base import BaseSetup
@@ -16,7 +16,7 @@ class PoeticFactory:
         if isinstance(settings, BaseTemplateSettings):
             builder_class = TemplateBuilder
         elif isinstance(settings, SetupSettings):
-            builder_class = ItemSetupBuilder
+            builder_class = ItemSetupFactory
         else:
             raise ValueError(
                 f"Settings class {settings.__class__.__name__} not supported in factory!"
