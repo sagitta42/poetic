@@ -56,7 +56,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         suggest_commit: suggest commit message
         """
         if suggest_commit is not None:
-            logg.info(suggest_commit)
+            logg.info(f"Commit message: {suggest_commit}")
         else:
             logg.info(f"{self.title} functionality setup")
 

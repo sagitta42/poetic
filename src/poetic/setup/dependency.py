@@ -119,10 +119,14 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
             ),
         )
 
-    def _add_vscode_launch_configurations(self, template_filename: str):
+    def _add_vscode_launch_configurations(self, template_filename: str) -> bool:
         """
         Add configurations to VSCode launch.json contained in given template.
+
+        Return bool representing whether this configuration existed before.
         """
+        existed = False
+
         path_to_launch = self.path / ".vscode" / "launch.json"
         if not path_to_launch.exists():
             self._vscode_setup.setup()
@@ -143,6 +147,10 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         for config in template_config["configurations"]:
             if config["name"] not in configuration_names:
                 launch_dct["configurations"].append(config)
+            else:
+                existed = True    
 
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)
+
+        return existed

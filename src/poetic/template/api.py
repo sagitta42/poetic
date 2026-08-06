@@ -3,7 +3,7 @@ import yaml
 
 from poetic.item.db import DBSetup
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DBSettingss
+from poetic.settings.item import DBSettings
 from poetic.settings.template import APITemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.pyproject_handler import PyProjectHandler

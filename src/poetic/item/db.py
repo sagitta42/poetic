@@ -2,10 +2,10 @@ import os
 from pathlib import Path
 import sqlite3
 
-from dotenv import set_key
+from dotenv import dotenv_values, set_key
 
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DBSettings, DBType, DotenvSettings
+from poetic.settings.item import DBSettings, DBType
 from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.utils import add_new_line_to_file
 
@@ -30,7 +30,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
     def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
 
-    def setup(self) -> None:
+    def setup(self) -> bool:
         """
         DB setup.
 
@@ -39,11 +39,13 @@ class DBSetup(BaseDependencySetup[DBSettings]):
             - alembic migrations
             - update .env template if necessary
         """
-        super().setup()
+        existed = super().setup()
 
         self.setup_db()
-        self.setup_alembic()
-        self.update_dotenv_template()
+        existed = existed or self.setup_alembic()
+        existed = existed or self.update_dotenv_template()
+
+        return existed
 
     def setup_db(self):
         """
@@ -60,7 +62,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
             self.git.run("add", self._local_db_path)
 
-    def setup_alembic(self):
+    def setup_alembic(self) -> bool:
         """
         Set up alembic migrations.
 
@@ -72,10 +74,12 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         Set up alembdantic.
         Set up example alembdantic model.
         Set up example migration for alembdantic usage.
+
+        Returns bool on whether this setup existed before.
         """
         template_subdir = "alembic"
 
-        self._copy_template(
+        _, existed = self._copy_template(
             "alembic.ini.template",
             package_filename="alembic.ini",
             template_subdir=template_subdir,
@@ -85,41 +89,51 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
+        else:
+            existed = True
+
         if not self._env_settings_setup.is_present():
             self._env_settings_setup.setup()
+        else:
+            existed = True
 
-        if not self._dotenv_setup.is_present():
-            self._dotenv_setup.setup()
-
-        self._copy_template(
+        _, env_existed = self._copy_template(
             "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
         )
+        existed = existed or env_existed
 
-        self._add_vscode_launch_configurations("alembic.launch.json")
+        existed = existed or self._add_vscode_launch_configurations(
+            "alembic.launch.json"
+        )
 
         alembdantic_subdir = "alembdantic"
         path_to_alembdandic = path_to_alembic / alembdantic_subdir
         os.makedirs(path_to_alembdandic, exist_ok=True)
         for filename in ["table_model.py", "opd.py"]:
-            self._copy_template(
+            _, file_existed = self._copy_template(
                 filename,
                 path_in_package=path_to_alembdandic,
                 template_subdir=alembdantic_subdir,
             )
+            existed = existed or file_existed
 
-        self._copy_template(
+        _, file_existed = self._copy_template(
             "models.py",
             path_in_package=self.path / alembic_dir,
             template_subdir=template_subdir,
         )
+        existed = existed or file_existed
 
         path_to_revisions = path_to_alembic / "versions"
         os.makedirs(path_to_revisions, exist_ok=True)
-        self._copy_template(
+        _, file_existed = self._copy_template(
             "2026_07_15_143709-36648a63d305-example.py",
             path_in_package=path_to_revisions,
             template_subdir=template_subdir,
         )
+        existed = existed or file_existed
+
+        return existed
 
     def untrack_db(self):
         """
@@ -136,12 +150,14 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         self.git.run("rm", "--cached", self._local_db_path)
         self.git.commit_all("untrack database (poetic)")
 
-    def update_dotenv_template(self):
+    def update_dotenv_template(self) -> bool:
         """
         Add DB_URL to .env
 
         DB_URL variable is read in alembic env.py
-        In case of SQLite DB, it is path to .db file
+        In case of SQLite DB, it is path to .db file.
+
+        Return flag reprsenting whether this variable already existed in .env
         """
         path_to_dotenv = self._get_filepath_in_package(".env.template")
 
@@ -150,5 +166,9 @@ class DBSetup(BaseDependencySetup[DBSettings]):
             if self._settings.db == DBType.sqlite
             else "changeme"
         )
+        var_name = "DB_URL"
 
-        set_key(path_to_dotenv, "DB_URL", db_url)
+        var_existed = dotenv_values(path_to_dotenv).get(var_name, None) is not None
+        set_key(path_to_dotenv, var_name, db_url)
+
+        return var_existed
