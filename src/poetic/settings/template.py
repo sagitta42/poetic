@@ -13,7 +13,7 @@ class BaseTemplateSettings(SetupSettings):
     """
 
     type: SetupType = Field(default=SetupType.package, description="Template type")
-    name: str = Field(description="Package name")
+    name: str = Field(description="Template/repository name")
     update: bool = Field(description="Update template rather than create new")
 
     # FIXME: improve
@@ -22,16 +22,17 @@ class BaseTemplateSettings(SetupSettings):
         return [SetupType.package, SetupType.api]
 
     @classmethod
-    def description(cls, field_name: str) -> str:
+    def description(cls, field_name: str, exclusive: bool = False) -> str:
+        """
+        Field description util for argparse.
+
+        exclusive: add note that it is exclusive for this type of template.
+        """
         ret = cls.model_fields[field_name].description
         assert ret is not None
-        return ret
-
-    @classmethod
-    def default(cls, field_name: str) -> Any:
-        ret = cls.model_fields[field_name].default
-        if isinstance(ret, enum.Enum):
-            ret = ret.value
+        if exclusive:
+            template_type = cls.default("type")
+            ret += f" ({template_type} only)"
         return ret
 
     @classmethod
@@ -54,7 +55,9 @@ class PackageTemplateSettings(BaseTemplateSettings):
     Include option to set up .env pydantic settings.
     """
 
-    type: Literal[SetupType.package] = Field(description="Template type")
+    type: Literal[SetupType.package] = Field(
+        default=SetupType.package, description="Template type"
+    )
     settings: bool = Field(default=False, description="Set up .env Settings class")
     progressbar: bool = Field(
         default=False, description="Set up progress bar source code"
@@ -68,5 +71,9 @@ class APITemplateSettings(BaseTemplateSettings):
     API template includes option to set up DB.
     """
 
-    type: Literal[SetupType.api] = Field(description="Template type")
-    db: DBType | None = Field(default=None, description="DB type")
+    type: Literal[SetupType.api] = Field(
+        default=SetupType.api, description="Template type"
+    )
+    db: DBType | None = Field(
+        default=None, description="Create/update DB functionalities of given DB type"
+    )

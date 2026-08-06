@@ -5,7 +5,7 @@ from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.base import SetupType
 from poetic.settings.options import SettingsOptions
-from poetic.settings.template import PackageTemplateSettings
+from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
 
 
 def add_template_arguments(parser: argparse.ArgumentParser):
@@ -24,24 +24,26 @@ def add_template_arguments(parser: argparse.ArgumentParser):
         "--db",
         type=str,
         nargs="?",
-        const=DBType.sqlite.value,
+        const=DBSettings.default("db"),
         default=None,
         choices=DBSettings.options("db"),
-        help="Create/update DB functionalities of given DB type",
+        help=APITemplateSettings.description("db", exclusive=True),
     )
     parser.add_argument(
         "--settings",
         action="store_true",
-        help=PackageTemplateSettings.description("settings"),
+        help=PackageTemplateSettings.description("settings", exclusive=True),
     )
     # TODO: convert to single --items flag listing settings, progressbar and other types
     parser.add_argument(
         "--progressbar",
         action="store_true",
-        help=PackageTemplateSettings.description("progressbar"),
+        help=PackageTemplateSettings.description("progressbar", exclusive=True),
     )
 
-    parser.add_argument("--update", action="store_true", help="Update existing package")
+    parser.add_argument(
+        "--update", action="store_true", help=BaseTemplateSettings.description("update")
+    )
 
 
 def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
@@ -51,7 +53,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     parser.add_argument(
         "type",
         type=str,
-        choices=[SetupType.vscode.value, SetupType.gitignore.value],
+        choices=[SetupType.vscode.value, SetupType.gitignore.value, SetupType.db.value],
         help="Type of functionality",
     )
 

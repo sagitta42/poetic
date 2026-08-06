@@ -34,7 +34,7 @@ class DBSettings(SetupSettings):
     """
 
     type: Literal[SetupType.db] = Field(default=SetupType.db, description="Setup type")
-    db: DBType = Field(description="Database type")
+    db: DBType = Field(default=DBType.sqlite, description="Database type")
 
 
 class DotenvSettings(SetupSettings):

@@ -1,4 +1,5 @@
 import enum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -33,3 +34,10 @@ class SetupSettings(BaseModel):
         if issubclass(field_type, enum.Enum):
             return [item.value for item in field_type if not item.name == "none"]
         return []
+
+    @classmethod
+    def default(cls, field_name: str) -> Any:
+        ret = cls.model_fields[field_name].default
+        if isinstance(ret, enum.Enum):
+            ret = ret.value
+        return ret
