@@ -1,3 +1,4 @@
+import enum
 from typing import Any, Literal, Self
 
 from pydantic import Field, model_validator
@@ -28,6 +29,8 @@ class BaseTemplateSettings(SetupSettings):
     @classmethod
     def default(cls, field_name: str) -> Any:
         ret = cls.model_fields[field_name].default
+        if isinstance(ret, enum.Enum):
+            ret = ret.value
         return ret
 
     @classmethod
