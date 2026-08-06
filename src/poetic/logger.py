@@ -62,12 +62,15 @@ class Logger:
 
         full_format = "%(asctime)s [%(levelname)s] %(classname)s.%(funcName)s:%(lineno)d - %(message)s"
         short_format = "[%(levelname)s] %(classname)s - %(message)s"
+        no_format = ""
         formatter = LevelFormatter(
             {
                 logging.DEBUG: full_format,
                 logging.ERROR: full_format,
-                logging.INFO: short_format,
-                logging.WARNING: short_format,
+                logging.INFO: short_format if log_level == logging.DEBUG else no_format,
+                logging.WARNING: (
+                    short_format if log_level == logging.DEBUG else no_format
+                ),
             }
         )
 
