@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import sqlite3
 
+from dotenv import set_key
+
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType, DotenvSettings
 from poetic.setup.dependency import BaseDependencySetup
@@ -48,8 +50,6 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         Set up DB.
 
         If not present, initialize database of given type, git add the initial file.
-        Set DB path in .env template.
-        Update .gitignore to not track the DB file.
         """
         if self._settings.db == DBType.sqlite:
             os.makedirs(self.path / self._db_dir, exist_ok=True)
@@ -66,15 +66,12 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
         Set up alembic.ini.
         Init alembic.
-        Set up .env Settings class if does not exist yet (used in alembic env.py)
-        Set up alembic environment.
+        Set up .env Settings class if does not exist yet (used in alembic env.py for DB URL)
+        Set up alembic environment (env.py).
         Add alembic upgrade debugger configuration to launch.json
         Set up alembdantic.
         Set up example alembdantic model.
         Set up example migration for alembdantic usage.
-
-        Note that alembic setup is independent from DB setup.
-        Note that providing DB URL in .env is not managed by this setup.
         """
         template_subdir = "alembic"
 
@@ -152,5 +149,4 @@ class DBSetup(BaseDependencySetup[DBSettings]):
             else "changeme"
         )
 
-        if self._settings.db == DBType.sqlite:
-            add_new_line_to_file(path_to_dotenv, f"DB_URL={db_url}")
+        set_key(path_to_dotenv, "DB_URL", db_url)
