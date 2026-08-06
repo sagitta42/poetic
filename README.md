@@ -14,35 +14,34 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ```bash
 $ poetic -h
-usage: poetic [-h] {template,add} ...
+usage: poetic [-h] {init,add} ...
 
 positional arguments:
-  {template,add}
-    template      create/update template
-    add  
+  {init,add}
+    init      create/update template
+    add       add functionality to existing repo
 ```
 
 #### Create/update template
 
 ```bash
-$ poetic template -h
-usage: poetic template [-h] [--type {package,api}] [--db [{sqlite}]] [--settings] [--update] name
+$  poetic init -h
+usage: poetic init [-h] [--type {package,api}] [--db [{sqlite,psql}]] [--settings] [--progressbar] [--update] name
 
 positional arguments:
-  name                  Package name
+  name                  Template/repository name
 
 options:
-  -h, --help            show this help message and exit
   --type {package,api}  Template type
-  --db [{sqlite}]  Create/update DB functionalities of given DB type
-  --settings            Set up .env settings module
-  --update              Update existing package
-
+  --db [{sqlite,psql}]  Create/update DB functionalities of given DB type (api only)
+  --settings            Set up .env Settings class (package only)
+  --progressbar         Set up progress bar source code (package only)
+  --update              Update template rather than create new
 ```
 
 Example:
 ```bash
-$ poetic awesome-package --type pacakge --settings
+$ poetic init awesome-package --type pacakge --settings
 ```
 
 Available package types:
@@ -62,20 +61,23 @@ Add `--update` flag to update existing poetic-made package repository after a po
 
 ```bash
 $ poetic add -h
-usage: poetic add [-h] {vscode,gitignore}
+usage: poetic add [-h] [--no-commit] [--db [{sqlite,psql}]] {vscode,gitignore,db}
 
 positional arguments:
-  {vscode,gitignore}  Type of functionality
+  {vscode,gitignore,db}
+                        Type of functionality
 
 options:
-  -h, --help          show this help message and exit
+  --no-commit           Do not commit changes
+  --db [{sqlite,psql}]  Database type (db only)
 ```
 
 Single functionalities added to current directory:
 - `poetic add vscode` - creates/updates `.vscode` setup
 - `poetic add gitignore` - creates/updates `.gitignore`
+- `poetic add db --db sqlite` - sets up DB of given type
 
-If directory is a git repository, will commit if new setup or suggest commit if modified.
+If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 
 ### In code
 
@@ -111,6 +113,7 @@ awesome-package
 │       ├── logger.py # log with levels based on .env and color/bold functionalities
 │       ├── core.py # everything here is imported in __init__ as core functionality
 |       ├── py.typed # empty file that enables import suggestions in IDE
+|       ├── progressbar.py # ProgressBar wrapper class
 │       └── settings.py # pydantic_settings based Settings class containing .env variables
 ├── tests
 |   ├── __init__.py
