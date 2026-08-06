@@ -224,6 +224,18 @@ VSCode update with [poetic](https://github.com/sagitta42/poetic)
 
 After this, this setup is now usable with `poetic add foo`
 
+### add new DB setup
+
+1. Define new DB type in `DBType` e.g. `DBType.foo`
+1. Create DB setup class `FooDBSetup` inheriting from `BaseDBSetup`
+1. Define its `setup_db()` method with actions for this DB setup. Return bool representing whether this setup existed before
+1. Define DB URL under `db_url` property
+1. Add `FooDBSetup` under `DBSetupClass` in `poetic.item.db.builder` using the same enum name as defined `DBType` (`foo`)
+
+After this, this setup is now usable with
+- `poetic template awesome-api --db psql`
+- `poetic add db --db foo`
+
 ### `pydantic` <-> `argparse` adapter
 
 Template and setup settings fields are used to set argparse descriptions, defaults, and options to avoid duplications.

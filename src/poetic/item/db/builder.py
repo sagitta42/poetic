@@ -3,12 +3,14 @@ from pathlib import Path
 
 from poetic.item.builder import BaseSetupBuilder
 from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.psql import PsqlDBSetup
 from poetic.item.db.sqlite import SQLiteSetup
 from poetic.settings.item import DBSettings, DBType
 
 
 class DBSetupClass(enum.Enum):
     sqlite = SQLiteSetup
+    psql = PsqlDBSetup
 
     @classmethod
     def from_db_type(cls, db_type: DBType):

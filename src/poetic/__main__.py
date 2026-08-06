@@ -8,7 +8,10 @@ from poetic.settings.base import SetupSettings, SetupType
 from poetic.settings.options import SettingsOptions
 from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
 
-def add_db_arguments(parser: argparse.ArgumentParser, description_source: Type[SetupSettings]):
+
+def add_db_arguments(
+    parser: argparse.ArgumentParser, description_source: Type[SetupSettings]
+):
     """
     Add arguments for DB setup to given parser.
 
@@ -22,7 +25,8 @@ def add_db_arguments(parser: argparse.ArgumentParser, description_source: Type[S
         default=None,
         choices=DBSettings.options("db"),
         help=description_source.description("db", exclusive=True),
-    )    
+    )
+
 
 def add_template_arguments(parser: argparse.ArgumentParser):
     """

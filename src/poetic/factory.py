@@ -1,7 +1,8 @@
 from poetic.item.factory import ItemSetupFactory
+from poetic.logger import logg
 from poetic.settings.item import SetupSettings
 from poetic.settings.template import BaseTemplateSettings
-from poetic.setup.base import BaseSetup
+from poetic.setup.functionality import BaseFunctionalitySetup
 from poetic.template.base import BaseTemplate
 from poetic.template.builder import TemplateBuilder
 
@@ -9,7 +10,7 @@ from poetic.template.builder import TemplateBuilder
 class PoeticFactory:
     def build(
         self, settings: BaseTemplateSettings | SetupSettings
-    ) -> BaseTemplate | BaseSetup:
+    ) -> BaseTemplate | BaseFunctionalitySetup:
         """
         Build template or functionlaity setup.
         """

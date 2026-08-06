@@ -2,11 +2,9 @@ import os
 from pathlib import Path
 import sqlite3
 
-from dotenv import dotenv_values, set_key
 
 from poetic.item.db.base import BaseDBSetup
-from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DBSettings, DBType
+from poetic.settings.item import DBSettings
 from poetic.utils.utils import add_new_line_to_file
 
 

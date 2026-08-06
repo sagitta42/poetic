@@ -26,6 +26,7 @@ class ProgressBarSettings(SetupSettings):
 
 class DBType(str, enum.Enum):
     sqlite = "sqlite"
+    psql = "psql"
 
 
 class DBSettings(SetupSettings):
