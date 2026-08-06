@@ -1,15 +1,10 @@
 import argparse
-from poetic.builder import PoeticFactory, BaseTemplateSettings
+from poetic.factory import PoeticFactory, BaseTemplateSettings
 from poetic.exceptions import PoeticException
 from poetic.logger import logg
-from poetic.settings import (
-    APITemplateSettings,
-    DBSettings,
-    DBType,
-    PackageTemplateSettings,
-    SettingsCrutch,
-    SetupType,
-)
+from poetic.settings.options import SettingsCrutch
+from poetic.settings.item import DBSettings, DBType, SetupType
+from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
 
 
 def add_template_arguments(parser: argparse.ArgumentParser):

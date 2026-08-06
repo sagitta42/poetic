@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 import shutil
 
-from poetic.base import BaseTemplate
-from poetic.settings import DotenvSettings, PackageTemplateSettings, SetupType
-from poetic.setup.settings import SettingsSetup
+from poetic.item.env_settings import EnvSettingsSetup
+from poetic.settings.item import DotenvSettings, SetupType
+from poetic.settings.template import PackageTemplateSettings
+from poetic.template.base import BaseTemplate
 from poetic.utils.utils import add_new_line_to_file
 
 
@@ -14,17 +15,21 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         settings = (
             init
             if isinstance(init, PackageTemplateSettings)
-            else PackageTemplateSettings(name=init, type=SetupType.package)
+            else PackageTemplateSettings(
+                name=init, type=SetupType.package, update=False
+            )
         )
         super().__init__(settings)
 
         src_subdir = Path("src") / self._inner_name
         self._path_to_src: Path = self.path / src_subdir
 
-        dotenv_settings = DotenvSettings(type=SetupType.dotenv, **self._settings.model_dump())
+        dotenv_settings = DotenvSettings(
+            type=SetupType.dotenv, **self._settings.model_dump()
+        )
         dotenv_settings.package_subdir = src_subdir
         self._dotenv_settings = (
-            SettingsSetup(dotenv_settings, self.path)
+            EnvSettingsSetup(dotenv_settings, self.path)
             if self._settings.settings
             else None
         )

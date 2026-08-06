@@ -1,2 +1,2 @@
-from poetic.api import APITemplate
-from poetic.package import PackageTemplate
+from poetic.template.api import APITemplate
+from poetic.template.package import PackageTemplate

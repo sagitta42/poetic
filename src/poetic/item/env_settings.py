@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from poetic.settings import DotenvSettings
-from poetic.setup.base import BaseDependencySetup
+from poetic.item.base import BaseDependencySetup
+from poetic.settings.item import DotenvSettings
 
 
-class SettingsSetup(BaseDependencySetup[DotenvSettings]):
+class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
     """
-    Settings setup.
+    Environment Settings setup.
 
     Set up settings source file / class with pydantic-settings based class
         containing .env variables.

@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from importlib import resources
 import json
 import os
 from pathlib import Path
@@ -8,7 +7,7 @@ import subprocess
 from typing import Generic, TypeVar
 import venv
 
-from poetic.settings import SetupSettings
+from poetic.settings.item import SetupSettings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
@@ -17,9 +16,9 @@ from poetic.utils.tree import display
 T_Settings = TypeVar("T_Settings", bound=SetupSettings)
 
 
-class BaseSetup(Generic[T_Settings]):
+class BaseItemSetup(Generic[T_Settings]):
     """
-    General setup of any kind.
+    General setup of any item.
 
     path (Path): path to root directory of setup
 
@@ -38,7 +37,7 @@ class BaseSetup(Generic[T_Settings]):
         self._path_to_resources = Path(__file__).resolve().parent.parent
         # TODO: try to use resources - Path() does not convert MultiplexedPath
         # self._path_to_resources = Path(resources.files(__package__).__str__()).parent
-        self._path_to_templates = self._path_to_resources / "templates"
+        self._path_to_templates = self._path_to_resources / "assets"
         self._path_to_type_templates = self._path_to_templates / self._type
 
         self.git = Git(self.path)
@@ -110,7 +109,7 @@ class BaseSetup(Generic[T_Settings]):
         return ret
 
 
-class BaseFunctionalitySetup(BaseSetup[T_Settings]):
+class BaseFunctionalitySetup(BaseItemSetup[T_Settings]):
     """
     General setup for functionalities.
 
@@ -169,7 +168,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
             logg.info(f"{self.name} functionality setup")
 
 
-class BaseDependencySetup(BaseSetup[T_Settings]):
+class BaseDependencySetup(BaseItemSetup[T_Settings]):
     """
     General setup with dependencies.
 

@@ -1,18 +1,19 @@
 import os
 import yaml
 
-from poetic.base import BaseTemplate
-from poetic.setup.db import DBSetup
-from poetic.setup.settings import SettingsSetup
+from poetic.item.db import DBSetup
+from poetic.item.env_settings import EnvSettingsSetup
+from poetic.settings.item import DBSettings, DotenvSettings, SetupType
+from poetic.settings.template import APITemplateSettings
+from poetic.template.base import BaseTemplate
 from poetic.utils.pyproject_handler import PyProjectHandler
-from poetic.settings import APITemplateSettings, DBSettings, DotenvSettings, SetupType
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._dotenv_settings = SettingsSetup(
+        self._dotenv_settings = EnvSettingsSetup(
             DotenvSettings(type=SetupType.dotenv, settings=True), self.path
         )
         self._db: DBSetup | None = (

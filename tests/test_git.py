@@ -4,21 +4,21 @@ from poetic.logger import logg
 
 
 def test_active_branch():
-    git = Git()
+    git = Git(path=None)
 
     active_branch = git.get_active_branch()
     logg.info(f"Active branch: {active_branch}")
 
 
 def test_branch_exists():
-    git = Git()
+    git = Git(path=None)
 
     check = git.branch_exists("main")
     assert check
 
 
 def test_first_commit():
-    git = Git()
+    git = Git(path=None)
 
     first_commit = git.get_first_commit()
 
@@ -26,7 +26,7 @@ def test_first_commit():
 
 
 def test_last_commit_message():
-    git = Git()
+    git = Git(path=None)
 
     last_commit = git.get_last_commit()
     last_commit_message = git.get_commit_message(last_commit)
