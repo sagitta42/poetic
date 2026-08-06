@@ -35,6 +35,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
     @abstractmethod
     def setup_dependencies(self) -> None:
         logg.info("...setting up dependencies", header=True)
+        self._run(self.venv("pip"), "install", "poetry", env=True)
 
     def setup(self) -> None:
         """
@@ -76,7 +77,6 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         if not self._path_to_venv.exists():
             logg.info("...creating venv", header=True)
             venv.create(self._path_to_venv, with_pip=True)
-        self._run(self.venv("pip"), "install", "poetry", env=True)
 
     def venv(self, exe: str) -> Path:
         """

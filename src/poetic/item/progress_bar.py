@@ -25,4 +25,6 @@ class ProgressBarSetup(
         self._copy_template("progress_bar.py")
 
     def setup_dependencies(self) -> None:
+        super().setup_dependencies()
+
         self._poetry_add("tqdm")

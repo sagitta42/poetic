@@ -148,6 +148,8 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self.setup_readme()
 
     def setup_dependencies(self):
+        super().setup_dependencies()
+        
         self._poetry_add("dotenv")
         self._poetry_add("pydantic")
 
