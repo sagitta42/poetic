@@ -30,4 +30,4 @@ def display(path: Path):
     Display tree in given path.
     """
     for line in tree(path):
-        logg.info(line)    
+        print(line)    
