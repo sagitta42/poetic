@@ -96,6 +96,20 @@ class BaseSetup(Generic[T_Settings]):
 
         return path_to_package_file, existed_before
 
+    def _package_file_exists(
+        self,
+        filename_in_package: str,
+        path_in_package: Path | None = None,
+    ) -> bool:
+        """
+        Check if file already exists in package.
+
+        filename_in_package (str | None): filename in package
+        path_in_package (Path | None): file path in package; default = root path
+        """
+        filepath = self._get_filepath_in_package(filename_in_package, path_in_package)
+        return filepath.exists()
+
     def _get_template_path(
         self, template_filename: str, generic: bool, template_subdir: Path | str | None
     ) -> Path:
@@ -113,15 +127,15 @@ class BaseSetup(Generic[T_Settings]):
 
     def _get_filepath_in_package(
         self,
-        package_filename: str,
+        filename_in_package: str,
         path_in_package: Path | None = None,
     ) -> Path:
         """
         Get destination path of file in package being set up.
 
-        package_filename (str | None): filename of template in package
+        filename_in_package (str | None): filename in package
         path_in_package (Path | None): file path in package; default = root path
         """
         path_in_package = path_in_package or self.path
-        ret = path_in_package / package_filename
+        ret = path_in_package / filename_in_package
         return ret

@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 import sqlite3
 
-from poetic.settings.item import DBSettings, DBType
+from poetic.item.env_settings import EnvSettingsSetup
+from poetic.settings.item import DBSettings, DBType, DotenvSettings
 from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.utils import add_new_line_to_file
 
@@ -20,6 +21,9 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
         self._db_path: Path = self.path / self._db_dir / self._filename
         self._local_db_path: str = str(self._db_dir / self._filename)
+
+        # TODO: unity with APITemplate
+        self._dotenv_setup = EnvSettingsSetup(DotenvSettings(), self.path, core=False)
 
     def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
@@ -62,6 +66,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
         Set up alembic.ini.
         Init alembic.
+        Set up .env Settings class if does not exist yet (used in alembic env.py)
         Set up alembic environment.
         Add alembic upgrade debugger configuration to launch.json
         Set up alembdantic.
@@ -83,6 +88,9 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
+
+        if not self._dotenv_setup.is_present():
+            self._dotenv_setup.setup()
 
         self._copy_template(
             "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
@@ -132,10 +140,17 @@ class DBSetup(BaseDependencySetup[DBSettings]):
     def update_dotenv_template(self):
         """
         Add DB_URL to .env
+
+        DB_URL variable is read in alembic env.py
+        In case of SQLite DB, it is path to .db file
         """
         path_to_dotenv = self._get_filepath_in_package(".env.template")
 
+        db_url = (
+            f"sqlite:///{self._local_db_path}"
+            if self._settings.db == DBType.sqlite
+            else "changeme"
+        )
+
         if self._settings.db == DBType.sqlite:
-            add_new_line_to_file(
-                path_to_dotenv, f"DB_URL=sqlite:///{self._local_db_path}"
-            )
+            add_new_line_to_file(path_to_dotenv, db_url)

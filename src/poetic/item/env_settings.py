@@ -24,3 +24,11 @@ class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
         super().setup_dependencies()
 
         self._poetry_add("pydantic_settings")
+
+    def is_present(self) -> bool:
+        """
+        Check whether setup already present.
+
+        Check if settings.py already exists
+        """
+        return self._package_file_exists("settings.py")
