@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 import venv
 
+from poetic.item.vscode import VSCodeSetup
 from poetic.setup.base import T_Settings
 from poetic.setup.functionality import BaseFunctionalitySetup
 
@@ -27,6 +28,8 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
 
         self._core = core
         self._path_to_venv = (self.path / "venv").resolve()
+
+        self._vscode_setup = VSCodeSetup(self.path)
 
     @abstractmethod
     def setup_dependencies(self) -> None:
@@ -116,7 +119,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         """
         path_to_launch = self.path / ".vscode" / "launch.json"
         if not path_to_launch.exists():
-            return
+            self._vscode_setup.setup()
 
         with open(path_to_launch) as f:
             launch_dct = json.load(f)
