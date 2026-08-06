@@ -1,7 +1,7 @@
 import enum
 from pathlib import Path
 
-from poetic.item.base import BaseItemSetup
+from poetic.item.base import BaseDependencySetup, BaseItemSetup
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.settings.item import SetupSettings, SetupType
@@ -19,5 +19,6 @@ class ItemClass(enum.Enum):
 class ItemBuilder:
     def build(self, settings: SetupSettings) -> BaseItemSetup:
         setup_class = ItemClass.from_setup_tupe(settings.type).value
-        ret = setup_class(settings, Path.cwd())
+        kwargs = {"core": True} if issubclass(setup_class, BaseDependencySetup) else {}
+        ret = setup_class(settings, Path.cwd(), **kwargs)
         return ret

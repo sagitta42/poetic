@@ -12,8 +12,8 @@ class DBSetup(BaseDependencySetup[DBSettings]):
     DB setup.
     """
 
-    def __init__(self, settings: DBSettings, path: Path) -> None:
-        super().__init__(settings, path)
+    def __init__(self, settings: DBSettings, path: Path, core: bool) -> None:
+        super().__init__(settings, path, core)
 
         self._db_dir: Path = Path("db")
         self._filename: str = "db.db"
@@ -39,7 +39,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
     def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
 
-    def setup(self, skip_super: bool = False) -> None:
+    def setup(self) -> None:
         """
         DB setup.
 
@@ -47,7 +47,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
             - DB
             - alembic migrations
         """
-        super().setup(skip_super)
+        super().setup()
 
         self.setup_db()
         self.setup_alembic()

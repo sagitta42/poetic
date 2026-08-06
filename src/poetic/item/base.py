@@ -45,7 +45,7 @@ class BaseItemSetup(Generic[T_Settings]):
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
     @abstractmethod
-    def setup(self, skip_super: bool = False) -> bool | None:
+    def setup(self) -> bool | None:
         """
         Main setup.
 
@@ -118,14 +118,16 @@ class BaseFunctionalitySetup(BaseItemSetup[T_Settings]):
     - if git repo and fresh seutp, commit
     """
 
-    # FIXME: improve
     @property
+    def title(self) -> str:
+        """
+        Functionality title
+        """
+        return self._settings.type.value
+
     @abstractmethod
-    def name(self) -> str:
-        """
-        Functionality name for commit
-        """
-        pass
+    def setup(self) -> bool | None:
+        logg.info(f"----- Setting up {self.title}", header=True)
 
     def commit_message(self, mod_type: str) -> str:
         """
@@ -133,12 +135,12 @@ class BaseFunctionalitySetup(BaseItemSetup[T_Settings]):
 
         mod_type: e.g. setup/update
         """
-        message = f"{self.name} {mod_type} with {self._poetic_link}"
+        message = f"{self.title} {mod_type} with {self._poetic_link}"
         return message
 
     def launch(self) -> None:
         """
-        Launch functionality setup.
+        Launch independent functionality setup.
 
         Perform setup.
         Commit setup if in git repository and files did not exist before.
@@ -165,12 +167,14 @@ class BaseFunctionalitySetup(BaseItemSetup[T_Settings]):
         if suggest_commit is not None:
             logg.info(suggest_commit)
         else:
-            logg.info(f"{self.name} functionality setup")
+            logg.info(f"{self.title} functionality setup")
 
 
-class BaseDependencySetup(BaseItemSetup[T_Settings]):
+class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
     """
     General setup with dependencies.
+
+    core (bool): this is a core setup i.e. set up core functionalities (.env, venv)
 
     Includes additional operations:
         - running subprocesses
@@ -179,21 +183,24 @@ class BaseDependencySetup(BaseItemSetup[T_Settings]):
         - .env template setup
     """
 
-    def __init__(self, settings: T_Settings, path: Path) -> None:
+    def __init__(self, settings: T_Settings, path: Path, core: bool) -> None:
         super().__init__(settings, path)
 
+        self._core = core
         self._path_to_venv = (self.path / "venv").resolve()
 
-    def setup(self, skip_super: bool = False) -> None:
+    def setup(self) -> None:
         """
         Main setup.
 
-        skip_super: do not perform superclass setup
-            (e.g. to skip for "assistive" internal setups)
+        Do not perform core set up if this setup is not core/main setup.
+            (e.g. is assistive item setup of template that sets this upstream)
         """
-        self.setup_dotenv_template()
-        self.setup_venv()
-        self.setup_dependencies()
+        super().setup()
+        if self._core:
+            self.setup_dotenv_template()
+            self.setup_venv()
+            self.setup_dependencies()
 
     def setup_dotenv_template(self) -> Path:
         """

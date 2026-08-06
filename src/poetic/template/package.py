@@ -75,8 +75,8 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._poetry_add("pytest", "dev")
 
-    def setup(self, skip_super: bool = False):
-        super().setup(skip_super)
+    def setup(self):
+        super().setup()
 
         self.setup_tests()
         self.setup_logger()

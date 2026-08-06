@@ -16,16 +16,14 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
 
         self._path_to_vscode = self.path / ".vscode"
 
-    @property
-    def name(self) -> str:
-        return "VSCode"
-
-    def setup(self, skip_super: bool = False) -> bool:
+    def setup(self) -> bool:
         """
         Set up VSCode.
 
         Return flag representing whether templates existed before.
         """
+        super().setup()
+
         os.makedirs(self._path_to_vscode, exist_ok=True)
 
         existed = []

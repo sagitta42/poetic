@@ -38,13 +38,14 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
     def __init__(self, settings: T_TemplateSettings) -> None:
         self.name = settings.name
-        super().__init__(settings, Path(self.name))
+
+        super().__init__(settings, Path(self.name), core=True)
 
         self._inner_name = self.name.replace("-", "_")
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
-        self._dotenv_settings: EnvSettingsSetup | None = None
+        self._dotenv_setup: EnvSettingsSetup | None = None
         self._vscode = VSCodeSetup(VSCodeSetupSettings(), self.path)
         self._gitignore = GitignoreSetup(GitignoreSetupSettings(), self.path)
 
@@ -80,6 +81,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         self.post_init_commit()
 
+        logg.info(f"Template setup DONE", header=True)
         self.display()
 
     def update(self):
@@ -135,14 +137,14 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self.git.run("switch", current_branch)
         self.git.run("merge", update_branch)
 
-    def setup(self, skip_super: bool = False) -> None:
-        super().setup(skip_super)
+    def setup(self) -> None:
+        super().setup()
 
         self._gitignore.setup()
         self.setup_source_files()
 
-        if self._dotenv_settings is not None:
-            self._dotenv_settings.setup(skip_super=True)
+        if self._dotenv_setup is not None:
+            self._dotenv_setup.setup()
         self._vscode.setup()
 
         self.setup_readme()
@@ -182,7 +184,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         """
         pass
 
-    def display(self):
+    def display(self, suggest_commit: str | None = None):
         """
         Display the template via tree.
         """

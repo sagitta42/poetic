@@ -8,11 +8,7 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
     Gitignore file setup.
     """
 
-    @property
-    def name(self) -> str:
-        return ".gitignore"
-
-    def setup(self, skip_super: bool = False) -> bool:
+    def setup(self) -> bool:
         """
         Set up .gitignore.
 
@@ -21,6 +17,8 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
 
         Return flag signifying it existed before.
         """
+        super().setup()
+
         _, existed = self._copy_template(
             "Python.gitignore", package_filename=".gitignore", generic=True
         )

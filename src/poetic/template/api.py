@@ -14,13 +14,15 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         super().__init__(settings)
 
         self._dotenv_settings = EnvSettingsSetup(
-            DotenvSettings(type=SetupType.dotenv, settings=True), self.path
+            DotenvSettings(type=SetupType.dotenv, settings=True), self.path, core=False
         )
         self._db: DBSetup | None = (
             None
             if settings.db is None
             else DBSetup(
-                DBSettings(type=SetupType.db, **settings.model_dump()), self.path
+                DBSettings(type=SetupType.db, **settings.model_dump()),
+                self.path,
+                core=False,
             )
         )
 
