@@ -1,6 +1,7 @@
 import enum
 import inspect
 import logging
+from pathlib import Path
 from dotenv import dotenv_values
 
 
@@ -128,6 +129,7 @@ class Logger:
         return frame.f_globals.get("__name__", "-")
 
 
-env_config = dotenv_values()
+# NOTE: dotenv_values() in some cases yielded empty .env for unexplained reason
+env_config = dotenv_values(Path.cwd() / ".env")
 is_debug = env_config.get("DEBUG", "").lower() in ("true", "1")
 logg = Logger(log_level=logging.DEBUG if is_debug else logging.INFO)
