@@ -1,0 +1,85 @@
+import argparse
+from typing import Type
+
+from poetic.settings.base import SetupSettings, SetupType
+from poetic.settings.item import DBSettings
+from poetic.settings.template import (
+    APITemplateSettings,
+    BaseTemplateSettings,
+    PackageTemplateSettings,
+)
+
+
+def add_bool(
+    parser: argparse.ArgumentParser,
+    name: str,
+    help: Type[SetupSettings],
+    exclusive: bool = False,
+):
+    parser.add_argument(
+        f"--{name}",
+        action="store_true",
+        help=help.description(name, exclusive=exclusive),
+    )
+
+
+def add_str(
+    parser: argparse.ArgumentParser,
+    name: str,
+    help: Type[SetupSettings],
+):
+    parser.add_argument(
+        f"--{name}",
+        type=str,
+        default=help.default(name),
+        help=help.description(name),
+        choices=help.options(name),
+    )
+
+
+def add_db_arguments(
+    parser: argparse.ArgumentParser, description_source: Type[SetupSettings]
+):
+    """
+    Add arguments for DB setup to given parser.
+
+    description_source: pydantic model to use for description
+    """
+    parser.add_argument(
+        "--db",
+        type=str,
+        nargs="?",
+        const=DBSettings.default("db"),
+        default=None,
+        choices=DBSettings.options("db"),
+        help=description_source.description("db", exclusive=True),
+    )
+
+
+def add_template_arguments(parser: argparse.ArgumentParser):
+    """
+    Add arguments for template creation/update to given parser.
+    """
+    parser.add_argument("name", type=str, help=BaseTemplateSettings.description("name"))
+    add_str(parser, "type", BaseTemplateSettings)
+
+    add_db_arguments(parser, APITemplateSettings)
+
+    # TODO: ? convert to single --items flag listing settings, progressbar and other types
+    add_bool(parser, "settings", PackageTemplateSettings, exclusive=True)
+    add_bool(parser, "progressbar", PackageTemplateSettings, exclusive=True)
+
+    add_bool(parser, "update", BaseTemplateSettings)
+
+
+def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
+    """
+    Add arguments for adding functionality to given parser.
+    """
+    parser.add_argument(
+        "type",
+        type=str,
+        choices=[SetupType.vscode.value, SetupType.gitignore.value, SetupType.db.value],
+        help="Type of functionality",
+    )
+    add_db_arguments(parser, DBSettings)
