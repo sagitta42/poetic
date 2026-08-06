@@ -6,6 +6,7 @@ import subprocess
 import venv
 
 from poetic.item.vscode import VSCodeSetup
+from poetic.logger import logg
 from poetic.setup.base import T_Settings
 from poetic.setup.functionality import BaseFunctionalitySetup
 
@@ -42,7 +43,12 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         Do not perform core set up if this setup is not core/main setup.
             (e.g. is assistive item setup of template that sets this upstream)
         """
+        line = "-"*30
+        if self._core:
+            logg.info(line, header=True)
         super().setup()
+        if self._core:
+            logg.info(line, header=True)        
 
         existed = False
         if self._core:

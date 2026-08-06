@@ -28,7 +28,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
 
     @abstractmethod
     def setup(self) -> bool | None:
-        logg.info(f"----- Setting up {self.title}", header=True)
+        logg.info(f"@ Setting up {self.title}", header=True)
 
     def launch(self) -> None:
         """
