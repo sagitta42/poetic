@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from poetic.item.base import BaseFunctionalitySetup
 from poetic.settings.item import VSCodeSetupSettings
+from poetic.setup.functionality import BaseFunctionalitySetup
 from poetic.utils.tree import display
 
 

@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from poetic.item.base import BaseDependencySetup
 from poetic.settings.item import DotenvSettings
+from poetic.setup.dependency import BaseDependencySetup
 
 
 class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
@@ -18,11 +18,7 @@ class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
     def setup(self) -> None:
         super().setup()
 
-        path_in_package = self.path
-        if self._settings.package_subdir is not None:
-            path_in_package = self.path / self._settings.package_subdir
-
-        self._copy_template("settings.py", path_in_package=path_in_package)
+        self._copy_template("settings.py")
 
     def setup_dependencies(self) -> None:
         super().setup_dependencies()

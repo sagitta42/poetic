@@ -3,7 +3,8 @@ import yaml
 
 from poetic.item.db import DBSetup
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DBSettings, DotenvSettings, SetupType
+from poetic.settings.base import SetupType
+from poetic.settings.item import DBSettings, DBType, DotenvSettings
 from poetic.settings.template import APITemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.pyproject_handler import PyProjectHandler
@@ -13,14 +14,12 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._dotenv_settings = EnvSettingsSetup(
-            DotenvSettings(type=SetupType.dotenv, settings=True), self.path, core=False
-        )
+        self._dotenv_setup = EnvSettingsSetup(DotenvSettings(), self.path, core=False)
         self._db: DBSetup | None = (
             None
             if settings.db is None
             else DBSetup(
-                DBSettings(type=SetupType.db, **settings.model_dump()),
+                DBSettings(type=SetupType.db, db=settings.db),
                 self.path,
                 core=False,
             )
@@ -51,7 +50,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         pyproject_handler.del_section("build-system")
         pyproject_handler.save_toml()
 
-    def setup(self, skip_super: bool = False) -> None:
+    def setup(self) -> None:
         """
         API template setup.
 
@@ -59,12 +58,12 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
             - docker compose file
             - DB if requested
         """
-        super().setup(skip_super)
+        super().setup()
 
         self.setup_docker_compose()
 
         if self._db is not None:
-            self._db.setup(skip_super=True)
+            self._db.setup()
 
     def setup_dependencies(self) -> None:
         """

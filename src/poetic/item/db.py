@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 import sqlite3
 
-from poetic.item.base import BaseDependencySetup
 from poetic.settings.item import DBSettings, DBType
+from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.utils import add_new_line_to_file
 
 
@@ -21,21 +21,6 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         self._db_path: Path = self.path / self._db_dir / self._filename
         self._local_db_path: str = str(self._db_dir / self._filename)
 
-    def setup_dotenv_template(self):
-        """
-        Setup .env template.
-
-        Add DB_URL to .env
-        """
-        path_to_dotenv = super().setup_dotenv_template()
-
-        if self._settings.db == DBType.sqlite:
-            add_new_line_to_file(
-                path_to_dotenv, f"DB_URL=sqlite:///{self._local_db_path}"
-            )
-
-        return path_to_dotenv
-
     def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
 
@@ -46,11 +31,13 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         In addition to standard setup:
             - DB
             - alembic migrations
+            - update .env template if necessary
         """
         super().setup()
 
         self.setup_db()
         self.setup_alembic()
+        self.update_dotenv_template()
 
     def setup_db(self):
         """
@@ -141,3 +128,14 @@ class DBSetup(BaseDependencySetup[DBSettings]):
 
         self.git.run("rm", "--cached", self._local_db_path)
         self.git.commit_all("untrack database (poetic)")
+
+    def update_dotenv_template(self):
+        """
+        Add DB_URL to .env
+        """
+        path_to_dotenv = self._get_filepath_in_package(".env.template")
+
+        if self._settings.db == DBType.sqlite:
+            add_new_line_to_file(
+                path_to_dotenv, f"DB_URL=sqlite:///{self._local_db_path}"
+            )

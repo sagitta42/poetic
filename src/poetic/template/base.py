@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import TypeVar
 
 from poetic.exceptions import PoeticException
-from poetic.item.base import BaseDependencySetup
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.vscode import VSCodeSetup
@@ -12,6 +11,7 @@ from poetic.settings.item import GitignoreSetupSettings, VSCodeSetupSettings
 from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
+from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.tree import display
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
@@ -21,17 +21,18 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     """
     General template setup.
 
-    Includes
+    Included functionalities setup:
+        - gitignore
+        - VSCode
+
+    Repository setup:
+        - source files
+        - README
+
+    Operations
         - repository init (git, poetry)
         - repository setup
         - repository update
-
-    Repository setup (in addition to BaseSetup):
-        - gitignore
-        - source files
-        - VSCode
-        - README
-        - extra
 
     Repository update: updating existing template with poetic updates.
     """

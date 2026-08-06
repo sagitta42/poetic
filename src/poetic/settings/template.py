@@ -3,7 +3,8 @@ from typing import Any, Literal, Self
 
 from pydantic import Field, model_validator
 
-from poetic.settings.item import DBSettings, DotenvSettings, SetupSettings, SetupType
+from poetic.settings.base import SetupSettings, SetupType
+from poetic.settings.item import DBSettings, DBType
 
 
 class BaseTemplateSettings(SetupSettings):
@@ -46,24 +47,26 @@ class BaseTemplateSettings(SetupSettings):
         return self
 
 
-class PackageTemplateSettings(BaseTemplateSettings, DotenvSettings):
+class PackageTemplateSettings(BaseTemplateSettings):
     """
     Package template settings.
 
     Include option to set up .env pydantic settings.
     """
 
-    type: Literal[SetupType.package] = Field(description="Template type", exclude=True)
+    type: Literal[SetupType.package] = Field(description="Template type")
+    settings: bool = Field(default=False, description="Set up .env Settings class")
     progressbar: bool = Field(
         default=False, description="Set up progress bar source code"
     )
 
 
-class APITemplateSettings(BaseTemplateSettings, DBSettings):
+class APITemplateSettings(BaseTemplateSettings):
     """
     API template settings.
 
     API template includes option to set up DB.
     """
 
-    type: Literal[SetupType.api] = Field(description="Template type", exclude=True)
+    type: Literal[SetupType.api] = Field(description="Template type")
+    db: DBType | None = Field(default=None, description="DB type")

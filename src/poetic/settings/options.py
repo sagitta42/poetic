@@ -5,8 +5,7 @@ from pydantic import BaseModel, Field
 from poetic.settings.item import GitignoreSetupSettings, VSCodeSetupSettings
 from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
 
-
-TemplateSettings = Annotated[
+AcceptedSetupSettings = Annotated[
     PackageTemplateSettings
     | APITemplateSettings
     | VSCodeSetupSettings
@@ -15,9 +14,9 @@ TemplateSettings = Annotated[
 ]
 
 
-class SettingsCrutch(BaseModel):
+class SettingsOptions(BaseModel):
     """
-    Exists only for convenience of detecting type of settings
+    Exists only for convenience of detecting type of settings provided in argparse
     """
 
-    settings: TemplateSettings
+    settings: AcceptedSetupSettings

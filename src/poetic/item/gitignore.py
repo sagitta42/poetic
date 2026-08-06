@@ -1,6 +1,6 @@
-from poetic.item.base import BaseFunctionalitySetup
 from poetic.logger import logg
 from poetic.settings.item import GitignoreSetupSettings
+from poetic.setup.functionality import BaseFunctionalitySetup
 
 
 class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):

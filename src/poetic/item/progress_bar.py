@@ -1,5 +1,5 @@
-from poetic.item.base import BaseDependencySetup
 from poetic.settings.item import ProgressBarSettings
+from poetic.setup.dependency import BaseDependencySetup
 
 
 class ProgressBarSetup(

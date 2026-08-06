@@ -1,6 +1,6 @@
 import enum
 
-from poetic.settings.item import SetupType
+from poetic.settings.base import SetupType
 from poetic.settings.template import BaseTemplateSettings
 from poetic.template.api import APITemplate
 from poetic.template.base import BaseTemplate

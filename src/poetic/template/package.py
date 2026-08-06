@@ -4,7 +4,8 @@ import shutil
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.progress_bar import ProgressBarSetup
-from poetic.settings.item import DotenvSettings, ProgressBarSettings, SetupType
+from poetic.settings.base import SetupType
+from poetic.settings.item import DotenvSettings, ProgressBarSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.utils import add_new_line_to_file
@@ -25,18 +26,15 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         src_subdir = Path("src") / self._inner_name
         self._path_to_src: Path = self.path / src_subdir
 
-        dotenv_settings = DotenvSettings(
-            type=SetupType.dotenv, **self._settings.model_dump()
-        )
-        dotenv_settings.package_subdir = src_subdir
+        # TODO: unify for internal items, use builder with core=False
         self._dotenv_setup = (
-            EnvSettingsSetup(dotenv_settings, self.path, core=False)
+            EnvSettingsSetup(DotenvSettings(), self._path_to_src, core=False)
             if self._settings.settings
             else None
         )
         self._progressbar_setup: ProgressBarSetup | None = (
             ProgressBarSetup(ProgressBarSettings(), self._path_to_src, core=False)
-            if settings.progressbar
+            if self._settings.progressbar
             else None
         )
 

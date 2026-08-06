@@ -2,9 +2,10 @@ import argparse
 from poetic.factory import PoeticFactory, BaseTemplateSettings
 from poetic.exceptions import PoeticException
 from poetic.logger import logg
-from poetic.settings.options import SettingsCrutch
-from poetic.settings.item import DBSettings, DBType, SetupType
-from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
+from poetic.settings.item import DBSettings, DBType
+from poetic.settings.base import SetupType
+from poetic.settings.options import SettingsOptions
+from poetic.settings.template import PackageTemplateSettings
 
 
 def add_template_arguments(parser: argparse.ArgumentParser):
@@ -24,9 +25,9 @@ def add_template_arguments(parser: argparse.ArgumentParser):
         type=str,
         nargs="?",
         const=DBType.sqlite.value,
-        default=DBType.none.value,
+        default=None,
         choices=DBSettings.options("db"),
-        help=APITemplateSettings.description("db"),
+        help="Create/update DB functionalities of given DB type",
     )
     parser.add_argument(
         "--settings",
@@ -74,7 +75,7 @@ def main():
 
     settings_args = vars(args).copy()
 
-    setup_settings = SettingsCrutch(**{"settings": settings_args}).settings
+    setup_settings = SettingsOptions(**{"settings": settings_args}).settings
 
     poetic_factory = PoeticFactory()
     setupper = poetic_factory.build(setup_settings)
