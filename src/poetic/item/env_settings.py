@@ -12,8 +12,10 @@ class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
         containing .env variables.
     """
 
-    def __init__(self, settings: DotenvSettings, path: Path, core: bool) -> None:
-        super().__init__(settings, path, core)
+    def __init__(
+        self, path: Path, settings: DotenvSettings = DotenvSettings(), core: bool = True
+    ) -> None:
+        super().__init__(path, settings, core)
 
     def setup(self) -> None:
         super().setup()

@@ -7,7 +7,6 @@ from poetic.exceptions import PoeticException
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.vscode import VSCodeSetup
-from poetic.settings.item import GitignoreSetupSettings, VSCodeSetupSettings
 from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
@@ -40,15 +39,15 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     def __init__(self, settings: T_TemplateSettings) -> None:
         self.name = settings.name
 
-        super().__init__(settings, Path(self.name), core=True)
+        super().__init__(Path(self.name), settings, core=True)
 
         self._inner_name = self.name.replace("-", "_")
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
         self._dotenv_setup: EnvSettingsSetup | None = None
-        self._vscode = VSCodeSetup(VSCodeSetupSettings(), self.path)
-        self._gitignore = GitignoreSetup(GitignoreSetupSettings(), self.path)
+        self._vscode = VSCodeSetup(self.path)
+        self._gitignore = GitignoreSetup(self.path)
 
         logg.info(f"Setting up {self._type}: {self.name}")
 

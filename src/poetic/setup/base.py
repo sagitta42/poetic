@@ -26,7 +26,7 @@ class BaseSetup(Generic[T_Settings]):
         - copying templates
     """
 
-    def __init__(self, settings: T_Settings, path: Path) -> None:
+    def __init__(self, path: Path, settings: T_Settings) -> None:
         self._settings = settings
         logg.debug(settings)
         self.path = path
@@ -49,7 +49,7 @@ class BaseSetup(Generic[T_Settings]):
         """
         Main setup.
 
-        Optionally return a flag.
+        Optionally return a flag representing whether this setup existed before.
         """
         pass
 

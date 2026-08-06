@@ -22,8 +22,8 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         - .env template setup
     """
 
-    def __init__(self, settings: T_Settings, path: Path, core: bool) -> None:
-        super().__init__(settings, path)
+    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
+        super().__init__(path, settings)
 
         self._core = core
         self._path_to_venv = (self.path / "venv").resolve()
@@ -32,7 +32,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
     def setup_dependencies(self) -> None:
         pass
 
-    def setup(self) -> None:
+    def setup(self) -> bool | None:
         """
         Main setup.
 
@@ -41,25 +41,31 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         """
         super().setup()
 
+        existed = False
         if self._core:
-            self.setup_dotenv_template()
+            existed = existed or self.setup_dotenv_template()
             self.setup_venv()
 
+        # TODO: flag if dependencies existed (pyproject / git diff)
         self.setup_dependencies()
+        return existed
 
-    def setup_dotenv_template(self):
+    def setup_dotenv_template(self) -> bool:
         """
         Set up .env.template.
+
+        Return bool on whether .env template existed before.
         """
-        self._copy_template(
+        _, existed = self._copy_template(
             "env.template", package_filename=".env.template", generic=True
         )
+        return existed
 
     def setup_venv(self):
         """
         Set up venv.
 
-        Create venv.
+        Create venv if does not exist.
         Install poetry into that venv.
         """
         if not self._path_to_venv.exists():

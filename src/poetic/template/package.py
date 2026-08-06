@@ -4,8 +4,6 @@ import shutil
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.progress_bar import ProgressBarSetup
-from poetic.settings.base import SetupType
-from poetic.settings.item import DotenvSettings, ProgressBarSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.utils import add_new_line_to_file
@@ -17,9 +15,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         settings = (
             init
             if isinstance(init, PackageTemplateSettings)
-            else PackageTemplateSettings(
-                name=init, type=SetupType.package, update=False
-            )
+            else PackageTemplateSettings(name=init, update=False)
         )
         super().__init__(settings)
 
@@ -28,12 +24,12 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         # TODO: unify for internal items, use builder with core=False
         self._dotenv_setup = (
-            EnvSettingsSetup(DotenvSettings(), self._path_to_src, core=False)
+            EnvSettingsSetup(self._path_to_src, core=False)
             if self._settings.settings
             else None
         )
         self._progressbar_setup: ProgressBarSetup | None = (
-            ProgressBarSetup(ProgressBarSettings(), self._path_to_src, core=False)
+            ProgressBarSetup(self._path_to_src, core=False)
             if self._settings.progressbar
             else None
         )

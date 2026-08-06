@@ -15,8 +15,8 @@ class DBSetup(BaseDependencySetup[DBSettings]):
     DB setup.
     """
 
-    def __init__(self, settings: DBSettings, path: Path, core: bool) -> None:
-        super().__init__(settings, path, core)
+    def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
+        super().__init__(path, settings, core)
 
         self._db_dir: Path = Path("db")
         self._filename: str = "db.db"
@@ -25,7 +25,7 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         self._local_db_path: str = str(self._db_dir / self._filename)
 
         # TODO: unity with APITemplate
-        self._dotenv_setup = EnvSettingsSetup(DotenvSettings(), self.path, core=False)
+        self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
 
     def setup_dependencies(self) -> None:
         self._poetry_add("alembic")
@@ -85,6 +85,8 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
+        if not self._env_settings_setup.is_present():
+            self._env_settings_setup.setup()
 
         if not self._dotenv_setup.is_present():
             self._dotenv_setup.setup()

@@ -11,8 +11,10 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
     VSCode settings and launch setup.
     """
 
-    def __init__(self, settings: VSCodeSetupSettings, path: Path) -> None:
-        super().__init__(settings, path)
+    def __init__(
+        self, path: Path, settings: VSCodeSetupSettings = VSCodeSetupSettings()
+    ) -> None:
+        super().__init__(path, settings)
 
         self._path_to_vscode = self.path / ".vscode"
 
@@ -22,18 +24,17 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
 
         Return flag representing whether templates existed before.
         """
-        super().setup()
+        existed = super().setup()
 
         os.makedirs(self._path_to_vscode, exist_ok=True)
 
-        existed = []
         for template in ["settings", "launch"]:
             _, template_existed = self._copy_template(
                 f"VSCode.{template}.json", self._path_to_vscode, f"{template}.json"
             )
-            existed.append(template_existed)
+            existed = existed or template_existed
 
-        return any(existed)
+        return existed
 
     def display(self, suggest_commit: str | None = None):
         super().display(suggest_commit)
