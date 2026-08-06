@@ -11,7 +11,7 @@ def main():
     subparsers = parser.add_subparsers()
 
     template_subparser = subparsers.add_parser(
-        "template", help="create/update template"
+        "init", help="create/update template"
     )
     add_template_arguments(template_subparser)
 
