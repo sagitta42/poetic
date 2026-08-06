@@ -79,8 +79,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         self.git.commit_all(f"template made with {self._poetic_link}")
 
-        self.post_init_commit()
-
         logg.info(f"Template setup DONE", header=True)
         self.display()
 
@@ -177,12 +175,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         path_to_readme = self.path / "README.md"
         with open(path_to_readme, "w") as f:
             f.writelines(readme_lines)
-
-    def post_init_commit(self):
-        """
-        Actions to be done after the initial commit.
-        """
-        pass
 
     def display(self, suggest_commit: str | None = None):
         """

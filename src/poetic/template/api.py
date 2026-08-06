@@ -139,16 +139,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
 
-    def post_init_commit(self):
-        """
-        Actions after initial commit.
-
-        If DB was requested, untrack DB file
-        """
-        # TODO: figure out how to move to DBSetup to generalize
-        if self._db is not None:
-            self._db.untrack_db()
-
     def _setup_subfolders(self):
         """
         Set up subfolders.

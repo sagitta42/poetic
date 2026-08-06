@@ -43,7 +43,7 @@ class SQLiteSetup(BaseDBSetup):
         Set up SQLite DB.
 
         If not present, create the DB directory.
-        If not present, create the .db file.
+        If not present, create the .db file and add to .gitignore.
         """
         existed = True
 
@@ -52,23 +52,11 @@ class SQLiteSetup(BaseDBSetup):
         if not self._db_path.exists():
             conn = sqlite3.connect(self._db_path)
             conn.close()
+
+            add_new_line_to_file(
+                self.path / ".gitignore", f"{self._local_db_path}\n", prepend=True
+            )
+
             existed = False
 
-        # TODO: do not commit
-        self.git.run("add", self._local_db_path)
         return existed
-
-    def untrack_db(self):
-        """
-        Untrack DB from git tracking.
-
-        Add DB path to .gignore.
-        Remove from cached.
-        """
-
-        add_new_line_to_file(
-            self.path / ".gitignore", f"{self._local_db_path}\n", prepend=True
-        )
-
-        self.git.run("rm", "--cached", self._local_db_path)
-        self.git.commit_all("untrack database (poetic)")
