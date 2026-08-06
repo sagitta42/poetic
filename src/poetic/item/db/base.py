@@ -52,14 +52,14 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         """
         existed = super().setup()
 
-        existed = existed or self.setup_db()
-        existed = existed or self.setup_alembic()
+        existed = self.setup_db() or existed
+        existed = self.setup_alembic() or existed
 
         return existed
 
     def setup_dependencies(self) -> None:
         super().setup_dependencies()
-        
+
         self._poetry_add("alembic")
 
     def setup_alembic(self) -> bool:
@@ -94,7 +94,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         else:
             existed = True
 
-        existed = existed or self._update_dotenv_template()
+        existed = self._update_dotenv_template() or existed
 
         if not self._env_settings_setup.is_present():
             self._env_settings_setup.setup()
@@ -106,8 +106,8 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         )
         existed = existed or env_existed
 
-        existed = existed or self._add_vscode_launch_configurations(
-            "alembic.launch.json"
+        existed = (
+            self._add_vscode_launch_configurations("alembic.launch.json") or existed
         )
 
         alembdantic_subdir = "alembdantic"

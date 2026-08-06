@@ -52,7 +52,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
 
         existed = False
         if self._core:
-            existed = existed or self.setup_dotenv_template()
+            existed = self.setup_dotenv_template() or existed
             self.setup_venv()
 
         # TODO: flag if dependencies existed (pyproject / git diff)

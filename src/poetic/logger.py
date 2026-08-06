@@ -64,7 +64,7 @@ class Logger:
         full_format = "%(asctime)s [%(levelname)s] %(classname)s.%(funcName)s:%(lineno)d - %(message)s"
         short_format = "[%(levelname)s] %(classname)s - %(message)s"
         no_format = ""
-        level_format = short_format if log_level == logging.DEBUG else no_format
+        level_format = full_format if log_level == logging.DEBUG else no_format
         formatter = LevelFormatter(
             {
                 logging.DEBUG: full_format,
