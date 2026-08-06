@@ -54,6 +54,9 @@ class PackageTemplateSettings(BaseTemplateSettings, DotenvSettings):
     """
 
     type: Literal[SetupType.package] = Field(description="Template type", exclude=True)
+    progressbar: bool = Field(
+        default=False, description="Set up progress bar source code"
+    )
 
 
 class APITemplateSettings(BaseTemplateSettings, DBSettings):

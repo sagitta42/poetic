@@ -33,6 +33,12 @@ def add_template_arguments(parser: argparse.ArgumentParser):
         action="store_true",
         help=PackageTemplateSettings.description("settings"),
     )
+    # TODO: convert to single --items flag listing settings, progressbar and other types
+    parser.add_argument(
+        "--progressbar",
+        action="store_true",
+        help=PackageTemplateSettings.description("progressbar"),
+    )
 
     parser.add_argument("--update", action="store_true", help="Update existing package")
 

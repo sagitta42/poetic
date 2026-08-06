@@ -3,7 +3,8 @@ from pathlib import Path
 import shutil
 
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DotenvSettings, SetupType
+from poetic.item.progress_bar import ProgressBarSetup
+from poetic.settings.item import DotenvSettings, ProgressBarSettings, SetupType
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.utils import add_new_line_to_file
@@ -28,9 +29,14 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             type=SetupType.dotenv, **self._settings.model_dump()
         )
         dotenv_settings.package_subdir = src_subdir
-        self._dotenv_settings = (
-            EnvSettingsSetup(dotenv_settings, self.path)
+        self._dotenv_setup = (
+            EnvSettingsSetup(dotenv_settings, self.path, core=False)
             if self._settings.settings
+            else None
+        )
+        self._progressbar_setup: ProgressBarSetup | None = (
+            ProgressBarSetup(ProgressBarSettings(), self._path_to_src, core=False)
+            if settings.progressbar
             else None
         )
 
@@ -80,6 +86,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self.setup_tests()
         self.setup_logger()
+
+        if self._progressbar_setup is not None:
+            self._progressbar_setup.setup()
 
     def setup_tests(self):
         """

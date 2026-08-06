@@ -12,6 +12,7 @@ class SetupType(str, enum.Enum):
     dotenv = "dotenv"
     vscode = "vscode"
     gitignore = "gitignore"
+    progressbar = "progressbar"
 
     @classmethod
     def values(cls) -> list[str]:
@@ -48,6 +49,12 @@ class GitignoreSetupSettings(SetupSettings):
     )
 
 
+class ProgressBarSettings(SetupSettings):
+    type: Literal[SetupType.progressbar] = Field(
+        default=SetupType.progressbar, description="Setup type"
+    )
+
+
 class DBType(str, enum.Enum):
     sqlite = "sqlite"
     none = "none"
@@ -68,6 +75,7 @@ class DotenvSettings(SetupSettings):
     """
 
     type: Literal[SetupType.dotenv] = Field(description="Setup type")
+    # FIXME: remove, redundant; move to package template settings
     settings: bool = Field(default=False, description="Set up .env settings module")
     package_subdir: Path | None = Field(
         default=None,

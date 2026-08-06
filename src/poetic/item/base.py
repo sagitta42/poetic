@@ -11,7 +11,6 @@ from poetic.settings.item import SetupSettings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
-from poetic.utils.tree import display
 
 T_Settings = TypeVar("T_Settings", bound=SetupSettings)
 
@@ -29,6 +28,7 @@ class BaseItemSetup(Generic[T_Settings]):
 
     def __init__(self, settings: T_Settings, path: Path) -> None:
         self._settings = settings
+        logg.debug(settings)
         self.path = path
 
         self._type: str = settings.type.value
