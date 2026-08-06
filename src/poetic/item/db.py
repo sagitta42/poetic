@@ -153,4 +153,4 @@ class DBSetup(BaseDependencySetup[DBSettings]):
         )
 
         if self._settings.db == DBType.sqlite:
-            add_new_line_to_file(path_to_dotenv, db_url)
+            add_new_line_to_file(path_to_dotenv, f"DB_URL={db_url}")
