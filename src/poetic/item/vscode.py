@@ -18,23 +18,18 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
 
         self._path_to_vscode = self.path / ".vscode"
 
-    def setup(self) -> bool:
+    def setup(self) -> None:
         """
         Set up VSCode.
-
-        Return flag representing whether templates existed before.
         """
-        existed = super().setup()
+        super().setup()
 
         os.makedirs(self._path_to_vscode, exist_ok=True)
 
         for template in ["settings", "launch"]:
-            _, template_existed = self._copy_template(
+            self._copy_template(
                 f"VSCode.{template}.json", self._path_to_vscode, f"{template}.json"
             )
-            existed = existed or template_existed
-
-        return existed
 
     def display(self, suggest_commit: str | None = None):
         super().display(suggest_commit)

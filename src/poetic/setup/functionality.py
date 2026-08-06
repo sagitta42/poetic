@@ -15,8 +15,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
 
     Standard launch action:
     - set up
-    - if git repo and fresh setup, commit
-    - otherwise only suggest commit message (need to pick desired changes)
+    - if git repo, commit changes unless requested otherwise
     - display setup results
     """
 
@@ -28,7 +27,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         return self._settings.type.value
 
     @abstractmethod
-    def setup(self) -> bool | None:
+    def setup(self) -> None:
         logg.info(f"@ Setting up {self.title}", header=True)
 
     def launch(self) -> None:
@@ -38,15 +37,14 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         Perform setup.
         Commit setup if in git repository and files did not exist before.
         """
-        existed_before = self.setup()
-        assert existed_before is not None
+        self.setup()
 
         if self.git.is_git_repo:
-            if not existed_before:
+            if self._settings.no_commit:
+                self.display(self._commit_message("update"))
+            else:
                 self.git.commit_all(self._commit_message("setup"))
                 self.display()
-            else:
-                self.display(self._commit_message("update"))
         else:
             self.display()
 
@@ -57,9 +55,9 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         suggest_commit: suggest commit message
         """
         if suggest_commit is not None:
-            logg.info(f"Commit message: {suggest_commit}")
+            logg.info(f"[not committed] {suggest_commit}")
         else:
-            logg.info(f"{self.title} functionality setup")
+            logg.info(f"{self.title} functionality setup DONE")
 
     def _commit_message(self, mod_type: str) -> str:
         """

@@ -36,7 +36,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
     def setup_dependencies(self) -> None:
         logg.info("...setting up dependencies", header=True)
 
-    def setup(self) -> bool | None:
+    def setup(self) -> None:
         """
         Main setup.
 
@@ -50,26 +50,21 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         if self._core:
             logg.info(line, header=True)
 
-        existed = False
         if self._core:
-            existed = self.setup_dotenv_template() or existed
+            self.setup_dotenv_template()
             self.setup_venv()
 
         # TODO: flag if dependencies existed (pyproject / git diff)
         self.setup_dependencies()
-        return existed
 
-    def setup_dotenv_template(self) -> bool:
+    def setup_dotenv_template(self):
         """
         Set up .env.template.
-
-        Return bool on whether .env template existed before.
         """
         logg.info("...setting up .env template", header=True)
-        _, existed = self._copy_template(
+        self._copy_template(
             "env.template", package_filename=".env.template", generic=True
         )
-        return existed
 
     def setup_venv(self):
         """
@@ -121,13 +116,10 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
             ),
         )
 
-    def _add_vscode_launch_configurations(self, template_filename: str) -> bool:
+    def _add_vscode_launch_configurations(self, template_filename: str):
         """
         Add configurations to VSCode launch.json contained in given template.
-
-        Return bool representing whether this configuration existed before.
         """
-        existed = False
 
         path_to_launch = self.path / ".vscode" / "launch.json"
         if not path_to_launch.exists():
@@ -149,10 +141,6 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         for config in template_config["configurations"]:
             if config["name"] not in configuration_names:
                 launch_dct["configurations"].append(config)
-            else:
-                existed = True
 
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)
-
-        return existed

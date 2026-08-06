@@ -82,4 +82,5 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         choices=[SetupType.vscode.value, SetupType.gitignore.value, SetupType.db.value],
         help="Type of functionality",
     )
+    add_bool(parser, "no-commit", SetupSettings)
     add_db_arguments(parser, DBSettings)

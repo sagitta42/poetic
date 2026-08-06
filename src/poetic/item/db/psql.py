@@ -9,24 +9,21 @@ class PsqlDBSetup(BaseDBSetup):
     def db_url(self) -> str:
         return "todo"
 
-    def setup_db(self) -> bool:
-        existed = self._setup_docker_compose()
-        return existed
+    def setup_db(self):
+        self._setup_docker_compose()
 
-    def _setup_docker_compose(self) -> bool:
+    def _setup_docker_compose(self):
         logg.info("..setting up docker-compose", header=True)
-        existed = False
 
         path_to_yml = self.path / "docker-compose.yml"
 
         yml_info = {}
         if path_to_yml.exists():
-            existed = True
             with open(path_to_yml) as f:
                 yml_info = yaml.safe_load(f)
         else:
             self._copy_template("docker-compose.yml")
-            return False
+            return
 
         if "services" not in yml_info:
             yml_info["serices"] = {}
@@ -41,5 +38,3 @@ class PsqlDBSetup(BaseDBSetup):
 
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
-
-        return existed

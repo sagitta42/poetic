@@ -36,14 +36,13 @@ class SQLiteSetup(BaseDBSetup):
         """
         return f"sqlite:///{self._local_db_path}"
 
-    def setup_db(self) -> bool:
+    def setup_db(self):
         """
         Set up SQLite DB.
 
         If not present, create the DB directory.
         If not present, create the .db file and add to .gitignore.
         """
-        existed = True
 
         os.makedirs(self.path / self._db_dir, exist_ok=True)
 
@@ -54,7 +53,3 @@ class SQLiteSetup(BaseDBSetup):
             add_new_line_to_file(
                 self.path / ".gitignore", f"{self._local_db_path}\n", prepend=True
             )
-
-            existed = False
-
-        return existed
