@@ -46,6 +46,16 @@ class PsqlDBSetup(BaseDBSetup):
 
         self._dotenv_vars = self._env_vars + [self._port]
 
+    def setup_dependencies(self):
+        """
+        Set up dependencies for PSQL functionality.
+
+        psycopg[binary] is needed for alembic migrations.
+        """
+        super().setup_dependencies()
+
+        self._poetry_add("psycopg[binary]")
+
     def setup_db(self):
         super().setup_db()
 
