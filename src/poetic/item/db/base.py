@@ -76,8 +76,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
 
-        if not self._env_settings_setup.is_present():
-            self._env_settings_setup.setup()
+        self._env_settings_setup.setup()
 
         self._copy_template(
             "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
