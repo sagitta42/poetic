@@ -23,7 +23,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._path_to_src: Path = self.path / src_subdir
 
         # TODO: unify for internal items, use builder with core=False
-        self._dotenv_setup = (
+        self._env_settings_setup = (
             EnvSettingsSetup(self._path_to_src, core=False)
             if self._settings.settings
             else None

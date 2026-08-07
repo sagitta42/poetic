@@ -2,7 +2,6 @@ from abc import abstractmethod
 import os
 from pathlib import Path
 
-from dotenv import set_key
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
@@ -64,7 +63,6 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
 
         Set up alembic.ini.
         Init alembic if not init already.
-        Update .env.template setting DB_URL.
         Set up .env Settings class if does not exist yet (used in alembic env.py for DB URL)
         Set up alembic environment (env.py).
         Add alembic upgrade debugger configuration to launch.json
@@ -85,8 +83,6 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
             self._run(self.venv("alembic"), "init", alembic_dir, env=True)
-
-        self._update_dotenv_template()
 
         if not self._env_settings_setup.is_present():
             self._env_settings_setup.setup()
@@ -121,14 +117,13 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
             template_subdir=template_subdir,
         )
 
-    def _update_dotenv_template(self):
+    def setup_dotenv_template(self):
         """
         Update .env.template
 
         Add DB_URL to .env
         DB_URL variable is read in alembic env.py
         """
-        path_to_dotenv = self._get_filepath_in_package(".env.template")
-        var_name = "DB_URL"
+        super().setup_dotenv_template()
 
-        set_key(path_to_dotenv, var_name, self.db_url)
+        self._update_env("DB_URL", self.db_url)

@@ -45,7 +45,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
-        self._dotenv_setup: EnvSettingsSetup | None = None
+        self._env_settings_setup: EnvSettingsSetup | None = None
         self._vscode = VSCodeSetup(self.path)
         self._gitignore = GitignoreSetup(self.path)
 
@@ -141,15 +141,15 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._gitignore.setup()
         self.setup_source_files()
 
-        if self._dotenv_setup is not None:
-            self._dotenv_setup.setup()
+        if self._env_settings_setup is not None:
+            self._env_settings_setup.setup()
         self._vscode.setup()
 
         self.setup_readme()
 
     def setup_dependencies(self):
         super().setup_dependencies()
-        
+
         self._poetry_add("dotenv")
         self._poetry_add("pydantic")
 

@@ -3,7 +3,10 @@ import json
 import os
 from pathlib import Path
 import subprocess
+from typing import Any
 import venv
+
+from dotenv import set_key
 
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
@@ -15,7 +18,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
     """
     General functionality setup with dependencies.
 
-    core (bool): this is a core setup i.e. set up core functionalities (.env, venv)
+    core (bool): this is a core setup (impacts only cosmetics e.g. info header)
 
     Includes additional operations:
         - running subprocesses
@@ -40,9 +43,6 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
     def setup(self) -> None:
         """
         Main setup.
-
-        Do not perform core set up if this setup is not core/main setup.
-            (e.g. is assistive item setup of template that sets this upstream)
         """
         line = "-" * 60
         if self._core:
@@ -51,11 +51,8 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         if self._core:
             logg.info(line, header=True)
 
-        if self._core:
-            self.setup_dotenv_template()
-            self.setup_venv()
-
-        # TODO: flag if dependencies existed (pyproject / git diff)
+        self.setup_dotenv_template()
+        self.setup_venv()
         self.setup_dependencies()
 
     def setup_dotenv_template(self):
@@ -63,9 +60,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         Set up .env.template.
         """
         logg.info("...setting up .env template", header=True)
-        self._copy_template(
-            "env.template", package_filename=".env.template", generic=True
-        )
+        self._update_env("DEBUG", 1)
 
     def setup_venv(self):
         """
@@ -144,3 +139,15 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
 
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)
+
+    def _update_env(self, var: str, value: Any, path_to_dotenv: Path | None = None):
+        """
+        Update .env file with given variable value.
+
+        Defaults to .env.template file in root directory of setup.
+
+        .env file will be created if does not exist.
+        """
+        filepath = path_to_dotenv or self.path / ".env.template"
+
+        set_key(filepath, var, str(value), quote_mode="never")

@@ -13,7 +13,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
     def __init__(self, settings: APITemplateSettings) -> None:
         super().__init__(settings)
 
-        self._dotenv_setup = EnvSettingsSetup(self.path, core=False)
+        self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
         self._db: SQLiteSetup | None = (
             None
             if settings.db is None
