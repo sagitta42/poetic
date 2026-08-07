@@ -134,7 +134,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         path_to_yml = self._get_filepath_in_package(filename)
         path_to_template = self._get_template_path(filename)
 
-        self._update_yml_from_template(path_to_yml, path_to_template)
+        self._update_docker_compose_from_template(path_to_yml, path_to_template)
 
     def _setup_subfolders(self):
         """

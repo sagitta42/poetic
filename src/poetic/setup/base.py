@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from pathlib import Path
 import shutil
-from typing import Generic
+from typing import Any, Generic
 
 import yaml
 
@@ -43,6 +43,13 @@ class BaseSetup(Generic[T_Settings]):
         self.git = Git(self.path)
 
         self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
+
+    @property
+    def docker_compose(self) -> Path:
+        """
+        Default path to docker-compose.yml
+        """
+        return self.path / "docker-compose.yml"
 
     @abstractmethod
     def setup(self) -> bool | None:
@@ -143,12 +150,34 @@ class BaseSetup(Generic[T_Settings]):
         ret = path_in_package / filename_in_package
         return ret
 
-    def _update_yml_from_template(self, path_to_yml: Path, path_to_template: Path):
+    def _update_docker_compose_from_template(
+        self, path_to_template: Path, path_to_docker_compose: Path | None = None
+    ):
         """
-        Update given .yml file with contents of given template.
+        Update given docker-compose .yml file with contents of given template.
 
+        Default to docker-compose.yml in root of setup.
         Create file if does not exist yet.
         """
+        yml_info = self._get_docker_compose(path_to_docker_compose)
+
+        with open(path_to_template) as f:
+            yml_template = yaml.safe_load(f)
+
+        yml_info["services"] |= yml_template["services"]
+
+        self._write_docker_compose(yml_info, path_to_docker_compose)
+
+    def _get_docker_compose(
+        self, path_to_docker_compose: Path | None = None
+    ) -> dict[str, Any]:
+        """
+        Get docker-compose from given path to .yml.
+
+        If does not exist, set up empty "services" in dict.
+        """
+        path_to_yml = path_to_docker_compose or self.docker_compose
+
         yml_info = {}
         if path_to_yml.exists():
             with open(path_to_yml) as f:
@@ -157,10 +186,12 @@ class BaseSetup(Generic[T_Settings]):
         if "services" not in yml_info:
             yml_info["services"] = {}
 
-        with open(path_to_template) as f:
-            yml_template = yaml.safe_load(f)
+        return yml_info
 
-        yml_info["services"] |= yml_template["services"]
-
+    def _write_docker_compose(
+        self, yml_info: dict[str, Any], path_to_docker_compose: Path | None = None
+    ):
+        # FIXME: improve duplication
+        path_to_yml = path_to_docker_compose or self.docker_compose
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)
