@@ -10,8 +10,16 @@ from poetic.settings.item import DBSettings
 
 # TODO: generalize .env.template util
 class EnvVar(BaseModel):
-    var: str = Field(description="Variable name")
+    name: str = Field(description="Variable name")
     value: Any = Field(description="Variable value")
+
+    @property
+    def dollar(self) -> str:
+        """
+        Get ${var} string.
+        """
+        ret = f"${{{self.name}}}"
+        return ret
 
 
 class PsqlDBSetup(BaseDBSetup):
@@ -20,19 +28,18 @@ class PsqlDBSetup(BaseDBSetup):
 
         self._service_name = "db"
 
+        self._name = EnvVar(name="DB_NAME", value="changeme")
+        self._user = EnvVar(name="DB_USER", value="changeme")
+
         self._env_vars = [
-            EnvVar(var="DB_NAME", value="changeme"),
-            EnvVar(var="DB_USER", value="changeme"),
-            EnvVar(var="DB_PASSWORD", value="changeme"),
+            self._name,
+            self._user,
+            EnvVar(name="DB_PASSWORD", value="changeme"),
         ]
 
-        self._port = EnvVar(var="DB_PORT", value=5432)
+        self._port = EnvVar(name="DB_PORT", value=5432)
 
         self._dotenv_vars = self._env_vars + [self._port]
-
-    @property
-    def db_url(self) -> str:
-        return "changeme"
 
     def setup_db(self):
         super().setup_db()
@@ -45,7 +52,7 @@ class PsqlDBSetup(BaseDBSetup):
 
         Set up DB service in docker-compose.
         Set up environment variables in service environment.
-        TODO: Set up port.
+        Set up port.
         TODO: Set up DB URL in API service if exists.
         """
         logg.info("..setting up PSQL docker-compose", header=True)
@@ -80,7 +87,7 @@ class PsqlDBSetup(BaseDBSetup):
         env = service["environment"]
 
         for env_var in self._env_vars:
-            env[env_var.var] = f"${{{env_var.var}}}"
+            env[env_var.name] = env_var.dollar
 
         self._write_docker_compose(yml_info)
 
@@ -95,7 +102,7 @@ class PsqlDBSetup(BaseDBSetup):
             service["ports"] = []
         ports = service["ports"]
 
-        port_str = f"${{{self._port.var}}}:{self._port.value}"
+        port_str = f"{self._port.dollar}:{self._port.value}"
         if len(ports) > 0:
             ports[0] = port_str
         else:

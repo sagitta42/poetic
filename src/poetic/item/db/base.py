@@ -30,14 +30,6 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         """
         logg.info(f"...setting up {self._settings.db.value} DB", header=True)
 
-    @property
-    @abstractmethod
-    def db_url(self) -> str:
-        """
-        DB URL for .env
-        """
-        pass
-
     def setup(self) -> None:
         """
         DB setup.
@@ -116,14 +108,3 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
             path_in_package=path_to_revisions,
             template_subdir=template_subdir,
         )
-
-    def setup_dotenv_template(self):
-        """
-        Update .env.template
-
-        Add DB_URL to .env
-        DB_URL variable is read in alembic env.py
-        """
-        super().setup_dotenv_template()
-
-        self._update_env("DB_URL", self.db_url)

@@ -54,3 +54,14 @@ class SQLiteSetup(BaseDBSetup):
             add_new_line_to_file(
                 self.path / ".gitignore", f"{self._local_db_path}\n", prepend=True
             )
+
+    def setup_dotenv_template(self):
+        """
+        Update .env.template
+
+        Add DB_URL to .env
+        DB_URL variable is read in alembic env.py
+        """
+        super().setup_dotenv_template()
+
+        self._update_env("DB_URL", self.db_url)

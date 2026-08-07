@@ -7,11 +7,33 @@ from alembic import context
 
 from settings import settings
 
+def get_env_url(driver: str) -> URL:
+    """
+    Get DB URL based on .env variables
+    """
+    url = URL.create(
+        drivername=driver,
+        database=settings.db_name,
+        host=settings.db_host,
+        port=settings.db_port,
+        username=settings.db_user,
+        password=settings.db_password,
+    )   
+    return url 
+
+def get_url(driver: str = "postgresql+psycopg"):
+    """
+    Get DB URL directly from .env or constructed.
+    """
+    # "mysql+pymysql"
+    if settings.db_url is None:
+        return get_env_url(driver)
+    return settings.db_url
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-db_url = settings.db_url
-config.set_main_option("sqlalchemy.url", db_url)
+config.set_main_option("sqlalchemy.url", get_url())
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

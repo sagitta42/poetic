@@ -140,7 +140,7 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         with open(path_to_launch, "w") as f:
             json.dump(launch_dct, f, indent=4)
 
-    def _update_env(self, var: str, value: Any, path_to_dotenv: Path | None = None):
+    def _update_env(self, name: str, value: Any, path_to_dotenv: Path | None = None):
         """
         Update .env file with given variable value.
 
@@ -150,4 +150,4 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         """
         filepath = path_to_dotenv or self.path / ".env.template"
 
-        set_key(filepath, var, str(value), quote_mode="never")
+        set_key(filepath, name, str(value), quote_mode="never")
