@@ -10,13 +10,15 @@ class PsqlDBSetup(BaseDBSetup):
         return "todo"
 
     def setup_db(self):
-        self._setup_docker_compose()
+        super().setup_db()
 
-    def _setup_docker_compose(self):
+        self.setup_docker_compose()
+
+    def setup_docker_compose(self):
         """
         Set up PSQL service in docker-compose.
         """
-        logg.info("..setting up docker-compose", header=True)
+        logg.info("..setting up PSQL docker-compose", header=True)
 
         filename = "docker-compose.yml"
 

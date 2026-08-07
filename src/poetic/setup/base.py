@@ -154,10 +154,13 @@ class BaseSetup(Generic[T_Settings]):
             with open(path_to_yml) as f:
                 yml_info = yaml.safe_load(f)
 
+        if "services" not in yml_info:
+            yml_info["services"] = {}
+
         with open(path_to_template) as f:
             yml_template = yaml.safe_load(f)
 
-        yml_info |= yml_template
+        yml_info["services"] |= yml_template["services"]
 
         with open(path_to_yml, "w") as f:
             yaml.dump(yml_info, f)

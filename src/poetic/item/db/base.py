@@ -28,7 +28,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         """
         Set up DB.
         """
-        pass
+        logg.info(f"...setting up {self._settings.db.value} DB", header=True)
 
     @property
     @abstractmethod

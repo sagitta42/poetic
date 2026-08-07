@@ -43,6 +43,7 @@ class SQLiteSetup(BaseDBSetup):
         If not present, create the DB directory.
         If not present, create the .db file and add to .gitignore.
         """
+        super().setup_db()
 
         os.makedirs(self.path / self._db_dir, exist_ok=True)
 
