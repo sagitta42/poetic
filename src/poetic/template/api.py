@@ -1,6 +1,8 @@
 import os
 import yaml
 
+from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.builder import DBSetupBuilder
 from poetic.item.db.sqlite import SQLiteSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings
@@ -14,13 +16,12 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         super().__init__(settings)
 
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
-        self._db: SQLiteSetup | None = (
+        db_setup_builder = DBSetupBuilder()
+        self._db: BaseDBSetup | None = (
             None
             if settings.db is None
-            else SQLiteSetup(
-                self.path,
-                DBSettings(db=settings.db),
-                core=False,
+            else db_setup_builder.build(
+                DBSettings(db=settings.db), self.path, core=False
             )
         )
 
