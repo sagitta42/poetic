@@ -129,15 +129,11 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
 
         Copy template and update app name.
         """
-        path_to_yml, _ = self._copy_template("docker-compose.yml", generic=False)
+        filename = "docker-compose.yml"
+        path_to_yml = self._get_filepath_in_package(filename)
+        path_to_template = self._get_template_path(filename)
 
-        with open(path_to_yml) as f:
-            yml_info = yaml.safe_load(f)
-
-        yml_info["services"]["api"]["environment"]["APP_NAME"] = self.name
-
-        with open(path_to_yml, "w") as f:
-            yaml.dump(yml_info, f)
+        self._update_yml_from_template(path_to_yml, path_to_template)
 
     def _setup_subfolders(self):
         """

@@ -3,6 +3,8 @@ from pathlib import Path
 import shutil
 from typing import Generic
 
+import yaml
+
 from poetic.settings.base import T_Settings
 from poetic.utils.git import Git
 
@@ -109,7 +111,10 @@ class BaseSetup(Generic[T_Settings]):
         return filepath.exists()
 
     def _get_template_path(
-        self, template_filename: str, generic: bool, template_subdir: Path | str | None
+        self,
+        template_filename: str,
+        generic: bool = False,
+        template_subdir: Path | str | None = None,
     ) -> Path:
         """
         Get path to given template in assets.
@@ -137,3 +142,22 @@ class BaseSetup(Generic[T_Settings]):
         path_in_package = path_in_package or self.path
         ret = path_in_package / filename_in_package
         return ret
+
+    def _update_yml_from_template(self, path_to_yml: Path, path_to_template: Path):
+        """
+        Update given .yml file with contents of given template.
+
+        Create file if does not exist yet.
+        """
+        yml_info = {}
+        if path_to_yml.exists():
+            with open(path_to_yml) as f:
+                yml_info = yaml.safe_load(f)
+
+        with open(path_to_template) as f:
+            yml_template = yaml.safe_load(f)
+
+        yml_info |= yml_template
+
+        with open(path_to_yml, "w") as f:
+            yaml.dump(yml_info, f)
