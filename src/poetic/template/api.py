@@ -1,13 +1,12 @@
 import os
-import yaml
 
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
-from poetic.item.db.sqlite import SQLiteSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings
 from poetic.settings.template import APITemplateSettings
 from poetic.template.base import BaseTemplate
+from poetic.utils.docker import DockerHandler
 from poetic.utils.pyproject_handler import PyProjectHandler
 
 
@@ -24,6 +23,8 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
                 DBSettings(db=settings.db), self.path, core=False
             )
         )
+
+        self._docker = DockerHandler(self.path)
 
     def poetry_init(self):
         """
@@ -128,13 +129,13 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         """
         Set up docker compose.
 
-        Copy template and update app name.
+        Copy template and set container name.
         """
         filename = "docker-compose.yml"
         path_to_yml = self._get_filepath_in_package(filename)
         path_to_template = self._get_template_path(filename)
 
-        self._update_docker_compose_from_template(path_to_yml, path_to_template)
+        self._docker.update_docker_compose_from_template(path_to_yml, path_to_template)
 
     def _setup_subfolders(self):
         """

@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from poetic.item.db.base import BaseDBSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
+from poetic.utils.docker import DockerHandler
 
 
 # TODO: generalize .env.template util
@@ -46,6 +47,8 @@ class PsqlDBSetup(BaseDBSetup):
 
         self._dotenv_vars = self._env_vars + [self._port]
 
+        self._docker = DockerHandler(self.path)
+
     def setup_dependencies(self):
         """
         Set up dependencies for PSQL functionality.
@@ -73,7 +76,7 @@ class PsqlDBSetup(BaseDBSetup):
         logg.info("..setting up PSQL docker-compose", header=True)
 
         path_to_template = self._get_template_path("docker-compose.yml")
-        self._update_docker_compose_from_template(path_to_template)
+        self._docker.update_docker_compose_from_template(path_to_template)
         self._update_service_env_vars()
         self._update_service_port()
 
@@ -86,7 +89,6 @@ class PsqlDBSetup(BaseDBSetup):
         for env_var in self._dotenv_vars:
             self._update_env(**env_var.model_dump())
 
-    # TODO: generalize docker compose util
     def _update_service_env_vars(self):
         """
         Set/update environment variables db service.
@@ -104,7 +106,7 @@ class PsqlDBSetup(BaseDBSetup):
         for env_var in self._env_vars:
             env[env_var.name] = env_var.dollar
 
-        self._write_docker_compose(yml_info)
+        self._docker.write_docker_compose(yml_info)
 
     def _update_service_port(self):
         """
@@ -123,18 +125,15 @@ class PsqlDBSetup(BaseDBSetup):
         else:
             ports.append(port_str)
 
-        # TODO: store docker compose in member, update, write at the end
-        self._write_docker_compose(yml_info)
+        self._docker.write_docker_compose(yml_info)
 
-    def _get_docker_compose(
-        self, path_to_docker_compose: Path | None = None
-    ) -> dict[str, Any]:
+    def _get_docker_compose(self) -> dict[str, Any]:
         """
         Get docker-compose with db service.
 
         If does not exist, set up empty "db" in dict.
         """
-        ret = super()._get_docker_compose(path_to_docker_compose)
+        ret = self._docker.get_docker_compose()
 
         services = ret["services"]
 
