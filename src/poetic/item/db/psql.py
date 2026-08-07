@@ -24,6 +24,10 @@ class PsqlDBSetup(BaseDBSetup):
             EnvVar(var="DB_PASSWORD", value="changeme"),
         ]
 
+        self._port = EnvVar(var="DB_PORT", value=5432)
+
+        self._dotenv_vars = self._env_vars + [self._port]
+
     @property
     def db_url(self) -> str:
         return "changeme"
@@ -54,7 +58,7 @@ class PsqlDBSetup(BaseDBSetup):
         """
         super().setup_dotenv_template()
 
-        for env_var in self._env_vars:
+        for env_var in self._dotenv_vars:
             self._update_env(**env_var.model_dump())
 
     def _update_service_env_vars(self, service_name: str = "db"):
