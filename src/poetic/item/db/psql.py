@@ -23,17 +23,22 @@ class EnvVar(BaseModel):
 
 
 class PsqlDBSetup(BaseDBSetup):
+    """
+    PSQL database setup.
+
+    env_vars: environment variables in docker-compose
+    dotenv_vars: .env variables = env_vars + port
+    """
+
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
         self._service_name = "db"
 
-        self._name = EnvVar(name="DB_NAME", value="changeme")
-        self._user = EnvVar(name="DB_USER", value="changeme")
-
         self._env_vars = [
-            self._name,
-            self._user,
+            EnvVar(name="DB_HOST", value="localhost"),
+            EnvVar(name="DB_NAME", value="db"),
+            EnvVar(name="DB_USER", value="user"),
             EnvVar(name="DB_PASSWORD", value="changeme"),
         ]
 
