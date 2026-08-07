@@ -16,6 +16,10 @@ API docs: http://localhost:8000/docs
 docker compose up --build
 ```
 
+Only one service:
+```bash
+docker compose up --build  <service>
+
 ## app
 
 ```bash

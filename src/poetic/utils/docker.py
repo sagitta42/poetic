@@ -13,8 +13,23 @@ class DockerHandler:
         self.path = path
         self.docker_compose = self.path / "docker-compose.yml"
 
-    def update_service_container_name(self):
-        pass
+    def update_service_container_name(self, service_name: str, container_name: str):
+        """
+        Set/Update container name of given service.
+        """
+        yml_info = self.get_docker_compose()
+        services = yml_info["services"]
+
+        if service_name not in services:
+            raise ValueError(
+                f"Service {services} not found under docker-compose services!"
+            )
+
+        service = services[service_name]
+        service["container_name"] = container_name
+
+        # TODO: store docker compose in member, update, write at the end
+        self.write_docker_compose(yml_info)
 
     def update_docker_compose_from_template(self, path_to_template: Path):
         """

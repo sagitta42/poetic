@@ -130,12 +130,13 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         Set up docker compose.
 
         Copy template and set container name.
+        TODO: Set up DB URL in API service if exists.
+        TODO: update DB service container name.
         """
-        filename = "docker-compose.yml"
-        path_to_yml = self._get_filepath_in_package(filename)
-        path_to_template = self._get_template_path(filename)
+        path_to_template = self._get_template_path("docker-compose.yml")
+        self._docker.update_docker_compose_from_template(path_to_template)
 
-        self._docker.update_docker_compose_from_template(path_to_yml, path_to_template)
+        self._docker.update_service_container_name("api", f"{self.name}_api")
 
     def _setup_subfolders(self):
         """

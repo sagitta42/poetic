@@ -69,14 +69,17 @@ class PsqlDBSetup(BaseDBSetup):
         Set up docker-compose with PSQL.
 
         Set up DB service in docker-compose.
+        Set container name.
         Set up environment variables in service environment.
         Set up port.
-        TODO: Set up DB URL in API service if exists.
         """
         logg.info("..setting up PSQL docker-compose", header=True)
 
         path_to_template = self._get_template_path("docker-compose.yml")
         self._docker.update_docker_compose_from_template(path_to_template)
+        self._docker.update_service_container_name(
+            self._service_name, f"db_{self._settings.db.value}"
+        )
         self._update_service_env_vars()
         self._update_service_port()
 
