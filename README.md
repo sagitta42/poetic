@@ -52,10 +52,13 @@ Add `--db` flag to set up `alembic` migrations and DB of given type (applies to 
 
 Available DB types:
 - `sqlite` to set up a local SQLite DB (default)
+- `psql` to set up PostgreSQL service (currently only a minimal `docker-compose` template setup, more features to come)
 
 Add `--settings` flag to set up `pydantic_settings` based `Settings` class containing `.env` variables (applies to `package` template only; API template always includes this class / source file)
 
-Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update.
+Add `--progressbar` flag to set up a simple `ProgressBar` util class in a package source file.
+
+Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update (more details in section below)
 
 #### Add functionality
 
@@ -97,7 +100,7 @@ Use `packge_template.update()` instead to update existing package.
 
 ## Examples
 
-### `poetic template awesome-package --package --settings`
+### `poetic template awesome-package --package --settings --progressbar`
 
 Result
 
@@ -113,8 +116,8 @@ awesome-package
 │       ├── logger.py # log with levels based on .env and color/bold functionalities
 │       ├── core.py # everything here is imported in __init__ as core functionality
 |       ├── py.typed # empty file that enables import suggestions in IDE
-|       ├── progressbar.py # ProgressBar wrapper class
-│       └── settings.py # pydantic_settings based Settings class containing .env variables
+|       ├── progressbar.py # ProgressBar wrapper class if requested
+│       └── settings.py # pydantic_settings based Settings class containing .env variables if requested
 ├── tests
 |   ├── __init__.py
 │   ├── conftest.py # set up to be able to run tests in dev mode
@@ -136,7 +139,7 @@ awesome-api
 ├── .vscode
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...
-├── alembic_migrations
+├── alembic_migrations # migrations for SQLite if requested; adaptation for PostgreSQL coming soon
 │   ├── alembdantic # pydantic controlled alembic
 │   │   ├── opd.py # pydantic controlled alembic.op
 │   │   └── table_model.py # base class for alembdantic tables
@@ -158,12 +161,12 @@ awesome-api
 ├── core
 │   └── dummy.py # dummy core logic
 ├── db
-│   └── db.db # initial committed SQLite DB file
+│   └── db.db # initial SQLite DB file if requested
 ├── .gitignore  # standard comprehensive Python .gitignore
 ├── .env.template
 ├── alembic.ini
 ├── app_info.py # app info extraction from pyproject
-├── docker-compose.yml # API service
+├── docker-compose.yml # API service; psql service if requested
 ├── main.py # main API launcher
 ├── poetry.lock
 ├── pyproject.toml
@@ -212,7 +215,7 @@ VSCode update with [poetic](https://github.com/sagitta42/poetic)
 └── launch.json
 ```
 
-## dev
+## development notes
 
 ### add new independent functionality item setup (`add`)
 
