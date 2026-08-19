@@ -4,6 +4,7 @@ from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
 from poetic.setup.venv import BaseVenvSetup
+from poetic.utils.toml import TomlHandler
 
 
 class InstallSetup(BaseVenvSetup[InstallSettings]):
@@ -13,6 +14,8 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
 
     def __init__(self, path: Path, settings: InstallSettings) -> None:
         super().__init__(path, settings)
+
+        self._toml_handler = TomlHandler(self.path / ".poetic.toml")
 
     def install(self):
         """
@@ -25,4 +28,6 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         self._run(self.venv("poetry"), "install", env=True)
 
         if self._settings.local:
-            logg.info("To be implemented")
+            poetic_settings = self._toml_handler.get_section("poetic")
+            dependencies = poetic_settings["local_dependencies"]
+            logg.info(f"To be implemented: {dependencies}")

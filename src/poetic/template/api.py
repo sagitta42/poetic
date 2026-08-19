@@ -7,7 +7,7 @@ from poetic.settings.item import DBSettings
 from poetic.settings.template import APITemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.docker import DockerHandler
-from poetic.utils.pyproject_handler import PyProjectHandler
+from poetic.utils.toml import PyProjectHandler
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
