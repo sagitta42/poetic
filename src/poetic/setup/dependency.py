@@ -11,18 +11,16 @@ from dotenv import set_key
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
-from poetic.setup.functionality import BaseFunctionalitySetup
+from poetic.setup.venv import BaseVenvSetup
 
 
-class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
+class BaseDependencySetup(BaseVenvSetup[T_Settings]):
     """
     General functionality setup with dependencies.
 
     core (bool): this is a core setup (impacts only cosmetics e.g. info header)
 
     Includes additional operations:
-        - running subprocesses
-        - venv setup
         - setting up dependencies with poetry
         - .env template setup
     """
@@ -31,19 +29,20 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         super().__init__(path, settings)
 
         self._core = core
-        self._path_to_venv = (self.path / "venv").resolve()
 
         self._vscode_setup = VSCodeSetup(self.path)
 
     @abstractmethod
     def setup_dependencies(self) -> None:
         logg.info("...setting up dependencies", header=True)
-        self._run(self.venv("pip"), "install", "poetry", env=True)
+        self.pip("install", "poetry", env=True)
 
     def setup(self) -> None:
         """
         Main setup.
         """
+        super().setup()
+
         line = "-" * 60
         if self._core:
             logg.info(line, header=True)
@@ -52,7 +51,6 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
             logg.info(line, header=True)
 
         self.setup_dotenv_template()
-        self.setup_venv()
         self.setup_dependencies()
 
     def setup_dotenv_template(self):
@@ -61,24 +59,6 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         """
         logg.info("...setting up .env template", header=True)
         self._update_env("DEBUG", 1)
-
-    def setup_venv(self):
-        """
-        Set up venv.
-
-        Create venv if does not exist.
-        Install poetry into that venv.
-        """
-        if not self._path_to_venv.exists():
-            logg.info("...creating venv", header=True)
-            venv.create(self._path_to_venv, with_pip=True)
-
-    def venv(self, exe: str) -> Path:
-        """
-        Get venv path to executable.
-        """
-        ret = self._path_to_venv / "bin" / exe
-        return ret
 
     def _poetry_add(self, package: str, group: str | None = None):
         """
@@ -92,24 +72,6 @@ class BaseDependencySetup(BaseFunctionalitySetup[T_Settings]):
         args.append(package)
 
         self._run(*args, env=True)
-
-    def _run(self, *args, env: bool = False):
-        """
-        Run command in template root directory.
-        """
-        subprocess.run(
-            args,
-            cwd=self.path,
-            env=(
-                {
-                    **os.environ,
-                    "POETRY_VIRTUALENVS_CREATE": "false",
-                    "VIRTUAL_ENV": self._path_to_venv,
-                }
-                if env
-                else None
-            ),
-        )
 
     def _add_vscode_launch_configurations(self, template_filename: str):
         """

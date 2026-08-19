@@ -1,13 +1,21 @@
 import argparse
+import enum
 from typing import Type
 
 from poetic.settings.base import SetupSettings, SetupType
+from poetic.settings.install import InstallSettings
 from poetic.settings.item import DBSettings
 from poetic.settings.template import (
     APITemplateSettings,
     BaseTemplateSettings,
     PackageTemplateSettings,
 )
+
+
+class Subparser(str, enum.Enum):
+    init = "init"
+    add = "add"
+    install = "install"
 
 
 def add_bool(
@@ -84,3 +92,10 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     )
     add_bool(parser, "no-commit", SetupSettings)
     add_db_arguments(parser, DBSettings)
+
+
+def add_install_arguments(parser: argparse.ArgumentParser):
+    """
+    Add arguments for install functionalities.
+    """
+    add_bool(parser, "local", InstallSettings)

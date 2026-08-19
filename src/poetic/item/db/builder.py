@@ -1,11 +1,11 @@
 import enum
 from pathlib import Path
 
-from poetic.item.builder import BaseSetupBuilder
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.psql import PsqlDBSetup
 from poetic.item.db.sqlite import SQLiteSetup
 from poetic.settings.item import DBSettings, DBType
+from poetic.setup.builder import BaseSetupBuilder
 
 
 class DBSetupClass(enum.Enum):

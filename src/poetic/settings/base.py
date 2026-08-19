@@ -13,6 +13,7 @@ class SetupType(str, enum.Enum):
     vscode = "vscode"
     gitignore = "gitignore"
     progressbar = "progressbar"
+    install = "install"
 
     @classmethod
     def values(cls) -> list[str]:
