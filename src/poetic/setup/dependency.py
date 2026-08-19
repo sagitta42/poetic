@@ -32,11 +32,6 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
 
         self._vscode_setup = VSCodeSetup(self.path)
 
-    @abstractmethod
-    def setup_dependencies(self) -> None:
-        logg.info("...setting up dependencies", header=True)
-        self.pip("install", "poetry", env=True)
-
     def setup(self) -> None:
         """
         Main setup.

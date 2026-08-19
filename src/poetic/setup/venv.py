@@ -1,3 +1,4 @@
+from abc import abstractmethod
 import os
 from pathlib import Path
 import subprocess
@@ -20,6 +21,11 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
     def __init__(self, path: Path, settings: T_Settings) -> None:
         super().__init__(path, settings)
         self._path_to_venv = (self.path / "venv").resolve()
+
+    @abstractmethod
+    def setup_dependencies(self) -> None:
+        logg.info("...setting up dependencies", header=True)
+        self.pip("install", "poetry", env=True)
 
     def setup(self) -> None:
         self.setup_venv()
