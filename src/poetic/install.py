@@ -21,22 +21,45 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
 
     def install(self):
         """
-        Run install.
+        Run poetry install handling dual dependencies.
 
-        Run standard poetry install.
-        If local flag was given in settings, perform local install based on .poetic.cfg
+        If local flag was given in settings, perform local install:
+            - uninstall dual dependencies
+            - install based on paths from .poetic.toml
+
+        Otherwise perform install based on pyproject.toml
         """
+
+        if not self._settings.local:
+            # TODO: check if already points to pyproject and skip
+            self._uninstall_dual_deps("pyproject.toml")
 
         self._run(self.venv("poetry"), "install", env=True)
 
         if self._settings.local:
-            poetic_settings = self._toml_handler.get_section("poetic")
-            dependencies = poetic_settings["local_dependencies"]
+            self._uninstall_dual_deps("local")
             # TODO: check if already points to local and skip
-            for dep in dependencies:
-                package, path = [component.strip() for component in dep.split("@")]
-                logg.info(f"Replacing {package} with local dependency", header=True)
-                self.pip("uninstall", package)
+            for package, path in self._yield_dual_deps():
                 logg.info(f"Installing local {package} @ {path}")
-                self.pip("install", path)
-            logg.info(f"To be implemented: {dependencies}")
+                self.pip("install", str(path))
+
+    def _uninstall_dual_deps(self, message: str):
+        """
+        Uninstall dual dependencies.
+
+        Uninstall dependencies listed as local in .poetic.toml
+        """
+        logg.info(f"Replacing dual packages with {message} dependencies", header=True)
+        for package, _ in self._yield_dual_deps():
+            self.pip("uninstall", package)
+
+    def _yield_dual_deps(self):
+        dual_deps = self._get_dual_deps()
+        for dep in dual_deps:
+            package, path = [component.strip() for component in dep.split("@")]
+            yield package, Path(path)
+
+    def _get_dual_deps(self) -> list[str]:
+        poetic_settings = self._toml_handler.get_section("poetic")
+        ret = poetic_settings["local_dependencies"]
+        return ret
