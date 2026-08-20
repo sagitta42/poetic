@@ -28,4 +28,4 @@ class TomlHandler:
 
 class PyProjectHandler(TomlHandler):
     def __init__(self, path_to_pyproject: Path) -> None:
-        super.__init__(path_to_pyproject / "pyproject.toml")
+        super().__init__(path_to_pyproject / "pyproject.toml")
