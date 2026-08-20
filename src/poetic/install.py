@@ -12,13 +12,17 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
     """
     Install functionalities on top of standard poetry.
 
+    Uses information in .poetic.toml file on dual dependencies.
+    Checks information in pyproject.toml for install type.
+
     TODO: add local dependency to .poetic.toml with e.g. poetic install add
     """
 
     def __init__(self, path: Path, settings: InstallSettings) -> None:
         super().__init__(path, settings)
 
-        self._poetic_toml = TomlHandler(self.path / ".poetic.toml")
+        self._toml_file = ".poetic.toml"
+        self._poetic_toml = TomlHandler(self.path / self._toml_file)
         self._pyproject = PyProjectHandler(self.path)
 
     def install(self):
@@ -35,8 +39,11 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         Otherwise perform install based on pyproject.toml:
             - uninstall dual dependencies
             - install based on pyproject.toml (i.e. standard poetry install)
-
         """
+        if self._settings.local and not self._has_dual_deps():
+            logg.warning(
+                f"Local install requested but no dual dependencies found in {self._toml_file}"
+            )
 
         if self._has_dual_deps() and not self._settings.local:
             # TODO: check if already points to pyproject and skip
