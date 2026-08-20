@@ -7,6 +7,7 @@ import venv
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.functionality import BaseFunctionalitySetup
+from poetic.utils.utils import list_as_args
 
 
 class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
@@ -49,11 +50,31 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
         return ret
 
     def pip(self, *args, env: bool = False):
-        self._run(self.venv("pip"), *args, env=env)
+        """
+        Run a pip command in project's venv.
+        """
+        self._venv_command("pip", *args, env=env)
+
+    def poetry(self, *args):
+        """
+        Run a poetry command in project's venv.
+        """
+        self._venv_command("poetry", *args, env=True)
+
+    def _venv_command(self, command: str, *args, env: bool = False):
+        """
+        Run a venv-based command with given arguments.
+
+        Invoke path/to/venv/command.
+        """
+        logg.info(f"poetic: {command} {list_as_args(args)}", header=True)
+        self._run(self.venv(command), *args, env=env)
 
     def _run(self, *args, env: bool = False):
         """
         Run command in template root directory.
+
+        env (bool): run with environment variables.
         """
         subprocess.run(
             args,

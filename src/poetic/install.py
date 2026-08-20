@@ -5,7 +5,7 @@ from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
 from poetic.setup.venv import BaseVenvSetup
-from poetic.utils.toml import TomlHandler
+from poetic.utils.toml import PyProjectHandler, TomlHandler
 
 
 class InstallSetup(BaseVenvSetup[InstallSettings]):
@@ -18,24 +18,35 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
     def __init__(self, path: Path, settings: InstallSettings) -> None:
         super().__init__(path, settings)
 
-        self._toml_handler = TomlHandler(self.path / ".poetic.toml")
+        self._poetic_toml = TomlHandler(self.path / ".poetic.toml")
+        self._pyproject = PyProjectHandler(self.path)
 
     def install(self):
         """
         Run poetry install handling dual dependencies.
 
+        Determine if the --no-root flag is needed based on package mode in pyproject.toml
+
         If local flag was given in settings, perform local install:
+            - perform poetry install
             - uninstall dual dependencies
             - install based on paths from .poetic.toml
 
-        Otherwise perform install based on pyproject.toml
+        Otherwise perform install based on pyproject.toml:
+            - uninstall dual dependencies
+            - install based on pyproject.toml (i.e. standard poetry install)
+
         """
 
         if self._has_dual_deps() and not self._settings.local:
             # TODO: check if already points to pyproject and skip
             self._uninstall_dual_deps("pyproject.toml")
 
-        self._run(self.venv("poetry"), "install", env=True)
+        poetry_args = ["install"]
+        if not self._is_package_mode():
+            poetry_args.append("--no-root")
+
+        self.poetry(*poetry_args)
 
         if self._has_dual_deps() and self._settings.local:
             self._uninstall_dual_deps("local")
@@ -48,6 +59,18 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         Determine if package has dual dependencies.
         """
         return len(self._dual_deps) > 0
+
+    def _is_package_mode(self) -> bool:
+        """
+        Determine if current pyproject is in package mode.
+        """
+        project = self._pyproject.get_section("project")
+
+        if "package-mode" not in project:
+            return False
+
+        return project["package-mode"]
+
     def _uninstall_dual_deps(self, message: str):
         """
         Uninstall dual dependencies.
@@ -59,7 +82,13 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
             self.pip("uninstall", package)
 
     def _yield_dual_deps(self):
-        dual_deps = self._get_dual_deps()
+        """
+        Yield dual dependencies.
+
+        Read dual dependencies.
+        Extract and yield package name and path.
+        """
+        dual_deps = self._dual_deps
         for dep in dual_deps:
             package, path = [component.strip() for component in dep.split("@")]
             yield package, Path(path)

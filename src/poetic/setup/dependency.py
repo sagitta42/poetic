@@ -1,10 +1,6 @@
-from abc import abstractmethod
 import json
-import os
 from pathlib import Path
-import subprocess
 from typing import Any
-import venv
 
 from dotenv import set_key
 
@@ -61,12 +57,11 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
 
         Invoke poetry add in template's venv to install added package while adding to pyproject.toml
         """
-        args = [self.venv("poetry"), "add"]
+        args = ["add", package]
         if group is not None:
             args += ["--group", group]
-        args.append(package)
 
-        self._run(*args, env=True)
+        self.poetry(*args)
 
     def _add_vscode_launch_configurations(self, template_filename: str):
         """

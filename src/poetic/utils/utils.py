@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Iterable
 
 
 def file_has_line(filepath: Path, line: str) -> bool:
@@ -34,3 +35,14 @@ def add_line_to_file(filepath: Path, line: str, prepend: bool):
 
     with open(filepath, "w") as f:
         f.writelines(updated_lines)
+
+
+def list_as_args(lst: Iterable) -> str:
+    """
+    Transform list into a list of command line arguments.
+
+    Example:
+    >>> list_as_args(["install", "--no-root"])
+    "install --no-root"
+    """
+    return " ".join(lst)
