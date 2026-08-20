@@ -2,6 +2,10 @@
 
 A higher level wrapper for `poetry` that creates templates pre-filled with basic structure and setup that I find convenient as a starting point for my packages.
 
+- [Usage][#usage]: command line usage with examples
+- [Examples][#examples]: examples of templates and functionalities results
+- [development notes][#development-notes]: notes on how to add new features to `poetic`
+
 ## Install
 
 ```bash
@@ -10,28 +14,31 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ## Usage
 
-### Command line
-
 ```bash
 $ poetic -h
-usage: poetic [-h] {init,add} ...
+usage: poetic [-h] {new,add,install} ...
 
 positional arguments:
-  {init,add}
-    init      create/update template
-    add       add functionality to existing repo
+  {new,add,install}
+    new              create/update template
+    add              add functionality to existing repo
+    install          poetry install with added options
+
+options:
+  -h, --help         show this help message and exit
 ```
 
-#### Create/update template
+### Create/update template
 
 ```bash
-$  poetic init -h
-usage: poetic init [-h] [--type {package,api}] [--db [{sqlite,psql}]] [--settings] [--progressbar] [--update] name
+$ poetic new -h
+usage: poetic new [-h] [--type {package,api}] [--db [{sqlite,psql}]] [--settings] [--progressbar] [--update] name
 
 positional arguments:
   name                  Template/repository name
 
 options:
+  -h, --help            show this help message and exit
   --type {package,api}  Template type
   --db [{sqlite,psql}]  Create/update DB functionalities of given DB type (api only)
   --settings            Set up .env Settings class (package only)
@@ -41,7 +48,7 @@ options:
 
 Example:
 ```bash
-$ poetic init awesome-package --type pacakge --settings
+$ poetic new awesome-package --type pacakge --settings
 ```
 
 Available package types:
@@ -60,7 +67,9 @@ Add `--progressbar` flag to set up a simple `ProgressBar` util class in a packag
 
 Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update (more details in section below)
 
-#### Add functionality
+See detailed examples in [Template examples][#templates]
+
+### Add functionality
 
 ```bash
 $ poetic add -h
@@ -71,6 +80,7 @@ positional arguments:
                         Type of functionality
 
 options:
+  -h, --help            show this help message and exit
   --no-commit           Do not commit changes
   --db [{sqlite,psql}]  Database type (db only)
 ```
@@ -82,25 +92,39 @@ Single functionalities added to current directory:
 
 If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 
-### In code
+See detailed examples in [Added functionality examples][#functionalities]
 
-For package template:
+### Install
 
-```python
-from poetic import PackageTemplate
+```bash
+$ poetic install -h
+usage: poetic install [-h] [--local]
 
-package_template = PackageTemplate("awesome-package")
-package_template.init()
+options:
+  -h, --help  show this help message and exit
+  --local     Install local dependencies defined in .poetic.toml
 ```
 
-Use `APITemplate` instead for API template.
+Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
 
-Use `packge_template.update()` instead to update existing package.
+Add `--local` flag if you want to install some of the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
 
+Provide paths to local dependencies via `.poetic.toml` file. Format:
+```toml
+[poetic]
+local_dependencies = [
+  "my-package @ /path/to/my-package",
+  "python-module @ /path/to/my/fork/of/python-module",
+]
+```
+
+See detailed examples in [Install examples][#install-examples]
 
 ## Examples
 
-### `poetic template awesome-package --package --settings --progressbar`
+### Templates
+
+#### `poetic new awesome-package --package --settings --progressbar`
 
 Result
 
@@ -130,7 +154,7 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-### `poetic template awesome-api --api --db`
+#### `poetic new awesome-api --api --db`
 
 Result
 
@@ -175,9 +199,9 @@ awesome-api
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev); fastapi, pydantic, pydantic-settings, uvicorn
 ```
 
-### Update template
+#### Update template
 
-Add `--update` flag to `poetic template` call.
+Add `--update` flag to `poetic new` call.
 
 On the first update, will create a branch dedicated to poetic updates starting from the first commit.
 
@@ -206,13 +230,60 @@ commit d68f600af54ae2410557d19a5f72b09ed63aadbe
     template made with poetic
 ```
 
-### Add functionality
+### Functionalities
 
 ```bash
 $ poetic add vscode
 VSCode update with [poetic](https://github.com/sagitta42/poetic)
 ├── settings.json
 └── launch.json
+```
+
+### Install examlpes
+
+Poetic automatically determines `--no-root` flag analyzing `pyproject.toml` for `package-mode=false`:
+
+```bash
+$ poetic install --local
+Local install requested but no dual dependencies found in .poetic.toml
+poetic: poetry install --no-root
+Installing dependencies from lock file
+
+No dependencies to install or update
+```
+
+Poetic uninstalls and re-installs dual dependencies:
+```bash
+$ poetic install --local
+poetic: poetry install --no-root
+Installing dependencies from lock file
+
+No dependencies to install or update
+Replacing dual packages with local dependencies
+poetic: pip uninstall python-module
+Found existing installation: python-module 2.13.4
+Uninstalling python-module-2.13.4:
+  Would remove:
+    /home/user/path/to/repo/venv/lib/python3.12/site-packages/python-module-2.13.4.dist-info/*
+    /home/user/path/to/repo/venv/lib/python3.12/site-packages/python-module/*
+Proceed (Y/n)? 
+
+...
+
+poetic: pip install /path/to/my/fork/of/python-module
+Processing /path/to/my/fork/of/python-module
+
+...
+
+Successfully installed python-module-2.14.0a1 ...
+```
+
+with `.poetic.toml`:
+```toml
+[poetic]
+local_dependencies = [
+  "python-module @ /path/to/my/fork/of/python-module",
+]
 ```
 
 ## development notes
@@ -239,7 +310,7 @@ After this, this setup is now usable with `poetic add foo`
 1. Add `FooDBSetup` under `DBSetupClass` in `poetic.item.db.builder` using the same enum name as defined `DBType` (`foo`)
 
 After this, this setup is now usable with
-- `poetic template awesome-api --db psql`
+- `poetic new awesome-api --db psql`
 - `poetic add db --db foo`
 
 ### `pydantic` <-> `argparse` adapter
