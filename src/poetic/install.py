@@ -1,3 +1,4 @@
+from functools import cached_property
 from pathlib import Path
 
 from poetic.settings.install import InstallSettings
@@ -30,19 +31,23 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         Otherwise perform install based on pyproject.toml
         """
 
-        if not self._settings.local:
+        if self._has_dual_deps() and not self._settings.local:
             # TODO: check if already points to pyproject and skip
             self._uninstall_dual_deps("pyproject.toml")
 
         self._run(self.venv("poetry"), "install", env=True)
 
-        if self._settings.local:
+        if self._has_dual_deps() and self._settings.local:
             self._uninstall_dual_deps("local")
             # TODO: check if already points to local and skip
             for package, path in self._yield_dual_deps():
-                logg.info(f"Installing local {package} @ {path}")
                 self.pip("install", str(path))
 
+    def _has_dual_deps(self) -> bool:
+        """
+        Determine if package has dual dependencies.
+        """
+        return len(self._dual_deps) > 0
     def _uninstall_dual_deps(self, message: str):
         """
         Uninstall dual dependencies.
@@ -59,7 +64,8 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
             package, path = [component.strip() for component in dep.split("@")]
             yield package, Path(path)
 
-    def _get_dual_deps(self) -> list[str]:
+    @cached_property
+    def _dual_deps(self) -> list[str]:
         """
         Get list of dual dependencies from poetic toml if stated.
         """
