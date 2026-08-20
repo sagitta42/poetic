@@ -60,6 +60,9 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
             yield package, Path(path)
 
     def _get_dual_deps(self) -> list[str]:
-        poetic_settings = self._toml_handler.get_section("poetic")
-        ret = poetic_settings["local_dependencies"]
+        """
+        Get list of dual dependencies from poetic toml if stated.
+        """
+        poetic_settings = self._poetic_toml.get_section("poetic")
+        ret = poetic_settings.get("local_dependencies", [])
         return ret
