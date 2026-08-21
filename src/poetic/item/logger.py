@@ -18,11 +18,16 @@ class LoggerSetup(BaseDependencySetup[LoggerSettings]):
 
     def setup(self) -> None:
         """
+        Set up logger.py file.
+
         Copy poetic's own logger.py source file with Logger class into setup directory.
+        Replace poetic's POETIC_DEBUG .env variable with the standard DEBUG for Logger debug mode.
         """
         super().setup()
 
-        shutil.copy(self._path_to_resources / "logger.py", self.path / "logger.py")
+        output_path = self.path / "logger.py"
+        shutil.copy(self._path_to_resources / "logger.py", output_path)
+        self._replace_str_in_file("POETIC_DEBUG", "DEBUG", output_path)
 
     def setup_dependencies(self) -> None:
         super().setup_dependencies()

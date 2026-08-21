@@ -133,12 +133,4 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         Replace $PACKAGE with package name in given source file.
         """
-        with open(filepath) as f:
-            source_file_lines = f.readlines()
-
-        source_file_lines = [
-            line.replace("$PACKAGE", self._inner_name) for line in source_file_lines
-        ]
-
-        with open(filepath, "w") as f:
-            f.writelines(source_file_lines)
+        self._replace_str_in_file("$PACKAGE", self._inner_name, filepath)
