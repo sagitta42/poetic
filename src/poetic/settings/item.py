@@ -24,6 +24,12 @@ class ProgressBarSettings(SetupSettings):
     )
 
 
+class LoggerSettings(SetupSettings):
+    type: Literal[SetupType.logger] = Field(
+        default=SetupType.logger, description="Setup type"
+    )
+
+
 class DBType(str, enum.Enum):
     sqlite = "sqlite"
     psql = "psql"

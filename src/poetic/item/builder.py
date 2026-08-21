@@ -1,6 +1,7 @@
 import enum
 from pathlib import Path
 
+from poetic.item.logger import LoggerSetup
 from poetic.setup.base import BaseSetup
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
@@ -12,6 +13,7 @@ from poetic.setup.dependency import BaseDependencySetup
 class ItemSetupClass(enum.Enum):
     vscode = VSCodeSetup
     gitignore = GitignoreSetup
+    logger = LoggerSetup
 
     @classmethod
     def from_setup_type(cls, setup_type: SetupType):

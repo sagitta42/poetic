@@ -1,4 +1,8 @@
 from abc import abstractmethod
+from pathlib import Path
+from typing import Any
+
+from dotenv import set_key
 
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
@@ -58,6 +62,25 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
             logg.info(f"[not committed] {suggest_commit}")
         else:
             logg.info(f"{self.title} functionality setup DONE")
+
+    def setup_dotenv_template(self):
+        """
+        Set up .env.template.
+        """
+        logg.info("...setting up .env template", header=True)
+        self._update_env("DEBUG", 1)
+
+    def _update_env(self, name: str, value: Any, path_to_dotenv: Path | None = None):
+        """
+        Update .env file with given variable value.
+
+        Defaults to .env.template file in root directory of setup.
+
+        .env file will be created if does not exist.
+        """
+        filepath = path_to_dotenv or self.path / ".env.template"
+
+        set_key(filepath, name, str(value), quote_mode="never")
 
     def _commit_message(self, mod_type: str) -> str:
         """

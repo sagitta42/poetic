@@ -13,6 +13,7 @@ class SetupType(str, enum.Enum):
     vscode = "vscode"
     gitignore = "gitignore"
     progressbar = "progressbar"
+    logger = "logger"
     install = "install"
 
     @classmethod

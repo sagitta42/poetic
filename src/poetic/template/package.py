@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-import shutil
 
 from poetic.item.env_settings import EnvSettingsSetup
+from poetic.item.logger import LoggerSetup
 from poetic.item.progress_bar import ProgressBarSetup
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
@@ -10,6 +10,9 @@ from poetic.utils.utils import add_new_line_to_file
 
 
 class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
+    """
+    Package template setup.
+    """
 
     def __init__(self, init: PackageTemplateSettings | str) -> None:
         settings = (
@@ -23,6 +26,8 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._path_to_src: Path = self.path / src_subdir
 
         # TODO: unify for internal items, use builder with core=False
+        self._logger_setup = LoggerSetup(self._path_to_src, core=False)
+
         self._env_settings_setup = (
             EnvSettingsSetup(self._path_to_src, core=False)
             if self._settings.settings
@@ -76,10 +81,21 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._poetry_add("pytest", "dev")
 
     def setup(self):
+        """
+        Package template setup.
+
+        In addition to base template setup:
+            Set up .env template
+            Set up tests (conftest, dummy test)
+            Set up Logger
+            Set up ProgressBar if requested
+        """
         super().setup()
 
+        self.setup_dotenv_template()
         self.setup_tests()
-        self.setup_logger()
+
+        self._logger_setup.setup()
 
         if self._progressbar_setup is not None:
             self._progressbar_setup.setup()
@@ -105,11 +121,6 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             "test_unit.py", path_in_package=path_to_tests
         )
         self._replace_package_placeholder(test_unit_filepath)
-
-    def setup_logger(self):
-        shutil.copy(
-            self._path_to_resources / "logger.py", self._path_to_src / "logger.py"
-        )
 
     def _create_source_file(self, filepath: str | Path):
         """

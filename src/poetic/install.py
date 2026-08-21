@@ -16,6 +16,7 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
     Checks information in pyproject.toml for install type.
 
     TODO: add local dependency to .poetic.toml with e.g. poetic install add
+    TODO: reinstall only a specific given dual dependency, not all in .poetic.toml
     """
 
     def __init__(self, path: Path, settings: InstallSettings) -> None:

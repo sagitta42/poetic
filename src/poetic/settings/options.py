@@ -2,7 +2,12 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from poetic.settings.item import DBSettings, GitignoreSetupSettings, VSCodeSetupSettings
+from poetic.settings.item import (
+    DBSettings,
+    GitignoreSetupSettings,
+    LoggerSettings,
+    VSCodeSetupSettings,
+)
 from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
 
 AcceptedSetupSettings = Annotated[
@@ -10,7 +15,8 @@ AcceptedSetupSettings = Annotated[
     | APITemplateSettings
     | VSCodeSetupSettings
     | GitignoreSetupSettings
-    | DBSettings,
+    | DBSettings
+    | LoggerSettings,
     Field(discriminator="type"),
 ]
 

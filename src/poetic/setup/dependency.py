@@ -1,8 +1,4 @@
-import json
 from pathlib import Path
-from typing import Any
-
-from dotenv import set_key
 
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
@@ -18,7 +14,6 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
 
     Includes additional operations:
         - setting up dependencies with poetry
-        - .env template setup
     """
 
     def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
@@ -41,15 +36,7 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
         if self._core:
             logg.info(line, header=True)
 
-        self.setup_dotenv_template()
         self.setup_dependencies()
-
-    def setup_dotenv_template(self):
-        """
-        Set up .env.template.
-        """
-        logg.info("...setting up .env template", header=True)
-        self._update_env("DEBUG", 1)
 
     def _poetry_add(self, package: str, group: str | None = None):
         """
@@ -62,44 +49,3 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
             args += ["--group", group]
 
         self.poetry(*args)
-
-    def _add_vscode_launch_configurations(self, template_filename: str):
-        """
-        Add configurations to VSCode launch.json contained in given template.
-        """
-
-        path_to_launch = self.path / ".vscode" / "launch.json"
-        if not path_to_launch.exists():
-            self._vscode_setup.setup()
-
-        with open(path_to_launch) as f:
-            launch_dct = json.load(f)
-
-        path_to_template = self._get_template_path(
-            template_filename, generic=False, template_subdir="alembic"
-        )
-        with open(path_to_template) as f:
-            template_config = json.load(f)
-
-        configuration_names = [
-            config["name"] for config in launch_dct["configurations"]
-        ]
-
-        for config in template_config["configurations"]:
-            if config["name"] not in configuration_names:
-                launch_dct["configurations"].append(config)
-
-        with open(path_to_launch, "w") as f:
-            json.dump(launch_dct, f, indent=4)
-
-    def _update_env(self, name: str, value: Any, path_to_dotenv: Path | None = None):
-        """
-        Update .env file with given variable value.
-
-        Defaults to .env.template file in root directory of setup.
-
-        .env file will be created if does not exist.
-        """
-        filepath = path_to_dotenv or self.path / ".env.template"
-
-        set_key(filepath, name, str(value), quote_mode="never")

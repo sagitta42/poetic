@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import json
 import os
 from pathlib import Path
 
@@ -107,3 +108,32 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
             path_in_package=path_to_revisions,
             template_subdir=template_subdir,
         )
+
+    def _add_vscode_launch_configurations(self, template_filename: str):
+        """
+        Add configurations to VSCode launch.json contained in given template.
+        """
+
+        path_to_launch = self.path / ".vscode" / "launch.json"
+        if not path_to_launch.exists():
+            self._vscode_setup.setup()
+
+        with open(path_to_launch) as f:
+            launch_dct = json.load(f)
+
+        path_to_template = self._get_template_path(
+            template_filename, generic=False, template_subdir="alembic"
+        )
+        with open(path_to_template) as f:
+            template_config = json.load(f)
+
+        configuration_names = [
+            config["name"] for config in launch_dct["configurations"]
+        ]
+
+        for config in template_config["configurations"]:
+            if config["name"] not in configuration_names:
+                launch_dct["configurations"].append(config)
+
+        with open(path_to_launch, "w") as f:
+            json.dump(launch_dct, f, indent=4)
