@@ -25,7 +25,11 @@ class LoggerSetup(BaseDependencySetup[LoggerSettings]):
         """
         super().setup()
 
-        output_path = self.path / "logger.py"
+        output_dir = self.path
+        if self._settings.subfolder is not None:
+            output_dir = output_dir / self._settings.subfolder
+        output_path = output_dir / "logger.py"
+
         shutil.copy(self._path_to_resources / "logger.py", output_path)
         self._replace_str_in_file("POETIC_DEBUG", "DEBUG", output_path)
 

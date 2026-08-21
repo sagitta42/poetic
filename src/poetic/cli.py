@@ -4,7 +4,7 @@ from typing import Type
 
 from poetic.settings.base import SetupSettings, SetupType
 from poetic.settings.install import InstallSettings
-from poetic.settings.item import DBSettings
+from poetic.settings.item import DBSettings, LoggerSettings
 from poetic.settings.template import (
     APITemplateSettings,
     BaseTemplateSettings,
@@ -52,6 +52,7 @@ def add_db_arguments(
     Add arguments for DB setup to given parser.
 
     description_source: pydantic model to use for description
+        (can be DBSettings or APITemplateSettings, for example)
     """
     parser.add_argument(
         "--db",
@@ -62,6 +63,13 @@ def add_db_arguments(
         choices=DBSettings.options("db"),
         help=description_source.description("db", exclusive=True),
     )
+
+
+def add_logger_arguments(parser: argparse.ArgumentParser):
+    """
+    Add logger arguments
+    """
+    add_str(parser, "subfolder", LoggerSettings)
 
 
 def add_template_arguments(parser: argparse.ArgumentParser):
@@ -100,6 +108,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     )
     add_bool(parser, "no-commit", SetupSettings)
     add_db_arguments(parser, DBSettings)
+    add_logger_arguments(parser)
 
 
 def add_install_arguments(parser: argparse.ArgumentParser):

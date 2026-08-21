@@ -28,6 +28,7 @@ class LoggerSettings(SetupSettings):
     type: Literal[SetupType.logger] = Field(
         default=SetupType.logger, description="Setup type"
     )
+    subfolder: str = Field(default="", description="Subfolder of setup")
 
 
 class DBType(str, enum.Enum):
