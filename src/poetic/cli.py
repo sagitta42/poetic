@@ -116,3 +116,10 @@ def add_install_arguments(parser: argparse.ArgumentParser):
     Add arguments for install functionalities.
     """
     add_bool(parser, "local", InstallSettings)
+    parser.add_argument(
+        "package",
+        type=str,
+        nargs="?",
+        default=None,
+        help=InstallSettings.description("package"),
+    )

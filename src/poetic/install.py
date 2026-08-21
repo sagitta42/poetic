@@ -1,11 +1,18 @@
 from functools import cached_property
 from pathlib import Path
 
+from pydantic import BaseModel
+
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
 from poetic.setup.venv import BaseVenvSetup
 from poetic.utils.toml import PyProjectHandler, TomlHandler
+
+
+class PackageInfo(BaseModel):
+    name: str
+    path: Path
 
 
 class InstallSetup(BaseVenvSetup[InstallSettings]):
@@ -40,6 +47,8 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         Otherwise perform install based on pyproject.toml:
             - uninstall dual dependencies
             - install based on pyproject.toml (i.e. standard poetry install)
+
+        Perform dual package treatment on given package name; or all if none are given.
         """
         if self._settings.local and not self._has_dual_deps():
             logg.warning(
@@ -59,14 +68,14 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         if self._has_dual_deps() and self._settings.local:
             self._uninstall_dual_deps("local")
             # TODO: check if already points to local and skip
-            for package, path in self._yield_dual_deps():
-                self.pip("install", str(path))
+            for pacakge_info in self._get_deps_of_interest():
+                self.pip("install", str(pacakge_info.path))
 
     def _has_dual_deps(self) -> bool:
         """
         Determine if package has dual dependencies.
         """
-        return len(self._dual_deps) > 0
+        return len(self._all_dual_deps) > 0
 
     def _is_package_mode(self) -> bool:
         """
@@ -83,29 +92,40 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         """
         Uninstall dual dependencies.
 
-        Uninstall dependencies listed as local in .poetic.toml
+        Uninstall dependencies of interest listed as local in .poetic.toml
         """
         logg.info(f"Replacing dual packages with {message} dependencies", header=True)
-        for package, _ in self._yield_dual_deps():
-            self.pip("uninstall", package)
+        for package_info in self._get_deps_of_interest():
+            self.pip("uninstall", package_info.name)
 
-    def _yield_dual_deps(self):
+    def _get_deps_of_interest(self) -> list[PackageInfo]:
         """
-        Yield dual dependencies.
+        Get list of dependencies of interest.
 
-        Read dual dependencies.
-        Extract and yield package name and path.
+        All dependencies if no specific package requested.
         """
-        dual_deps = self._dual_deps
-        for dep in dual_deps:
-            package, path = [component.strip() for component in dep.split("@")]
-            yield package, Path(path)
+
+        ret = (
+            [self._dual_deps_map[self._settings.package]]
+            if self._settings.package is not None
+            else self._all_dual_deps
+        )
+        return ret
 
     @cached_property
-    def _dual_deps(self) -> list[str]:
+    def _dual_deps_map(self) -> dict[str, PackageInfo]:
+        ret = {package_info.name: package_info for package_info in self._all_dual_deps}
+        return ret
+
+    @cached_property
+    def _all_dual_deps(self) -> list[PackageInfo]:
         """
-        Get list of dual dependencies from poetic toml if stated.
+        Get list of all dual dependencies from poetic toml.
         """
         poetic_settings = self._poetic_toml.get_section("poetic")
-        ret = poetic_settings.get("local_dependencies", [])
+        local_deps_items = poetic_settings.get("local_dependencies", [])
+        ret = []
+        for dep_str in local_deps_items:
+            package, path = [component.strip() for component in dep_str.split("@")]
+            ret.append(PackageInfo(name=package, path=path))
         return ret
