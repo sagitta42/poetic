@@ -8,7 +8,6 @@ import os
 from dotenv import dotenv_values
 
 from poetic.settings.options import AcceptedSetupSettings, SettingsOptions
-from poetic.settings.template import BaseTemplateSettings
 
 env_config = dotenv_values()
 is_debug = env_config.get("DEBUG", "").lower() in ("true", "1")
@@ -25,18 +24,18 @@ PATH_TO_ASSETS = Path(os.path.dirname(__file__))
 PATH_TO_CONFIGS = PATH_TO_ASSETS / "configs"
 
 
-def get_setup_settings(filename: str) -> AcceptedSetupSettings:
+def get_setup_settings(filename: str) -> dict:
     """
     Get setup settings from given config filename (with extension).
     """
     filepath = PATH_TO_CONFIGS / filename
     with open(filepath) as f:
-        settings = SettingsOptions(**{"settings": json.load(f)}).settings
+        settings = json.load(f)
     return settings
 
 
 class TemplateTestCase(BaseModel):
-    settings: AcceptedSetupSettings = Field(description="Template setup settings")
+    settings: dict = Field(description="Template setup settings")
     overwrite: bool = Field(
         description="Overwrite template setup if directory already exists"
     )

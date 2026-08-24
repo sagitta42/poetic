@@ -15,16 +15,16 @@ class ItemSetupFactory:
     Marks it as core setup.
     """
 
-    def build(self, settings: SetupSettings) -> BaseSetup:
+    def build(self, settings: SetupSettings, path: Path | None) -> BaseSetup:
         """
         Build item setup based on settings.
 
         Create builder based on settings type.
-        Build setup.
+        Build setup in provided path. Default (None): build in current path
         """
         builder_class = (
             DBSetupBuilder if isinstance(settings, DBSettings) else ItemSetupBuilder
         )
         builder = builder_class()
-        ret = builder.build(settings, path=Path.cwd(), core=True)
+        ret = builder.build(settings, path=path or Path.cwd(), core=True)
         return ret

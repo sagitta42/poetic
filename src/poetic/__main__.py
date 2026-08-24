@@ -6,13 +6,11 @@ from poetic.cli import (
     add_microfunctionality_arguments,
     add_new_template_arguments,
 )
-from poetic.factory import PoeticFactory
+from poetic.core import launch, update
 from poetic.exceptions import PoeticException
 from poetic.install import InstallSetup
 from poetic.logger import logg
 from poetic.settings.install import InstallSettings
-from poetic.settings.options import SettingsOptions
-from poetic.template.builder import TemplateBuilder
 
 
 def main():
@@ -45,20 +43,13 @@ def main():
     command = Subparser(settings_args.pop("command"))
 
     try:
-
         if command == Subparser.update:
-            logg.info("Update subparser will be here")
-            template_builder = TemplateBuilder()
-            setupper = template_builder.find()
-            setupper.update()
+            update()
         elif command == Subparser.install:
             install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))
             install_setup.install()
         else:
-            setup_settings = SettingsOptions(**{"settings": settings_args}).settings
-            poetic_factory = PoeticFactory()
-            setupper = poetic_factory.build(setup_settings)
-            setupper.launch()
+            launch(settings_args)
 
     except PoeticException as e:
         logg.error(str(e))

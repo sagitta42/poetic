@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from poetic.item.factory import ItemSetupFactory
 from poetic.logger import logg
 from poetic.settings.item import SetupSettings
@@ -9,7 +11,7 @@ from poetic.template.builder import TemplateBuilder
 
 class PoeticFactory:
     def build(
-        self, settings: BaseTemplateSettings | SetupSettings
+        self, settings: BaseTemplateSettings | SetupSettings, path: Path | None = None
     ) -> BaseTemplate | BaseFunctionalitySetup:
         """
         Build template or functionlaity setup.
@@ -24,5 +26,5 @@ class PoeticFactory:
             )
 
         builder = builder_class()
-        ret = builder.build(settings)
+        ret = builder.build(settings, path)
         return ret
