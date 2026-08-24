@@ -2,6 +2,7 @@ import enum
 import inspect
 import logging
 from pathlib import Path
+from typing import Any
 from dotenv import dotenv_values
 
 
@@ -22,7 +23,7 @@ class AnsiColor(str, enum.Enum):
     yellow = "33"
     white = "37"
 
-    def apply(self, message: str | int, bold: bool = False) -> str:
+    def apply(self, message: Any, bold: bool = False) -> str:
         """
         To be used with color based
         """
@@ -30,7 +31,7 @@ class AnsiColor(str, enum.Enum):
         ret = f"{AnsiStyle.start}{style};{self.value}m{message}{AnsiStyle.end}"
         return ret
 
-    def bold(self, message: str | int | float) -> str:
+    def bold(self, message: Any) -> str:
         """
         Shortcut for bold colored text
         """
@@ -82,22 +83,22 @@ class Logger:
         self._logger.setLevel(log_level)
         self._logger.propagate = False
 
-    def info(self, message: str, header: bool = False):
+    def info(self, message: Any, header: bool = False):
         color = AnsiColor.green if header else AnsiColor.white
         return self._log(logging.INFO, color.apply(message, header))
 
-    def error(self, message: str):
+    def error(self, message: Any):
         return self._log(logging.ERROR, AnsiColor.red.apply(message))
 
-    def warning(self, message: str, important: bool = False):
+    def warning(self, message: Any, important: bool = False):
         if important:
             message = f"! WARNING ! {message}"
         return self._log(logging.WARNING, AnsiColor.yellow.apply(message, important))
 
-    def debug(self, message: str):
+    def debug(self, message: Any):
         return self._log(logging.DEBUG, AnsiColor.grey.apply(message))
 
-    def _log(self, level, message: str):
+    def _log(self, level, message: Any):
         """
         Common log interface for info/error/warning/debug.
 
