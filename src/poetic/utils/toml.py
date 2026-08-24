@@ -28,7 +28,7 @@ class TomlHandler:
         """
         if "." in name:
             super_section, inner_section = name.split(".")
-            return self.get_section(super_section)[inner_section]
+            return self.get_section(super_section).get(inner_section, {})
 
         return self._toml_dict.get(name, {})
 

@@ -44,24 +44,25 @@ def main():
     settings_args = vars(args).copy()
     command = Subparser(settings_args.pop("command"))
 
-    if command == Subparser.update:
-        logg.info("Update subparser will be here")
-        template_builder = TemplateBuilder()
-        setupper = template_builder.find()
-        setupper.update()
-    elif command == Subparser.install:
-        install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))
-        install_setup.install()
-    else:
-        setup_settings = SettingsOptions(**{"settings": settings_args}).settings
-        poetic_factory = PoeticFactory()
-        setupper = poetic_factory.build(setup_settings)
+    try:
 
-        try:
+        if command == Subparser.update:
+            logg.info("Update subparser will be here")
+            template_builder = TemplateBuilder()
+            setupper = template_builder.find()
+            setupper.update()
+        elif command == Subparser.install:
+            install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))
+            install_setup.install()
+        else:
+            setup_settings = SettingsOptions(**{"settings": settings_args}).settings
+            poetic_factory = PoeticFactory()
+            setupper = poetic_factory.build(setup_settings)
             setupper.launch()
-        except PoeticException as e:
-            logg.error(str(e))
-            return
+
+    except PoeticException as e:
+        logg.error(str(e))
+        return
 
 
 if __name__ == "__main__":

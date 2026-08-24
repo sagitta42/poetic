@@ -2,6 +2,7 @@ import enum
 from pathlib import Path
 from typing import Any
 
+from poetic.exceptions import PoeticException
 from poetic.settings.base import SetupType
 from poetic.settings.options import TemplateOptions
 from poetic.settings.template import BaseTemplateSettings
@@ -47,6 +48,10 @@ class TemplateBuilder:
         pyproject_handler.read()
 
         poetic_config: dict[str, Any] = pyproject_handler.get_section("tool.poetic")
+        if poetic_config == {}:
+            raise PoeticException(
+                f"No [tool.poetic] section found in pyproject.toml! Cannot auto-udpate.\nLaunch with command line arguments used to create tempalte with poetic new; or add them under tool.poetic manually"
+            )
         poetic_config["name"] = pyproject_handler.get_section("project")["name"]
         settings = TemplateOptions(**{"settings": poetic_config}).settings
         ret = self.build(settings, path=Path.cwd())
