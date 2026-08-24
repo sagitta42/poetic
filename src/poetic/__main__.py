@@ -4,7 +4,7 @@ from poetic.cli import (
     Subparser,
     add_install_arguments,
     add_microfunctionality_arguments,
-    add_template_arguments,
+    add_new_template_arguments,
 )
 from poetic.factory import PoeticFactory
 from poetic.exceptions import PoeticException
@@ -18,10 +18,14 @@ def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
 
-    template_subparser = subparsers.add_parser(
+    new_template_subparser = subparsers.add_parser(
         Subparser.new.value, help="create/update template"
     )
-    add_template_arguments(template_subparser)
+    add_new_template_arguments(new_template_subparser)
+
+    subparsers.add_parser(
+        Subparser.update.value, help="update current template with new poetic updates"
+    )
 
     micro_functionality_subparser = subparsers.add_parser(
         Subparser.add.value, help="add functionality to existing repo"
@@ -39,7 +43,10 @@ def main():
     settings_args = vars(args).copy()
     command = Subparser(settings_args.pop("command"))
 
-    if command == Subparser.install:
+    if command == Subparser.update:
+        logg.info("Update subparser will be here")
+
+    elif command == Subparser.install:
         install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))
         install_setup.install()
     else:

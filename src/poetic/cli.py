@@ -16,6 +16,7 @@ class Subparser(str, enum.Enum):
     new = "new"
     add = "add"
     install = "install"
+    update = "update"
 
 
 def add_bool(
@@ -72,7 +73,7 @@ def add_logger_arguments(parser: argparse.ArgumentParser):
     add_str(parser, "subfolder", LoggerSettings)
 
 
-def add_template_arguments(parser: argparse.ArgumentParser):
+def add_new_template_arguments(parser: argparse.ArgumentParser):
     """
     Add arguments for template creation/update to given parser.
     """
