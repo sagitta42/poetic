@@ -36,10 +36,20 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     Repository update: updating existing template with poetic updates.
     """
 
-    def __init__(self, settings: T_TemplateSettings) -> None:
+    def __init__(self, settings: T_TemplateSettings, root_path: Path | None) -> None:
+        """
+        Initialize template setup with given settings.
+
+        root_path (Path): path in which to do the setup. Used mainly for testing/debug.
+            Default None -> setup path is same as package name. Otherwise prepend path
+        """
         self.name = settings.name
 
-        super().__init__(Path(self.name), settings, core=True)
+        template_path = Path(self.name)
+        if root_path is not None:
+            template_path = root_path / template_path
+
+        super().__init__(template_path, settings, core=True)
 
         self._inner_name = self.name.replace("-", "_")
 
@@ -187,9 +197,10 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     @abstractmethod
     def poetry_init(self):
         """
-        Initialize package with poetry
+        Initialize package with poetry.
         """
-        if os.path.exists(self.name):
+
+        if os.path.exists(self.path):
             raise PoeticException(
                 f"{self.name} exists! Change name of new or existing package; or run with --update flag if you wish to update existing package."
             )

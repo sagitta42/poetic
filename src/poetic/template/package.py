@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import subprocess
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.logger import LoggerSetup
@@ -14,13 +15,15 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
     Package template setup.
     """
 
-    def __init__(self, init: PackageTemplateSettings | str) -> None:
+    def __init__(
+        self, init: PackageTemplateSettings | str, root_path: Path | None = None
+    ) -> None:
         settings = (
             init
             if isinstance(init, PackageTemplateSettings)
             else PackageTemplateSettings(name=init, update=False)
         )
-        super().__init__(settings)
+        super().__init__(settings, root_path)
 
         src_subdir = Path("src") / self._inner_name
         self._path_to_src: Path = self.path / src_subdir
@@ -44,10 +47,11 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         Initialize package with poetry.
 
         Standard setup with src/package_name structure.
+        Run poetry from same environment from which poetic is being called
+            (not poetry from project's venv - does not exist yet)
         """
         super().poetry_init()
-        # TODO: use subprocess
-        os.system(f"poetry new {self.name}")
+        subprocess.run(["poetry", "new", self.name], cwd=self.path.parent)
 
     def setup_source_files(self):
         """

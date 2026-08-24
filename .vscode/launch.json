@@ -10,7 +10,8 @@
                 "debug-test"
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "subProcess": false
         }
     ]
 }

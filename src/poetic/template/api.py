@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
@@ -11,8 +12,8 @@ from poetic.utils.toml import PyProjectHandler
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
-    def __init__(self, settings: APITemplateSettings) -> None:
-        super().__init__(settings)
+    def __init__(self, settings: APITemplateSettings, root_path: Path | None = None) -> None:
+        super().__init__(settings, root_path)
 
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
         db_setup_builder = DBSetupBuilder()
@@ -34,7 +35,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         Disable package mode.
         """
         super().poetry_init()
-        os.mkdir(self.name)
+        os.makedirs(self.path)
 
         self.run(
             "poetry",

@@ -1,4 +1,5 @@
 import enum
+from pathlib import Path
 
 from poetic.settings.base import SetupType
 from poetic.settings.template import BaseTemplateSettings
@@ -17,11 +18,18 @@ class TemplateClass(enum.Enum):
 
 
 class TemplateBuilder:
-    def build(self, settings: BaseTemplateSettings) -> BaseTemplate:
+    def build(
+        self,
+        settings: BaseTemplateSettings,
+        root_path: Path | None = None,
+    ) -> BaseTemplate:
         """
         Build template setup.
+
+        root_path (Path): path in which to do the setup. Used mainly for testing/debug.
+            Default None -> setup path is same as package name. Otherwise prepend path
         """
         template_class = TemplateClass.from_template_type(settings.type).value
 
-        ret = template_class(settings)
+        ret = template_class(settings, root_path)
         return ret
