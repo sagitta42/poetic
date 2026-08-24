@@ -59,11 +59,12 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
             # TODO: check if already points to pyproject and skip
             self._uninstall_dual_deps("pyproject.toml")
 
-        poetry_args = ["install"]
-        if not self._is_package_mode():
-            poetry_args.append("--no-root")
+        if self._settings.package is None:
+            poetry_args = ["install"]
+            if not self._is_package_mode():
+                poetry_args.append("--no-root")
 
-        self.poetry(*poetry_args)
+            self.poetry(*poetry_args)
 
         if self._has_dual_deps() and self._settings.local:
             self._uninstall_dual_deps("local")
