@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Union
 
 from pydantic import BaseModel, Field
 
@@ -21,7 +21,7 @@ AcceptedSetupSettings = Annotated[
 ]
 
 
-class SettingsOptions(BaseModel):
+class SetupOptions(BaseModel):
     """
     Exists for convenience of constructing and validating accepted setup settings.
     """
@@ -41,3 +41,5 @@ class TemplateOptions(BaseModel):
     """
 
     settings: AcceptedTemplateSettings
+
+SettingsOptions = Union[SetupOptions, TemplateOptions]

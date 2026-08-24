@@ -4,18 +4,21 @@ from time import sleep
 
 from poetic.factory import PoeticFactory
 from poetic.logger import logg
-from poetic.settings.options import SettingsOptions
+from poetic.settings.builder import SettingsBuilder
 from poetic.template.builder import TemplateBuilder
+from poetic.utils.toml import PyProjectHandler
 
 
-def launch(settings_dict: dict, path: Path | None = None, overwrite: bool = False):
+def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
     """
     Launch setup with given settings in given path.
 
     path: set up in given path; default (None) = tempalte name
     overwrite (bool): overwrite if package already exists
     """
-    setup_settings = SettingsOptions(**{"settings": settings_dict}).settings
+    settings_builder = SettingsBuilder()
+    setup_settings = settings_builder.build_setup(settings)
+
     poetic_factory = PoeticFactory()
     setupper = poetic_factory.build(setup_settings, path)
 
@@ -31,15 +34,24 @@ def launch(settings_dict: dict, path: Path | None = None, overwrite: bool = Fals
     setupper.launch()
 
 
-def update(settings_dict: dict | None = None, path: Path | None = None):
+def update(path: Path | None = None):
     """
     Update existing template in given path.
 
-    settings_dict: settings;
-        if None provided, read all settings from pyproject.toml tool.poetic section
-        if some provided, combine pyproject.toml and given within compatibility
     path: default None = current directory
+
+    Read pyproject.toml settings.
+    Combine them with provided settings.
     """
+    template_path = path or Path.cwd()
+
+    pyproject_handler = PyProjectHandler(template_path)
+    pyproject_handler.read()
+    settings_pyproject_dict = pyproject_handler.get_template_settings()
+
+    settings_builder = SettingsBuilder()
+    settings_pyproject = settings_builder.build_template(settings_pyproject_dict)
+
     template_builder = TemplateBuilder()
-    setupper = template_builder.find(path)
+    setupper = template_builder.build(settings_pyproject, template_path)
     setupper.update()

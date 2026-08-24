@@ -24,10 +24,18 @@ def add_bool(
     name: str,
     help: Type[SetupSettings],
     exclusive: bool = False,
+    informative: bool = True,
 ):
+    """
+    Add bool argument.
+
+    exclusive: exclusive to these settings
+    informative: True = flag not provided means False; False = flag not provided means no info (None)
+    """
     parser.add_argument(
         f"--{name}",
         action="store_true",
+        default=False if informative else None,
         help=help.description(name, exclusive=exclusive),
     )
 
@@ -36,55 +44,93 @@ def add_str(
     parser: argparse.ArgumentParser,
     name: str,
     help: Type[SetupSettings],
+    optional: bool,
+    exclusive: bool = False,
+    informative: bool = True,
 ):
+    """
+    Add string argument.
+
+    optional (bool): make argument optional = if not provided assume const value
+
+    exclusive (bool): this argument is exclusive to the given type of SetupSettings
+
+    informative: True/False = flag not provided means use default/None (no info)
+    """
     parser.add_argument(
         f"--{name}",
         type=str,
-        default=help.default(name),
-        help=help.description(name),
+        default=help.default(name) if informative else None,
         choices=help.options(name),
+        nargs="?" if optional else None,
+        const=help.const(name) if optional else None,
+        help=help.description(name, exclusive=exclusive),
     )
 
 
 def add_db_arguments(
-    parser: argparse.ArgumentParser, description_source: Type[SetupSettings]
+    parser: argparse.ArgumentParser, help: Type[SetupSettings], informative: bool = True
 ):
     """
     Add arguments for DB setup to given parser.
 
-    description_source: pydantic model to use for description
+    help: pydantic model to use for description; default, and const values.
         (can be DBSettings or APITemplateSettings, for example)
     """
-    parser.add_argument(
-        "--db",
-        type=str,
-        nargs="?",
-        const=DBSettings.default("db"),
-        default=None,
-        choices=DBSettings.options("db"),
-        help=description_source.description("db", exclusive=True),
+    add_str(
+        parser, "db", help=help, optional=True, exclusive=True, informative=informative
     )
 
 
-def add_logger_arguments(parser: argparse.ArgumentParser):
+def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
     """
-    Add logger arguments
+    Add arguments for template creation/update to given parser.
     """
-    add_str(parser, "subfolder", LoggerSettings)
+    parser.add_argument(
+        "type",
+        type=str,
+        choices=[setup_type.value for setup_type in [SetupType.package, SetupType.api]],
+        nargs="?",
+        default=SetupType.package,
+        help="Type of functionality",
+    )
+
+    add_db_arguments(parser, APITemplateSettings, informative=informative)
+
+    add_bool(
+        parser,
+        "settings",
+        PackageTemplateSettings,
+        exclusive=True,
+        informative=informative,
+    )
+    add_bool(
+        parser,
+        "progressbar",
+        PackageTemplateSettings,
+        exclusive=True,
+        informative=informative,
+    )
 
 
 def add_new_template_arguments(parser: argparse.ArgumentParser):
     """
-    Add arguments for template creation/update to given parser.
+    Add arguments for new template creation.
     """
-    parser.add_argument("name", type=str, help=BaseTemplateSettings.description("name"))
-    add_str(parser, "type", BaseTemplateSettings)
+    add_str(
+        parser, "name", help=BaseTemplateSettings, optional=False, informative=False
+    )
 
-    add_db_arguments(parser, APITemplateSettings)
+    add_template_arguments(parser, informative=True)
 
-    # TODO: ? convert to single --items flag listing settings, progressbar and other types
-    add_bool(parser, "settings", PackageTemplateSettings, exclusive=True)
-    add_bool(parser, "progressbar", PackageTemplateSettings, exclusive=True)
+
+def add_update_arguments(parser: argparse.ArgumentParser):
+    """
+    Add arguments for template update.
+
+    During update, all unprovided flags assume None instead of default.
+    """
+    add_template_arguments(parser, informative=False)
 
 
 def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
@@ -105,9 +151,11 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         ],
         help="Type of functionality",
     )
-    add_bool(parser, "no-commit", SetupSettings)
+
     add_db_arguments(parser, DBSettings)
-    add_logger_arguments(parser)
+    add_str(parser, "subfolder", LoggerSettings, optional=True)
+
+    add_bool(parser, "no-commit", SetupSettings)
 
 
 def add_install_arguments(parser: argparse.ArgumentParser):
@@ -115,10 +163,4 @@ def add_install_arguments(parser: argparse.ArgumentParser):
     Add arguments for install functionalities.
     """
     add_bool(parser, "local", InstallSettings)
-    parser.add_argument(
-        "package",
-        type=str,
-        nargs="?",
-        default=None,
-        help=InstallSettings.description("package"),
-    )
+    add_str(parser, "package", help=InstallSettings, optional=True)

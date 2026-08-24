@@ -5,6 +5,7 @@ from poetic.cli import (
     add_install_arguments,
     add_microfunctionality_arguments,
     add_new_template_arguments,
+    add_update_arguments,
 )
 from poetic.core import launch, update
 from poetic.exceptions import PoeticException
@@ -18,14 +19,15 @@ def main():
     subparsers = parser.add_subparsers(dest="command")
 
     new_template_subparser = subparsers.add_parser(
-        Subparser.new.value, help="create/update template"
+        Subparser.new.value, help="create new template"
     )
     add_new_template_arguments(new_template_subparser)
 
     update_subparser = subparsers.add_parser(
-        Subparser.update.value, help="update current template with new poetic updates"
+        Subparser.update.value,
+        help="update current template as is with new poetic updates",
     )
-    add_new_template_arguments(update_subparser)
+    # add_update_arguments(update_subparser)
 
     micro_functionality_subparser = subparsers.add_parser(
         Subparser.add.value, help="add functionality to existing repo"

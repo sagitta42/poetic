@@ -61,6 +61,16 @@ class SetupSettings(BaseModel):
         return ret
 
     @classmethod
+    def const(cls, arg: str) -> str:
+        """
+        Constant value.
+
+        Default value = setting not mentioned
+        Const value = setting mentioned without specifying value
+        """
+        return cls.default(arg)
+
+    @classmethod
     def _get_field(cls, arg: str) -> FieldInfo:
         return cls.model_fields[arg.replace("-", "_")]
 

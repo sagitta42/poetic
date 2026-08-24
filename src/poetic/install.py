@@ -68,7 +68,7 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
         if self._has_dual_packages() and not self._settings.local:
             self._uninstall_dual_packages(InstallSource.pyproject)
 
-        if self._settings.package is None:
+        if self._settings.package == "":
             self._full_poetry_install()
 
         if self._has_dual_packages() and self._settings.local:
@@ -149,7 +149,7 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
 
         ret = (
             [self._dual_package_map[self._settings.package]]
-            if self._settings.package is not None
+            if self._settings.package != ""
             else self._all_dual_packages
         )
         return ret

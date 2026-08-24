@@ -7,8 +7,6 @@ import os
 
 from dotenv import dotenv_values
 
-from poetic.settings.options import AcceptedSetupSettings, SettingsOptions
-
 env_config = dotenv_values()
 is_debug = env_config.get("DEBUG", "").lower() in ("true", "1")
 test_eann = env_config.get("TEST_EANN", "").lower() in ("true", "1")

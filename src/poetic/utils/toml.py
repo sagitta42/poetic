@@ -94,7 +94,7 @@ class PyProjectHandler(TomlHandler):
     def __init__(self, path: Path) -> None:
         super().__init__(path / "pyproject.toml")
 
-    def get_template_settings(self) -> BaseTemplateSettings:
+    def get_template_settings(self) -> dict:
         """
         Get poetic settings from pyproject.toml (if any).
         """
@@ -104,5 +104,4 @@ class PyProjectHandler(TomlHandler):
                 f"No [tool.poetic] section found in pyproject.toml! Cannot auto-udpate.\nLaunch with command line arguments used to create tempalte with poetic new; or add them under tool.poetic manually"
             )
         settings["name"] = self.get_section("project")["name"]
-        ret = TemplateOptions(**{"settings": settings}).settings
-        return ret
+        return settings

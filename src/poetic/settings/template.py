@@ -18,23 +18,6 @@ class BaseTemplateSettings(SetupSettings):
         ret = self.model_dump(exclude={"no_commit": True, "update": True, "name": True})
         return ret
 
-    # FIXME: improve
-    @classmethod
-    def type_options(cls) -> list[SetupType]:
-        return [SetupType.package, SetupType.api]
-
-    @classmethod
-    def options(cls, field_name: str) -> list:
-        if field_name == "type":
-            return [type.value for type in cls.type_options()]
-        return super().options(field_name)
-
-    @model_validator(mode="after")
-    def check_type(self) -> Self:
-        if self.type not in self.__class__.type_options():
-            raise ValueError(f"Template type {self.type} not supported!")
-        return self
-
 
 class PackageTemplateSettings(BaseTemplateSettings):
     """
@@ -62,7 +45,16 @@ class APITemplateSettings(BaseTemplateSettings):
     type: Literal[SetupType.api] = Field(
         default=SetupType.api, description="Template type"
     )
-    db: DBType = Field(
-        default=DBType.none,
-        description="Create/update DB functionalities of given DB type",
-    )
+    db: DBType = Field(default=DBType.none, description="Database type")
+
+    @classmethod
+    def const(cls, arg: str) -> str:
+        """
+        Constant value for argument.
+
+        If --db flag is used without value, default to SQLite.
+        Use default value as const for all other arguments.
+        """
+        if arg == "db":
+            return DBType.sqlite
+        return super().const(arg)
