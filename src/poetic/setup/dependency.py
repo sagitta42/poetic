@@ -37,8 +37,6 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
         """
         logg.info("...setting up dependencies", header=True)
 
-        self.run("pip", "install", "poetry (>=2.0.0,<3.0.0)")
-
     def setup(self) -> None:
         """
         Main setup.
