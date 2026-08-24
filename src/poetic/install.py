@@ -1,19 +1,24 @@
+import enum
 from functools import cached_property
 from pathlib import Path
 
-from pydantic import BaseModel
 
 from poetic.exceptions import PoeticException
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
 from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.venv import PackageInfo
+from poetic.utils.pip import get_package_source
 from poetic.utils.toml import PyProjectHandler, TomlHandler
 
 
-class PackageInfo(BaseModel):
-    name: str
-    path: Path
+class InstallSource(str, enum.Enum):
+    local = "local"
+    pyproject = "pyproject"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class InstallSetup(BaseDependencySetup[InstallSettings]):
@@ -32,52 +37,62 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
 
         self._toml_file = ".poetic.toml"
         self._poetic_toml = TomlHandler(self.path / self._toml_file)
+        self._poetic_toml.read()
+
         self._pyproject = PyProjectHandler(self.path)
+        self._pyproject.read()
 
     def install(self):
         """
         Run poetry install handling dual dependencies.
 
-        Determine if the --no-root flag is needed based on package mode in pyproject.toml
+        Determine if the --no-root flag is needed based on package mode in pyproject.toml.
 
         If local flag was given in settings, perform local install:
-            - perform poetry install
-            - uninstall dual dependencies
+            - perform full poetry install if no specific package was requested
+            - uninstall dual dependencies if they do not already point to local path
             - install based on paths from .poetic.toml
 
         Otherwise perform install based on pyproject.toml:
             - uninstall dual dependencies
+                TODO: check if already points to pyproject and skip
             - install based on pyproject.toml (i.e. standard poetry install)
 
         Perform dual package treatment on given package name; or all if none are given.
         """
-        if self._settings.local and not self._has_dual_deps():
+        if self._settings.local and not self._has_dual_packages():
             logg.warning(
                 f"Local install requested but no dual dependencies found in {self._toml_file}"
             )
 
-        if self._has_dual_deps() and not self._settings.local:
-            # TODO: check if already points to pyproject and skip
-            self._uninstall_dual_deps("pyproject.toml")
+        if self._has_dual_packages() and not self._settings.local:
+            self._uninstall_dual_packages(InstallSource.pyproject)
 
         if self._settings.package is None:
-            poetry_args = ["install"]
-            if not self._is_package_mode():
-                poetry_args.append("--no-root")
+            self._full_poetry_install()
 
-            self.poetry(*poetry_args)
+        if self._has_dual_packages() and self._settings.local:
+            self._uninstall_dual_packages(InstallSource.local)
+            for package in self._get_dual_packages_of_interest():
+                self.pip("install", package.source)
 
-        if self._has_dual_deps() and self._settings.local:
-            self._uninstall_dual_deps("local")
-            # TODO: check if already points to local and skip
-            for pacakge_info in self._get_deps_of_interest():
-                self.pip("install", str(pacakge_info.path))
-
-    def _has_dual_deps(self) -> bool:
+    def _full_poetry_install(self):
         """
-        Determine if package has dual dependencies.
+        Perform full poetry install.
+
+        Add --no-root flag if not in package mode.
         """
-        return len(self._all_dual_deps) > 0
+        poetry_args = ["install"]
+        if not self._is_package_mode():
+            poetry_args.append("--no-root")
+
+        self.poetry(*poetry_args)
+
+    def _has_dual_packages(self) -> bool:
+        """
+        Determine if packages with dual dependencies are present.
+        """
+        return len(self._all_dual_packages) > 0
 
     def _is_package_mode(self) -> bool:
         """
@@ -90,116 +105,73 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
 
         return project["package-mode"]
 
-    def _uninstall_dual_deps(self, message: str):
+    def _uninstall_dual_packages(self, install_source: InstallSource):
         """
-        Uninstall dual dependencies.
+        Uninstall dual packages.
 
-        Uninstall dependencies of interest listed as local in .poetic.toml
+        Uninstall dual packages of interest listed as local in .poetic.toml.
+        Skip if package is not present in pip freeze.
+
+        Local install: do not perform uninstall if package already points to same install path in pip freeze.
         """
-        for package_info in self._get_deps_of_interest():
-            package_source = self._get_package_source(package_info.name)
-            logg.debug(package_source)
-            logg.debug(package_info.path)
-            if message == "local" and not package_source == package_info.path:
-                logg.info(
-                    f"Replacing dual package {package_info.name} with {message} dependency",
-                    header=True,
-                )
-                self.pip("uninstall", package_info.name)
+        for dual_package in self._get_dual_packages_of_interest():
+            pip_freeze_info = self._get_pip_package_info(dual_package.name)
 
-    def _get_deps_of_interest(self) -> list[PackageInfo]:
+            if pip_freeze_info is None:
+                continue
+
+            if install_source == InstallSource.local:
+                if pip_freeze_info.source is None:
+                    continue
+
+                logg.debug(pip_freeze_info.source)
+                pip_raw_path = pip_freeze_info.source.removeprefix("file://")
+                logg.debug(pip_raw_path)
+                if dual_package.source == pip_raw_path:
+                    continue
+
+            logg.info(
+                f"Replacing dual package {dual_package.name} with {install_source} dependency:",
+                header=True,
+            )
+
+            if pip_freeze_info.source is not None:
+                logg.info(f"{pip_freeze_info.source} -> {dual_package.source}")
+
+            self.pip("uninstall", dual_package.name)
+
+    def _get_dual_packages_of_interest(self) -> list[PackageInfo]:
         """
-        Get list of dependencies of interest.
+        Get list of packages of interest for install.
 
-        All dependencies if no specific package requested.
+        All dual dependency packages if no specific package requested.
         """
 
         ret = (
-            [self._dual_deps_map[self._settings.package]]
+            [self._dual_package_map[self._settings.package]]
             if self._settings.package is not None
-            else self._all_dual_deps
+            else self._all_dual_packages
         )
         return ret
 
-    def _get_package_source(self, package: str) -> str | Path:
-        """
-        Get package install source from pip freeze.
-
-        Source is be "python" if package version stated in pip freeze with "==".
-        Source is path (git, local etc.) if version stated with "@".
-
-        Get pip freeze command output and extract items containing package name.
-        Check only items where package name corresponds to package (not contain it)
-        """
-        command_output = self.run(
-            self.venv("pip"), "freeze", package, check=True, env=True
-        )
-        assert command_output is not None
-        package_command_outputs = [cout for cout in command_output if package in cout]
-
-        for package_output in package_command_outputs:
-            if "@" in package_output:
-                package_in_output, path = self._get_package_path(
-                    package_output, prefix="file:"
-                )
-                if package_in_output != package:
-                    continue
-
-                return path
-
-            try:
-                package_in_output, version = self._get_package_info(
-                    package_output, "=="
-                )
-                if package_in_output != package:
-                    continue
-
-                return version
-            except Exception as e:
-                raise e.__class__(
-                    f"Impossible to extract package==version from string: {package_output}\nError: {e}"
-                )
-
-        raise PoeticException(f"Package {package} not found in pip freeze!")
-
     @cached_property
-    def _dual_deps_map(self) -> dict[str, PackageInfo]:
-        ret = {package_info.name: package_info for package_info in self._all_dual_deps}
+    def _dual_package_map(self) -> dict[str, PackageInfo]:
+        ret = {package.name: package for package in self._all_dual_packages}
         return ret
 
     @cached_property
-    def _all_dual_deps(self) -> list[PackageInfo]:
+    def _all_dual_packages(self) -> list[PackageInfo]:
         """
-        Get list of all dual dependencies from poetic toml.
+        Get list of all dual dependency packages from poetic toml.
         """
         poetic_settings = self._poetic_toml.get_section("poetic")
         local_deps_items = poetic_settings.get("local_dependencies", [])
         ret = []
         for dep_str in local_deps_items:
-            package, path = self._get_package_path(dep_str)
-            ret.append(PackageInfo(name=package, path=path))
+            if not "@" in dep_str:
+                raise PoeticException(
+                    f"Incorrect fromat in .poetic.toml local dependency: {dep_str}! Use package @ path format"
+                )
+            package, path = get_package_source(dep_str)
+            ret.append(PackageInfo(name=package, source=path, version=None))
         return ret
-
-    def _get_package_path(
-        self, dep_str: str, prefix: str | None = None
-    ) -> tuple[str, Path]:
-        """
-        Extract package name and path from "package @ path" dependency string.
-
-        prefix: remove string from prefix of path string
-        """
-        package, path = self._get_package_info(dep_str, "@")
-
-        if prefix is not None:
-            path = path.removeprefix(prefix)
-
-        return package, Path(path)
-
-    def _get_package_info(self, dep_str: str, split_str: str) -> tuple[str, str]:
-        """
-        Get package information splitting dependency string by given split string.
-
-        E.g. package==1.2.3, package @ path
-        """
-        package, info = [component.strip() for component in dep_str.split(split_str)]
-        return package, info
