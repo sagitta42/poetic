@@ -7,7 +7,7 @@ from pydantic.fields import FieldInfo
 
 class SetupType(str, enum.Enum):
     package = "package"
-    api = "api"
+    app = "app"
     db = "db"
     dotenv = "dotenv"
     vscode = "vscode"

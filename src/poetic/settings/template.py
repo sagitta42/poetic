@@ -35,15 +35,15 @@ class PackageTemplateSettings(BaseTemplateSettings):
     )
 
 
-class APITemplateSettings(BaseTemplateSettings):
+class AppTemplateSettings(BaseTemplateSettings):
     """
-    API template settings.
+    Web app template settings.
 
-    API template includes option to set up DB.
+    Web app template includes option to set up DB.
     """
 
-    type: Literal[SetupType.api] = Field(
-        default=SetupType.api, description="Template type"
+    type: Literal[SetupType.app] = Field(
+        default=SetupType.app, description="Template type"
     )
     db: DBType = Field(default=DBType.none, description="Database type")
 

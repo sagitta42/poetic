@@ -5,13 +5,13 @@ from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType
-from poetic.settings.template import APITemplateSettings
+from poetic.settings.template import AppTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.docker import DockerHandler
 
 
-class APITemplate(BaseTemplate[APITemplateSettings]):
-    def __init__(self, settings: APITemplateSettings, path: Path | None) -> None:
+class AppTemplate(BaseTemplate[AppTemplateSettings]):
+    def __init__(self, settings: AppTemplateSettings, path: Path | None) -> None:
         super().__init__(settings, path)
 
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
@@ -48,7 +48,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
 
     def setup(self) -> None:
         """
-        API template setup.
+        App template setup.
 
         In addition to standard template setup:
             - docker compose file
@@ -137,20 +137,20 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         Set up docker compose.
 
         Copy template and set container name.
-        TODO: Set up DB URL in API service if exists.
+        TODO: Set up DB URL in app service if exists.
         TODO: update DB service container name.
         """
         path_to_template = self._get_template_path("docker-compose.yml")
         self._docker.update_docker_compose_from_template(path_to_template)
 
-        self._docker.update_service_container_name("api", f"{self.name}_api")
+        self._docker.update_service_container_name("app", f"{self.name}_app")
 
     def _setup_subfolders(self):
         """
         Set up subfolders.
 
-        app: app code (api, schemas, serviecs)
-        core: code logic/engine code
+        app: app code (api, schemas, routers, serviecs)
+        core: core logic/engine code
         """
 
         for subfolder in ["app", "core"]:

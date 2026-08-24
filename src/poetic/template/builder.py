@@ -3,14 +3,14 @@ from pathlib import Path
 
 from poetic.settings.base import SetupType
 from poetic.settings.template import BaseTemplateSettings
-from poetic.template.api import APITemplate
+from poetic.template.app import AppTemplate
 from poetic.template.base import BaseTemplate
 from poetic.template.package import PackageTemplate
 
 
 class TemplateClass(enum.Enum):
     package = PackageTemplate
-    api = APITemplate
+    app = AppTemplate
 
     @classmethod
     def from_template_type(cls, template_type: SetupType):

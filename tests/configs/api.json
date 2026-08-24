@@ -1,5 +1,0 @@
-{
-    "type": "api",
-    "name": "test-api",
-    "db": "sqlite"
-}

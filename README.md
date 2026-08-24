@@ -33,15 +33,15 @@ options:
 
 ```bash
 $ poetic new -h
-usage: poetic new [-h] [--type {package,api}] [--db [{sqlite,psql}]] [--settings] [--progressbar] name
+usage: poetic new [-h] [--type {package,app}] [--db [{sqlite,psql}]] [--settings] [--progressbar] name
 
 positional arguments:
   name                  Template/repository name
 
 options:
   -h, --help            show this help message and exit
-  --type {package,api}  Template type
-  --db [{sqlite,psql}]  Create/update DB functionalities of given DB type (api only)
+  --type {package,app}  Template type
+  --db [{sqlite,psql}]  Create/update DB functionalities of given DB type (app only)
   --settings            Set up .env Settings class (package only)
   --progressbar         Set up progress bar source code (package only)
 ```
@@ -53,15 +53,15 @@ $ poetic new awesome-package --type pacakge --settings
 
 Available package types:
 - `package` to create a package template (default)
-- `api` to create an API template
+- `p` to create a simple web app template
 
-Add `--db` flag to set up `alembic` migrations and DB of given type (applies to `api` template type only)
+Add `--db` flag to set up `alembic` migrations and DB of given type (applies to `app` template type only)
 
 Available DB types:
 - `sqlite` to set up a local SQLite DB (default)
 - `psql` to set up PostgreSQL service (currently only a minimal `docker-compose` template setup, more features to come)
 
-Add `--settings` flag to set up `pydantic_settings` based `Settings` class containing `.env` variables (applies to `package` template only; API template always includes this class / source file)
+Add `--settings` flag to set up `pydantic_settings` based `Settings` class containing `.env` variables (applies to `package` template only; app template always includes this class / source file)
 
 Add `--progressbar` flag to set up a simple `ProgressBar` util class in a package source file.
 
@@ -164,12 +164,12 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-#### `poetic new awesome-api --api --db`
+#### `poetic new awesome-app --app --db`
 
 Result
 
 ```bash
-awesome-api
+awesome-app
 ├── .vscode
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...
@@ -200,7 +200,7 @@ awesome-api
 ├── .env.template
 ├── alembic.ini
 ├── app_info.py # app info extraction from pyproject
-├── docker-compose.yml # API service; psql service if requested
+├── docker-compose.yml # app service; psql service if requested
 ├── main.py # main API launcher
 ├── poetry.lock
 ├── pyproject.toml
@@ -322,7 +322,7 @@ After this, this setup is now usable with `poetic add foo`
 1. Add `FooDBSetup` under `DBSetupClass` in `poetic.item.db.builder` using the same enum name as defined `DBType` (`foo`)
 
 After this, this setup is now usable with
-- `poetic new awesome-api --db psql`
+- `poetic new awesome-app --db psql`
 - `poetic add db --db foo`
 
 ### `pydantic` <-> `argparse` adapter

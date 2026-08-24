@@ -6,7 +6,7 @@ from poetic.settings.base import SetupSettings, SetupType
 from poetic.settings.install import InstallSettings
 from poetic.settings.item import DBSettings, LoggerSettings
 from poetic.settings.template import (
-    APITemplateSettings,
+    AppTemplateSettings,
     BaseTemplateSettings,
     PackageTemplateSettings,
 )
@@ -75,7 +75,7 @@ def add_db_arguments(
     Add arguments for DB setup to given parser.
 
     help: pydantic model to use for description; default, and const values.
-        (can be DBSettings or APITemplateSettings, for example)
+        (can be DBSettings or AppTemplateSettings, for example)
     """
     add_str(
         parser, "db", help=help, optional=True, exclusive=True, informative=informative
@@ -89,13 +89,13 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
     parser.add_argument(
         "type",
         type=str,
-        choices=[setup_type.value for setup_type in [SetupType.package, SetupType.api]],
+        choices=[setup_type.value for setup_type in [SetupType.package, SetupType.app]],
         nargs="?",
         default=SetupType.package,
         help="Type of functionality",
     )
 
-    add_db_arguments(parser, APITemplateSettings, informative=informative)
+    add_db_arguments(parser, AppTemplateSettings, informative=informative)
 
     add_bool(
         parser,

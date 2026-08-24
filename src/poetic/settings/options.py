@@ -8,11 +8,11 @@ from poetic.settings.item import (
     LoggerSettings,
     VSCodeSetupSettings,
 )
-from poetic.settings.template import APITemplateSettings, PackageTemplateSettings
+from poetic.settings.template import AppTemplateSettings, PackageTemplateSettings
 
 AcceptedSetupSettings = Annotated[
     PackageTemplateSettings
-    | APITemplateSettings
+    | AppTemplateSettings
     | VSCodeSetupSettings
     | GitignoreSetupSettings
     | DBSettings
@@ -30,7 +30,7 @@ class SetupOptions(BaseModel):
 
 
 AcceptedTemplateSettings = Annotated[
-    PackageTemplateSettings | APITemplateSettings,
+    PackageTemplateSettings | AppTemplateSettings,
     Field(discriminator="type"),
 ]
 
@@ -41,5 +41,6 @@ class TemplateOptions(BaseModel):
     """
 
     settings: AcceptedTemplateSettings
+
 
 SettingsOptions = Union[SetupOptions, TemplateOptions]
