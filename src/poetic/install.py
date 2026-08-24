@@ -3,6 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from poetic.exceptions import PoeticException
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
@@ -95,9 +96,16 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
 
         Uninstall dependencies of interest listed as local in .poetic.toml
         """
-        logg.info(f"Replacing dual packages with {message} dependencies", header=True)
         for package_info in self._get_deps_of_interest():
-            self.pip("uninstall", package_info.name)
+            package_source = self._get_package_source(package_info.name)
+            logg.debug(package_source)
+            logg.debug(package_info.path)
+            if message == "local" and not package_source == package_info.path:
+                logg.info(
+                    f"Replacing dual package {package_info.name} with {message} dependency",
+                    header=True,
+                )
+                self.pip("uninstall", package_info.name)
 
     def _get_deps_of_interest(self) -> list[PackageInfo]:
         """
@@ -113,6 +121,47 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         )
         return ret
 
+    def _get_package_source(self, package: str) -> str | Path:
+        """
+        Get package install source from pip freeze.
+
+        Source is be "python" if package version stated in pip freeze with "==".
+        Source is path (git, local etc.) if version stated with "@".
+
+        Get pip freeze command output and extract items containing package name.
+        Check only items where package name corresponds to package (not contain it)
+        """
+        command_output = self.run(
+            self.venv("pip"), "freeze", package, check=True, env=True
+        )
+        assert command_output is not None
+        package_command_outputs = [cout for cout in command_output if package in cout]
+
+        for package_output in package_command_outputs:
+            if "@" in package_output:
+                package_in_output, path = self._get_package_path(
+                    package_output, prefix="file:"
+                )
+                if package_in_output != package:
+                    continue
+
+                return path
+
+            try:
+                package_in_output, version = self._get_package_info(
+                    package_output, "=="
+                )
+                if package_in_output != package:
+                    continue
+
+                return version
+            except Exception as e:
+                raise e.__class__(
+                    f"Impossible to extract package==version from string: {package_output}\nError: {e}"
+                )
+
+        raise PoeticException(f"Package {package} not found in pip freeze!")
+
     @cached_property
     def _dual_deps_map(self) -> dict[str, PackageInfo]:
         ret = {package_info.name: package_info for package_info in self._all_dual_deps}
@@ -127,6 +176,30 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
         local_deps_items = poetic_settings.get("local_dependencies", [])
         ret = []
         for dep_str in local_deps_items:
-            package, path = [component.strip() for component in dep_str.split("@")]
+            package, path = self._get_package_path(dep_str)
             ret.append(PackageInfo(name=package, path=path))
         return ret
+
+    def _get_package_path(
+        self, dep_str: str, prefix: str | None = None
+    ) -> tuple[str, Path]:
+        """
+        Extract package name and path from "package @ path" dependency string.
+
+        prefix: remove string from prefix of path string
+        """
+        package, path = self._get_package_info(dep_str, "@")
+
+        if prefix is not None:
+            path = path.removeprefix(prefix)
+
+        return package, Path(path)
+
+    def _get_package_info(self, dep_str: str, split_str: str) -> tuple[str, str]:
+        """
+        Get package information splitting dependency string by given split string.
+
+        E.g. package==1.2.3, package @ path
+        """
+        package, info = [component.strip() for component in dep_str.split(split_str)]
+        return package, info
