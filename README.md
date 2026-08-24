@@ -16,23 +16,24 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ```bash
 $ poetic -h
-usage: poetic [-h] {new,add,install} ...
+usage: poetic [-h] {new,update,add,install} ...
 
 positional arguments:
-  {new,add,install}
-    new              create/update template
-    add              add functionality to existing repo
-    install          poetry install with added options
+  {new,update,add,install}
+    new                 create/update template
+    update              update current template with new poetic updates
+    add                 add functionality to existing repo
+    install             poetry install with added options
 
 options:
-  -h, --help         show this help message and exit
+  -h, --help            show this help message and exit
 ```
 
-### Create/update template
+### Create template
 
 ```bash
 $ poetic new -h
-usage: poetic new [-h] [--type {package,api}] [--db [{sqlite,psql}]] [--settings] [--progressbar] [--update] name
+usage: poetic new [-h] [--type {package,api}] [--db [{sqlite,psql}]] [--settings] [--progressbar] name
 
 positional arguments:
   name                  Template/repository name
@@ -43,7 +44,6 @@ options:
   --db [{sqlite,psql}]  Create/update DB functionalities of given DB type (api only)
   --settings            Set up .env Settings class (package only)
   --progressbar         Set up progress bar source code (package only)
-  --update              Update template rather than create new
 ```
 
 Example:
@@ -65,7 +65,17 @@ Add `--settings` flag to set up `pydantic_settings` based `Settings` class conta
 
 Add `--progressbar` flag to set up a simple `ProgressBar` util class in a package source file.
 
-Add `--update` flag to update existing poetic-made package repository after a poetic functionalities update (more details in section below)
+See detailed examples in [Template examples][#templates]
+
+## Update template
+
+```bash
+$ $ poetic update -h
+usage: poetic update [-h]
+
+options:
+  -h, --help  show this help message and exit
+```
 
 See detailed examples in [Template examples][#templates]
 
@@ -201,7 +211,7 @@ awesome-api
 
 #### Update template
 
-Add `--update` flag to `poetic new` call.
+`poetic update`
 
 On the first update, will create a branch dedicated to poetic updates starting from the first commit.
 
