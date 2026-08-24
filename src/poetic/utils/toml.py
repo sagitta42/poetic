@@ -2,6 +2,10 @@ from pathlib import Path
 import tomlkit
 from typing import Any
 
+from poetic.exceptions import PoeticException
+from poetic.settings.options import TemplateOptions
+from poetic.settings.template import BaseTemplateSettings
+
 
 class TomlHandler:
     """
@@ -89,3 +93,16 @@ class PyProjectHandler(TomlHandler):
 
     def __init__(self, path: Path) -> None:
         super().__init__(path / "pyproject.toml")
+
+    def get_template_settings(self) -> BaseTemplateSettings:
+        """
+        Get poetic settings from pyproject.toml (if any).
+        """
+        settings: dict[str, Any] = self.get_section("tool.poetic")
+        if settings == {}:
+            raise PoeticException(
+                f"No [tool.poetic] section found in pyproject.toml! Cannot auto-udpate.\nLaunch with command line arguments used to create tempalte with poetic new; or add them under tool.poetic manually"
+            )
+        settings["name"] = self.get_section("project")["name"]
+        ret = TemplateOptions(**{"settings": settings}).settings
+        return ret

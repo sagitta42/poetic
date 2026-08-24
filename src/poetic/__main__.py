@@ -22,9 +22,10 @@ def main():
     )
     add_new_template_arguments(new_template_subparser)
 
-    subparsers.add_parser(
+    update_subparser = subparsers.add_parser(
         Subparser.update.value, help="update current template with new poetic updates"
     )
+    add_new_template_arguments(update_subparser)
 
     micro_functionality_subparser = subparsers.add_parser(
         Subparser.add.value, help="add functionality to existing repo"

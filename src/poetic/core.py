@@ -31,10 +31,13 @@ def launch(settings_dict: dict, path: Path | None = None, overwrite: bool = Fals
     setupper.launch()
 
 
-def update(path: Path | None = None):
+def update(settings_dict: dict | None = None, path: Path | None = None):
     """
     Update existing template in given path.
 
+    settings_dict: settings;
+        if None provided, read all settings from pyproject.toml tool.poetic section
+        if some provided, combine pyproject.toml and given within compatibility
     path: default None = current directory
     """
     template_builder = TemplateBuilder()
