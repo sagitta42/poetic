@@ -63,14 +63,9 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
     def launch(self) -> None:
         """
-        Template launch action.
-
-        Update/create based on request.
+        Template launch action: init template
         """
-        if self._settings.update:
-            self.update()
-        else:
-            self.init()
+        self.init()
 
     def init(self):
         """

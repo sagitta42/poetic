@@ -13,9 +13,6 @@ class BaseTemplateSettings(SetupSettings):
 
     type: SetupType = Field(default=SetupType.package, description="Template type")
     name: str = Field(description="Template/repository name")
-    update: bool = Field(
-        default=False, description="Update template rather than create new"
-    )
 
     def core_settings(self) -> dict:
         ret = self.model_dump(exclude={"no_commit": True, "update": True, "name": True})

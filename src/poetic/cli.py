@@ -86,8 +86,6 @@ def add_new_template_arguments(parser: argparse.ArgumentParser):
     add_bool(parser, "settings", PackageTemplateSettings, exclusive=True)
     add_bool(parser, "progressbar", PackageTemplateSettings, exclusive=True)
 
-    add_bool(parser, "update", BaseTemplateSettings)
-
 
 def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     """
