@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from pydantic import BaseModel, Field
 import pytest
 import sys
 import os
@@ -34,7 +35,16 @@ def get_setup_settings(filename: str) -> AcceptedSetupSettings:
     return settings
 
 
-def create_setup_test_cases(filenames: list[str] | None = None):
+class TemplateTestCase(BaseModel):
+    settings: AcceptedSetupSettings = Field(description="Template setup settings")
+    overwrite: bool = Field(
+        description="Overwrite template setup if directory already exists"
+    )
+
+
+def create_setup_test_cases(
+    filenames: list[str] | None = None, overwrite: bool = False
+):
     """
     Create setup test cases based on given config filenames (with extension).
 
@@ -45,10 +55,15 @@ def create_setup_test_cases(filenames: list[str] | None = None):
     ret = []
     for fname in config_filenames:
         settings = get_setup_settings(fname)
-        ret.append(pytest.param(settings, id=Path(fname).stem))
+        template_test_case = TemplateTestCase(settings=settings, overwrite=overwrite)
+        ret.append(
+            pytest.param(
+                template_test_case, id=f"{Path(fname).stem}_overwrite-{overwrite}"
+            )
+        )
     return ret
 
 
-@pytest.fixture(params=create_setup_test_cases())
-def test_case_template(request) -> AcceptedSetupSettings:
+@pytest.fixture(params=create_setup_test_cases(overwrite=True))
+def test_case_template(request) -> TemplateTestCase:
     return request.param
