@@ -24,7 +24,12 @@ class TomlHandler:
         Get section of given name.
 
         If does not exist, treat it as empty section.
+        Interpret composite section name iteratively (e.g. tool.poetic)
         """
+        if "." in name:
+            super_section, inner_section = name.split(".")
+            return self.get_section(super_section)[inner_section]
+
         return self._toml_dict.get(name, {})
 
     def add_section(self, name: str, items: dict[str, Any]):
@@ -46,7 +51,11 @@ class TomlHandler:
         self._toml_dict[name] |= items
 
     def del_section(self, name: str):
-        self._toml_dict.pop(name)
+        """
+        Remove section if exists.
+        """
+        if name in self._toml_dict:
+            self._toml_dict.pop(name)
 
     def save_toml(self):
         with open(self._path, "w") as f:

@@ -12,6 +12,7 @@ from poetic.install import InstallSetup
 from poetic.logger import logg
 from poetic.settings.install import InstallSettings
 from poetic.settings.options import SettingsOptions
+from poetic.template.builder import TemplateBuilder
 
 
 def main():
@@ -45,7 +46,9 @@ def main():
 
     if command == Subparser.update:
         logg.info("Update subparser will be here")
-
+        template_builder = TemplateBuilder()
+        setupper = template_builder.find()
+        setupper.update()
     elif command == Subparser.install:
         install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))
         install_setup.install()

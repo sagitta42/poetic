@@ -11,10 +11,8 @@ from poetic.utils.docker import DockerHandler
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
-    def __init__(
-        self, settings: APITemplateSettings, root_path: Path | None = None
-    ) -> None:
-        super().__init__(settings, root_path)
+    def __init__(self, settings: APITemplateSettings, path: Path | None) -> None:
+        super().__init__(settings, path)
 
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
         db_setup_builder = DBSetupBuilder()
@@ -80,7 +78,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         """
         super().setup_pyproject()
 
-        self._pyproject_handler.add_section("tool.poetry", {"package-mode": False})
+        self._pyproject_handler.add_section("project", {"package-mode": False})
         self._pyproject_handler.del_section("build-system")
         self._pyproject_handler.save_toml()
 

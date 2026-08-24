@@ -15,15 +15,8 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
     Package template setup.
     """
 
-    def __init__(
-        self, init: PackageTemplateSettings | str, root_path: Path | None = None
-    ) -> None:
-        settings = (
-            init
-            if isinstance(init, PackageTemplateSettings)
-            else PackageTemplateSettings(name=init, update=False)
-        )
-        super().__init__(settings, root_path)
+    def __init__(self, settings: PackageTemplateSettings, path: Path | None) -> None:
+        super().__init__(settings, path)
 
         src_subdir = Path("src") / self._inner_name
         self._path_to_src: Path = self.path / src_subdir

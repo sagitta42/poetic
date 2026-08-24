@@ -23,7 +23,21 @@ AcceptedSetupSettings = Annotated[
 
 class SettingsOptions(BaseModel):
     """
-    Exists only for convenience of detecting type of settings provided in argparse
+    Exists for convenience of constructing and validating accepted setup settings.
     """
 
     settings: AcceptedSetupSettings
+
+
+AcceptedTemplateSettings = Annotated[
+    PackageTemplateSettings | APITemplateSettings,
+    Field(discriminator="type"),
+]
+
+
+class TemplateOptions(BaseModel):
+    """
+    Exists for convenience of constructing and validating accepted template options.
+    """
+
+    settings: AcceptedTemplateSettings

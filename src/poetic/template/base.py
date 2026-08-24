@@ -37,18 +37,16 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     Repository update: updating existing template with poetic updates.
     """
 
-    def __init__(self, settings: T_TemplateSettings, root_path: Path | None) -> None:
+    def __init__(self, settings: T_TemplateSettings, path: Path | None) -> None:
         """
         Initialize template setup with given settings.
 
-        root_path (Path): path in which to do the setup. Used mainly for testing/debug.
-            Default None -> setup path is same as package name. Otherwise prepend path
+        path (Path): path in which to do the setup.
+            Default (None): package name
         """
         self.name = settings.name
 
-        template_path = Path(self.name)
-        if root_path is not None:
-            template_path = root_path / template_path
+        template_path = path or Path(self.name)
 
         super().__init__(template_path, settings, core=True)
 
@@ -142,7 +140,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         # )
         # message = f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
 
-        message = f"updated with {self._poetic_link}"
+        message = f"latest {self._poetic_link} update"
         self.git.commit_all(message)
 
         self.git.run("switch", current_branch)

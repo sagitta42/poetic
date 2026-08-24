@@ -13,11 +13,12 @@ def test_template(test_case_template):
     """
     template_builder = TemplateBuilder()
 
-    root_path = Path.cwd().parent / "poetic_test"
-    if not root_path.exists():
-        os.mkdir(root_path)
+    test_path = Path.cwd().parent / "poetic_test"
+    if not test_path.exists():
+        os.mkdir(test_path)
 
-    setupper = template_builder.build(test_case_template.settings, root_path=root_path)
+    settings = test_case_template.settings
+    setupper = template_builder.build(settings, path=test_path / settings.name)
 
     if test_case_template.overwrite and setupper.path.exists():
         logg.warning(
