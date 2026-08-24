@@ -4,7 +4,7 @@ from pathlib import Path
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.item import DBSettings
+from poetic.settings.item import DBSettings, DBType
 from poetic.settings.template import APITemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.docker import DockerHandler
@@ -18,7 +18,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         db_setup_builder = DBSetupBuilder()
         self._db: BaseDBSetup | None = (
             None
-            if settings.db is None
+            if settings.db == DBType.none
             else db_setup_builder.build(
                 DBSettings(db=settings.db), self.path, core=False
             )

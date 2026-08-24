@@ -13,7 +13,9 @@ class BaseTemplateSettings(SetupSettings):
 
     type: SetupType = Field(default=SetupType.package, description="Template type")
     name: str = Field(description="Template/repository name")
-    update: bool = Field(default=False, description="Update template rather than create new")
+    update: bool = Field(
+        default=False, description="Update template rather than create new"
+    )
 
     def core_settings(self) -> dict:
         ret = self.model_dump(exclude={"no_commit": True, "update": True, "name": True})
@@ -63,6 +65,7 @@ class APITemplateSettings(BaseTemplateSettings):
     type: Literal[SetupType.api] = Field(
         default=SetupType.api, description="Template type"
     )
-    db: DBType | None = Field(
-        default=None, description="Create/update DB functionalities of given DB type"
+    db: DBType = Field(
+        default=DBType.none,
+        description="Create/update DB functionalities of given DB type",
     )

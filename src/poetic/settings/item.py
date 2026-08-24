@@ -34,6 +34,7 @@ class LoggerSettings(SetupSettings):
 class DBType(str, enum.Enum):
     sqlite = "sqlite"
     psql = "psql"
+    none = "none"
 
 
 class DBSettings(SetupSettings):
