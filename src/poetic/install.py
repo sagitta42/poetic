@@ -7,7 +7,7 @@ from poetic.exceptions import PoeticException
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
-from poetic.setup.venv import BaseVenvSetup
+from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.toml import PyProjectHandler, TomlHandler
 
 
@@ -16,7 +16,7 @@ class PackageInfo(BaseModel):
     path: Path
 
 
-class InstallSetup(BaseVenvSetup[InstallSettings]):
+class InstallSetup(BaseDependencySetup[InstallSettings]):
     """
     Install functionalities on top of standard poetry.
 
@@ -28,7 +28,7 @@ class InstallSetup(BaseVenvSetup[InstallSettings]):
     """
 
     def __init__(self, path: Path, settings: InstallSettings) -> None:
-        super().__init__(path, settings)
+        super().__init__(path, settings, core=False)
 
         self._toml_file = ".poetic.toml"
         self._poetic_toml = TomlHandler(self.path / self._toml_file)
