@@ -14,7 +14,8 @@ def test_launch(test_case_template):
     if not test_path.exists():
         os.mkdir(test_path)
 
-    launch(test_case_template.settings, path=test_path, overwrite=True)
+    settings = test_case_template.settings
+    launch(settings, path=test_path / settings["name"], overwrite=True)
 
 
 def test_update(test_case_template):
