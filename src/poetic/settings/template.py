@@ -1,10 +1,9 @@
-import enum
-from typing import Any, Literal, Self
+from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
 from poetic.settings.base import SetupSettings, SetupType
-from poetic.settings.item import DBSettings, DBType
+from poetic.settings.item import DBType
 
 
 class BaseTemplateSettings(SetupSettings):
@@ -14,7 +13,11 @@ class BaseTemplateSettings(SetupSettings):
 
     type: SetupType = Field(default=SetupType.package, description="Template type")
     name: str = Field(description="Template/repository name")
-    update: bool = Field(description="Update template rather than create new")
+    update: bool = Field(default=False, description="Update template rather than create new")
+
+    def core_settings(self) -> dict:
+        ret = self.model_dump(exclude={"no_commit": True, "update": True, "name": True})
+        return ret
 
     # FIXME: improve
     @classmethod

@@ -11,6 +11,7 @@ from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
 from poetic.setup.dependency import BaseDependencySetup
+from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
@@ -58,6 +59,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._env_settings_setup: EnvSettingsSetup | None = None
         self._vscode = VSCodeSetup(self.path)
         self._gitignore = GitignoreSetup(self.path)
+        self._pyproject_handler = PyProjectHandler(self.path)
 
         logg.info(f"Setting up {self._type}: {self.name}")
 
@@ -76,13 +78,14 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         """
         Initial setup of the template.
 
-        Initialize package with poetry.
+        Initialize package with poetry. Register resulting initial pyproject.toml.
         Initialize git repository.
-        Set up files.
+        Set up repository.
         Make initial commit.
         Perform post-commit setup.
         """
         self.poetry_init()
+
         self.git.run("init")
 
         self.setup()
@@ -146,6 +149,18 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self.git.run("merge", update_branch)
 
     def setup(self) -> None:
+        """
+        Main setup.
+
+        Additional setup: set up repository.
+
+        Set up standard Python gitignore.
+        Set up source files.
+        Set up pydantic-settings class for if requested.
+        Set up .vscode launch and settings.
+        Set up README file.
+        Set up pyproject.toml.
+        """
         super().setup()
 
         self._gitignore.setup()
@@ -156,6 +171,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._vscode.setup()
 
         self.setup_readme()
+        self.setup_pyproject()
 
     def setup_dependencies(self):
         super().setup_dependencies()
@@ -186,6 +202,18 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         path_to_readme = self.path / "README.md"
         with open(path_to_readme, "w") as f:
             f.writelines(readme_lines)
+
+    def setup_pyproject(self):
+        """
+        Set up pyproject.toml.
+
+        Set up poetic section in pyproject.toml.
+        """
+        self._pyproject_handler.read()
+        self._pyproject_handler.add_section(
+            "tool.poetic", self._settings.core_settings()
+        )
+        self._pyproject_handler.save_toml()
 
     def display(self, suggest_commit: str | None = None):
         """

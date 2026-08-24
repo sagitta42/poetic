@@ -1,7 +1,6 @@
 from abc import abstractmethod
 import os
 from pathlib import Path
-import subprocess
 import venv
 
 from poetic.command_runner import BaseCommandRunner
@@ -32,6 +31,13 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings], BaseCommandRunner):
         self.pip("install", "poetry", env=True)
 
     def setup(self) -> None:
+        """
+        Main setup.
+
+        Additional setup: set up venv
+        """
+        super().setup()
+
         self.setup_venv()
 
     def setup_venv(self):
@@ -62,6 +68,7 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings], BaseCommandRunner):
         """
         Run a poetry command in project's venv.
         """
+        # TODO: should it use venv poetry or global poetry (same env as poetic itself)?
         self._venv_command("poetry", *args, env=True)
 
     def _venv_command(self, command: str, *args, env: bool = False):

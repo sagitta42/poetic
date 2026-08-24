@@ -8,11 +8,12 @@ from poetic.settings.item import DBSettings
 from poetic.settings.template import APITemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.docker import DockerHandler
-from poetic.utils.toml import PyProjectHandler
 
 
 class APITemplate(BaseTemplate[APITemplateSettings]):
-    def __init__(self, settings: APITemplateSettings, root_path: Path | None = None) -> None:
+    def __init__(
+        self, settings: APITemplateSettings, root_path: Path | None = None
+    ) -> None:
         super().__init__(settings, root_path)
 
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
@@ -47,11 +48,6 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
             "",
         )
 
-        pyproject_handler = PyProjectHandler(self.path)
-        pyproject_handler.add_section("tool.poetry", {"package-mode": False})
-        pyproject_handler.del_section("build-system")
-        pyproject_handler.save_toml()
-
     def setup(self) -> None:
         """
         API template setup.
@@ -75,6 +71,18 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
 
         self._poetry_add("fastapi")
         self._poetry_add("uvicorn")
+
+    def setup_pyproject(self):
+        """
+        Set up pyproject.toml.
+
+        Additional setup: set package-mode as False and remove build-system section.
+        """
+        super().setup_pyproject()
+
+        self._pyproject_handler.add_section("tool.poetry", {"package-mode": False})
+        self._pyproject_handler.del_section("build-system")
+        self._pyproject_handler.save_toml()
 
     def setup_source_files(self):
         """
