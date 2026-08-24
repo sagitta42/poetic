@@ -4,13 +4,14 @@ from pathlib import Path
 import subprocess
 import venv
 
+from poetic.command_runner import BaseCommandRunner
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.functionality import BaseFunctionalitySetup
 from poetic.utils.utils import list_as_args
 
 
-class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
+class BaseVenvSetup(BaseFunctionalitySetup[T_Settings], BaseCommandRunner):
     """
     General functionality setup with venv.
 
@@ -20,7 +21,9 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
     """
 
     def __init__(self, path: Path, settings: T_Settings) -> None:
-        super().__init__(path, settings)
+        BaseFunctionalitySetup.__init__(self, path, settings)
+        BaseCommandRunner.__init__(self, path)
+
         self._path_to_venv = (self.path / "venv").resolve()
 
     @abstractmethod
@@ -68,17 +71,17 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
         Invoke path/to/venv/command.
         """
         logg.info(f"poetic: {command} {list_as_args(args)}", header=True)
-        self._run(self.venv(command), *args, env=env)
+        self.run(self.venv(command), *args, env=env)
 
-    def _run(self, *args, env: bool = False):
+    def run(self, *args, check: bool = False, env: bool = False) -> list[str] | None:
         """
         Run command in template root directory.
 
         env (bool): run with environment variables.
         """
-        subprocess.run(
-            args,
-            cwd=self.path,
+        return super().run(
+            *args,
+            check=check,
             env=(
                 {
                     **os.environ,

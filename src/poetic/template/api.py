@@ -36,7 +36,7 @@ class APITemplate(BaseTemplate[APITemplateSettings]):
         super().poetry_init()
         os.mkdir(self.name)
 
-        self._run(
+        self.run(
             "poetry",
             "init",
             "--no-interaction",
