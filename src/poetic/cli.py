@@ -31,7 +31,8 @@ def add_bool(
     Add bool argument.
 
     exclusive: exclusive to these settings
-    informative: True = flag not provided means False; False = flag not provided means no info (None)
+    
+    informative: if just --flag is provided with no option, assume const value
     """
 
     parser.add_argument(
@@ -54,13 +55,13 @@ def add_str(
     """
     Add string argument.
 
-    optional (bool): make argument optional = if not provided assume const value
+    optional (bool): if not provided, defaults to default
 
     flag: add -- i.e. --name keyword argument
 
     exclusive (bool): this argument is exclusive to the given type of SetupSettings
 
-    informative: True/False = flag not provided means use default/None (no info)
+    informative: if just --flag is provided with no option, assume const value
     """
     arg_name = name
     if flag:
@@ -69,10 +70,10 @@ def add_str(
     parser.add_argument(
         arg_name,
         type=str,
-        default=help.default(name) if informative else None,
+        default=help.default(name) if optional else None,
         choices=help.options(name),
         nargs="?" if optional else None,
-        const=help.const(name) if optional else None,
+        const=help.const(name) if informative else None,
         help=help.description(name, exclusive=exclusive),
     )
 
@@ -127,19 +128,15 @@ def add_new_template_arguments(parser: argparse.ArgumentParser):
     Add arguments for new template creation.
     """
     add_str(
-        parser, "name", help=BaseTemplateSettings, optional=False, flag=False, informative=False
+        parser,
+        "name",
+        help=BaseTemplateSettings,
+        optional=False,
+        flag=False,
+        informative=False,
     )
 
     add_template_arguments(parser, informative=True)
-
-
-def add_update_arguments(parser: argparse.ArgumentParser):
-    """
-    Add arguments for template update.
-
-    During update, all unprovided flags assume None instead of default.
-    """
-    add_template_arguments(parser, informative=False)
 
 
 def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
@@ -162,7 +159,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     )
 
     add_db_arguments(parser, DBSettings)
-    add_str(parser, "subfolder", LoggerSettings, optional=True)
+    add_str(parser, "subfolder", LoggerSettings, optional=True, informative=False)
 
     add_bool(parser, "no-commit", SetupSettings)
 

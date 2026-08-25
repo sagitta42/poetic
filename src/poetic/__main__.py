@@ -5,7 +5,6 @@ from poetic.cli import (
     add_install_arguments,
     add_microfunctionality_arguments,
     add_new_template_arguments,
-    add_update_arguments,
 )
 from poetic.core import launch, update
 from poetic.exceptions import PoeticException
