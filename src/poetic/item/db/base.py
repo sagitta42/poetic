@@ -94,6 +94,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         super().setup_dependencies()
 
         self._poetry_add("alembic")
+        self._poetry_add("git+https://github.com/sagitta42/pydantibase.git@v0.1.0")
 
     def setup_alembic(self):
         """
@@ -104,7 +105,6 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         Set up .env Settings class if does not exist yet (used in alembic env.py for DB URL)
         Set up alembic environment (env.py).
         Add alembic upgrade debugger configuration to launch.json
-        Set up alembdantic.
         Set up example alembdantic model.
         Set up example migration for alembdantic usage.
         """
@@ -129,16 +129,6 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         )
 
         self._add_vscode_launch_configurations("alembic.launch.json")
-
-        alembdantic_subdir = "alembdantic"
-        path_to_alembdandic = path_to_alembic / alembdantic_subdir
-        os.makedirs(path_to_alembdandic, exist_ok=True)
-        for filename in ["table_model.py", "opd.py"]:
-            self._templates.copy(
-                filename,
-                package_path=path_to_alembdandic,
-                template_subdir=alembdantic_subdir,
-            )
 
         self._templates.copy(
             "models.py",

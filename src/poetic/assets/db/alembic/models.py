@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from alembic_migrations.alembdantic.table_model import TableModel
+from pydantibase import TableModel
 
 
 class ExampleTable(TableModel):
