@@ -5,6 +5,7 @@ import subprocess
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.logger import LoggerSetup
 from poetic.item.progress_bar import ProgressBarSetup
+from poetic.settings.item import LoggerSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.utils import add_new_line_to_file
@@ -22,13 +23,18 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._path_to_src: Path = self.path / src_subdir
 
         # TODO: unify for internal items, use builder with core=False
-        self._logger_setup = LoggerSetup(self._path_to_src, core=False)
+        self._logger_setup = LoggerSetup(
+            self.path, LoggerSettings(subfolder=src_subdir), core=False
+        )
 
+        # FIXME: same issue as logger setup - provide subfolder to use correct project venv
         self._env_settings_setup = (
             EnvSettingsSetup(self._path_to_src, core=False)
             if self._settings.settings
             else None
         )
+
+        # FIXME: same issue as logger setup - provide subfolder to use correct project venv
         self._progressbar_setup: ProgressBarSetup | None = (
             ProgressBarSetup(self._path_to_src, core=False)
             if self._settings.progressbar

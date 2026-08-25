@@ -1,4 +1,5 @@
 import enum
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field
@@ -28,7 +29,7 @@ class LoggerSettings(SetupSettings):
     type: Literal[SetupType.logger] = Field(
         default=SetupType.logger, description="Setup type"
     )
-    subfolder: str = Field(default="", description="Subfolder of setup")
+    subfolder: Path = Field(default=Path(""), description="Subfolder of setup")
 
 
 class DBType(str, enum.Enum):
