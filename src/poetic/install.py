@@ -35,7 +35,7 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
     def __init__(self, path: Path, settings: InstallSettings) -> None:
         super().__init__(path, settings, core=False)
 
-        self._toml_file = ".poetic.toml"
+        self._toml_file = "poetic.toml"
         self._poetic_toml = TomlHandler(self.path / self._toml_file)
         self._poetic_toml.read()
 
@@ -164,13 +164,13 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
         """
         Get list of all dual dependency packages from poetic toml.
         """
-        poetic_settings = self._poetic_toml.get_section("poetic")
-        local_deps_items = poetic_settings.get("local_dependencies", [])
+        poetic_settings = self._poetic_toml.get_section("dependency-groups")
+        local_deps_items = poetic_settings.get("local", [])
         ret = []
         for dep_str in local_deps_items:
             if not "@" in dep_str:
                 raise PoeticException(
-                    f"Incorrect fromat in .poetic.toml local dependency: {dep_str}! Use package @ path format"
+                    f"Incorrect fromat in {self._toml_file} local dependency: {dep_str}! Use package @ path format"
                 )
             package, path = get_package_source(dep_str)
             ret.append(PackageInfo(name=package, source=path, version=None))

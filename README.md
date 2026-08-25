@@ -123,8 +123,8 @@ Add `--local` flag if you want to install some of the dependences in `pyproject.
 
 Provide paths to local dependencies via `.poetic.toml` file. Format:
 ```toml
-[poetic]
-local_dependencies = [
+[dependency-groups]
+local = [
   "my-package @ /path/to/my-package",
   "python-module @ /path/to/my/fork/of/python-module",
 ]
