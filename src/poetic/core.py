@@ -7,7 +7,7 @@ from poetic.factory import PoeticFactory
 from poetic.logger import logg
 from poetic.settings.builder import SettingsBuilder
 from poetic.template.builder import TemplateBuilder
-from poetic.utils.files import path_exists_non_empty
+from poetic.utils.path import Dir
 from poetic.utils.toml import PyProjectHandler
 
 
@@ -24,7 +24,7 @@ def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
     poetic_factory = PoeticFactory()
     setupper = poetic_factory.build(setup_settings, path)
 
-    if overwrite and path_exists_non_empty(setupper.path):
+    if overwrite and Dir(setupper.path).exists_and_non_empty():
         logg.warning(
             f"Cleaning directory in path {setupper.path} before setup in 5 seconds! Press Ctrl+C, or stop test to cancel",
             important=True,
@@ -33,7 +33,10 @@ def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
         for item in os.listdir(setupper.path):
             send2trash(setupper.path / item)
 
-        logg.warning(f"Old contents of directory in {setupper.path} moved to trash", important=True)
+        logg.warning(
+            f"Old contents of directory in {setupper.path} moved to trash",
+            important=True,
+        )
 
     setupper.launch()
 

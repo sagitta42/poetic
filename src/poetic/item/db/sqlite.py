@@ -5,7 +5,7 @@ import sqlite3
 
 from poetic.item.db.base import BaseDBSetup, EnvVar
 from poetic.settings.item import DBSettings
-from poetic.utils.files import add_new_line_to_file
+from poetic.utils.path import File
 
 
 class SQLiteSetup(BaseDBSetup):
@@ -49,6 +49,6 @@ class SQLiteSetup(BaseDBSetup):
             conn = sqlite3.connect(full_path_to_file)
             conn.close()
 
-        add_new_line_to_file(
-            self.path / ".gitignore", f"{local_path_to_file}\n", prepend=True
+        File(self.path / ".gitignore").add_new_line(
+            str(local_path_to_file), prepend=True
         )

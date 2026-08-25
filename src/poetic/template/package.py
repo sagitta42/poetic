@@ -8,7 +8,7 @@ from poetic.item.progress_bar import ProgressBarSetup
 from poetic.settings.item import LoggerSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
-from poetic.utils.files import add_new_line_to_file, replace_str_in_file
+from poetic.utils.path import File
 from poetic.utils.template import TemplateLocation
 
 
@@ -75,8 +75,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         self._create_source_file("core.py")
 
-        add_new_line_to_file(
-            self._path_to_src / "__init__.py", f"from {self._inner_name}.core import *"
+        # TODO: phase out
+        File(self._path_to_src / "__init__.py").add_new_line(
+            f"from {self._inner_name}.core import *", prepend=True
         )
 
         self._templates.copy("foo.py", package_path=self._path_to_src)
@@ -148,4 +149,4 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         Replace $PACKAGE with package name in given source file.
         """
-        replace_str_in_file("$PACKAGE", self._inner_name, filepath)
+        File(filepath).replace_str("$PACKAGE", self._inner_name)

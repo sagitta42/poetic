@@ -5,12 +5,11 @@ from typing import TypeVar
 from poetic.exceptions import PoeticException
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.item.vscode import VSCodeSetup
 from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
 from poetic.setup.dependency import BaseDependencySetup
-from poetic.utils.files import path_exists_non_empty
+from poetic.utils.path import Dir
 from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
 from poetic.utils.misc import POETIC_LINK
@@ -215,7 +214,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         Check if setup path directory already exists and contains files.
         """
 
-        if path_exists_non_empty(self.path):
+        if Dir(self.path).exists_and_non_empty():
             raise PoeticException(
                 f"{self.name} exists and non-empty! Change name or (re)move existing packge; or run poetic update inside existing package if you wish to update it."
             )

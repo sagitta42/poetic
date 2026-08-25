@@ -2,7 +2,7 @@ from pathlib import Path
 
 from poetic.settings.item import LoggerSettings
 from poetic.setup.dependency import BaseDependencySetup
-from poetic.utils.files import replace_str_in_file
+from poetic.utils.path import File
 from poetic.utils.template import TemplateLocation
 
 
@@ -36,7 +36,7 @@ class LoggerSetup(BaseDependencySetup[LoggerSettings]):
             template_location=TemplateLocation.poetic_src,
         )
 
-        replace_str_in_file("POETIC_DEBUG", "DEBUG", path_in_package)
+        File(path_in_package).replace_str("POETIC_DEBUG", "DEBUG")
 
         self.setup_dotenv_template()
 
