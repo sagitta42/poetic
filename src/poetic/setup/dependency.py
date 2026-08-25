@@ -61,7 +61,7 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
         If core setup, add poetic line to readme at the end of setup.
         """
         if self._core:
-            self._add_poetic_line()
+            self._readme.add_poetic_line()
 
     def _poetry_add(self, package: str, group: str | None = None):
         """

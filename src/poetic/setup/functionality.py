@@ -7,7 +7,8 @@ from dotenv import set_key
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.base import BaseSetup
-from poetic.utils.utils import get_readme_section_line
+from poetic.utils.readme import Readme
+from poetic.utils.utils import POETIC_LINK
 
 
 class BaseFunctionalitySetup(BaseSetup[T_Settings]):
@@ -22,7 +23,16 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
     - set up
     - if git repo, commit changes unless requested otherwise
     - display setup results
+
+    Included setup:
+        - readme setup
+        - .env template setup and update
     """
+
+    def __init__(self, path: Path, settings: T_Settings) -> None:
+        super().__init__(path, settings)
+
+        self._readme = Readme(self.path)
 
     @property
     def title(self) -> str:
@@ -104,63 +114,5 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
 
         mod_type: e.g. setup/update
         """
-        message = f"{self.title} {mod_type} with {self._poetic_link}"
+        message = f"{self.title} {mod_type} with {POETIC_LINK}"
         return message
-
-    def _add_readme_section(self, title: str, header: int):
-        """
-        Add section to README.md.
-
-        Construct section title based on header.
-        Add empty line(s) above and below where needed.
-        """
-        title_line = get_readme_section_line(title, header)
-
-        title_lines = []
-        if header > 1:
-            title_lines.append("\n")
-        title_lines.append(title_line)
-        title_lines.append("\n")
-
-        self._add_lines_to_readme(title_lines)
-
-    def _update_readme_from_template(self, path_to_template_readme: Path):
-        """
-        Update README.md by appending lines from given path
-        """
-        with open(path_to_template_readme) as f:
-            template_lines = f.readlines()
-
-        self._add_lines_to_readme(template_lines)
-
-    def _add_lines_to_readme(self, lines: list[str] | str):
-        """
-        Update README.md with given lines.
-        """
-        path_to_readme = self.path / "README.md"
-
-        readme_lines = []
-        if path_to_readme.exists():
-            with open(path_to_readme) as f:
-                readme_lines = f.readlines()
-
-        final_lines = readme_lines
-
-        if len(final_lines) > 0:
-            final_lines += ["\n"]
-
-        lines_to_add = lines if isinstance(lines, list) else [lines]
-        final_lines += lines_to_add
-
-        with open(path_to_readme, "w") as f:
-            f.writelines(final_lines)
-
-    def _add_poetic_line(self):
-        """
-        Add a made with poetic line to README.
-        """
-        poetic_lines = []
-        poetic_lines.append("\n-----\n")
-        poetic_lines.append(f"*Made with {self._poetic_link}*\n")
-
-        self._add_lines_to_readme(poetic_lines)

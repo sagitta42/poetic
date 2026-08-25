@@ -27,7 +27,6 @@ class BaseSetup(Generic[T_Settings]):
 
     def __init__(self, path: Path, settings: T_Settings) -> None:
         self._settings = settings
-        logg.debug(settings)
         self.path = path
 
         self._type: str = settings.type.value
@@ -41,7 +40,6 @@ class BaseSetup(Generic[T_Settings]):
 
         self.git = Git(self.path)
 
-        self._poetic_link = "[poetic](https://github.com/sagitta42/poetic)"
 
     def global_setup(self):
         """

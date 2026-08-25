@@ -12,7 +12,7 @@ from poetic.logger import logg
 from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
-from poetic.utils.utils import path_exists_non_empty
+from poetic.utils.utils import POETIC_LINK, path_exists_non_empty
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
@@ -83,7 +83,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         self.global_setup()
 
-        self.git.commit_all(f"template made with {self._poetic_link}")
+        self.git.commit_all(f"template made with {POETIC_LINK}")
 
         logg.info(f"Template setup DONE", header=True)
         self.display()
@@ -135,7 +135,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         # )
         # message = f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
 
-        message = f"latest {self._poetic_link} update"
+        message = f"latest {POETIC_LINK} update"
         self.git.commit_all(message)
 
         self.git.run("switch", current_branch)
@@ -174,13 +174,16 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         """
         Set up README.md
 
+        Set up fresh readme.
         Use package name as title.
-        Include template if exists
+        Include template if exists.
         """
-        self._add_readme_section(self.name, header=1)
+
+        self._readme.clean()
+        self._readme.add_section(self.name, header=1)
 
         readme_template_path = self._get_template_path("README.md")
-        self._update_readme_from_template(readme_template_path)
+        self._readme.update_from_template(readme_template_path)
 
     def setup_pyproject(self):
         """

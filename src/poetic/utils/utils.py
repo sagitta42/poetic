@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Iterable
 
+POETIC_LINK = "[poetic](https://github.com/sagitta42/poetic)"
+
 
 def file_has_line(filepath: Path, line: str) -> bool:
     """
@@ -46,18 +48,7 @@ def list_as_args(lst: Iterable) -> str:
     >>> list_as_args(["install", "--no-root"])
     "install --no-root"
     """
-    return " ".join(lst)
-
-
-def get_readme_section_line(title: str, header: int) -> str:
-    """
-    Get README section line.
-
-    >>> get_readme_section_line("Database", 2)
-    "## Database\n\n"
-    """
-    ret = f"{'#'*header} {title}"
-    return ret
+    return " ".join(str(element) for element in lst)
 
 
 def path_exists_non_empty(path: Path) -> bool:
