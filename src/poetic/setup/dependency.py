@@ -45,8 +45,6 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
             - set up poetry: install poetry in current environment (the one from which poetic is launched)
             - set up dependencies
         """
-        super().setup()
-
         line = "-" * 60
         if self._core:
             logg.info(line, header=True)

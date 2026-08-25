@@ -73,7 +73,7 @@ class PsqlDBSetup(BaseDBSetup):
         Set up environment variables in service environment.
         Set up port.
         """
-        logg.info("..setting up PSQL docker-compose", header=True)
+        logg.info("...setting up PSQL docker-compose", header=True)
 
         path_to_template = self._get_template_path("docker-compose.yml")
         self._docker.update_docker_compose_from_template(path_to_template)
