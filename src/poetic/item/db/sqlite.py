@@ -5,7 +5,7 @@ import sqlite3
 
 from poetic.item.db.base import BaseDBSetup, EnvVar
 from poetic.settings.item import DBSettings
-from poetic.utils.utils import add_new_line_to_file
+from poetic.utils.files import add_new_line_to_file
 
 
 class SQLiteSetup(BaseDBSetup):

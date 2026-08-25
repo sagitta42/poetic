@@ -10,9 +10,10 @@ from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
 from poetic.setup.dependency import BaseDependencySetup
+from poetic.utils.files import path_exists_non_empty
 from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
-from poetic.utils.utils import POETIC_LINK, path_exists_non_empty
+from poetic.utils.misc import POETIC_LINK
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 

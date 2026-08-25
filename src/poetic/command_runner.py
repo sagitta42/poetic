@@ -3,7 +3,7 @@ import subprocess
 from typing import Callable
 
 from poetic.logger import logg
-from poetic.utils.utils import list_as_args
+from poetic.utils.misc import list_as_args
 
 
 class BaseCommandRunner:

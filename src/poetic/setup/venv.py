@@ -8,7 +8,7 @@ from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.functionality import BaseFunctionalitySetup
 from poetic.utils.pip import get_package_source, get_package_version
-from poetic.utils.utils import list_as_args
+from poetic.utils.misc import list_as_args
 
 
 class PackageInfo(BaseModel):

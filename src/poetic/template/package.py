@@ -8,8 +8,8 @@ from poetic.item.progress_bar import ProgressBarSetup
 from poetic.settings.item import LoggerSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
+from poetic.utils.files import add_new_line_to_file, replace_str_in_file
 from poetic.utils.template import TemplateLocation
-from poetic.utils.utils import add_new_line_to_file
 
 
 class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
@@ -148,4 +148,4 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         Replace $PACKAGE with package name in given source file.
         """
-        self._replace_str_in_file("$PACKAGE", self._inner_name, filepath)
+        replace_str_in_file("$PACKAGE", self._inner_name, filepath)

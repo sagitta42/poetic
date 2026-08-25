@@ -8,7 +8,7 @@ from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.base import BaseSetup
 from poetic.utils.readme import Readme
-from poetic.utils.utils import POETIC_LINK
+from poetic.utils.misc import POETIC_LINK
 
 
 class BaseFunctionalitySetup(BaseSetup[T_Settings]):

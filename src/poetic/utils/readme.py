@@ -2,7 +2,7 @@ from pathlib import Path
 
 from send2trash import send2trash
 
-from poetic.utils.utils import POETIC_LINK
+from poetic.utils.misc import POETIC_LINK
 
 
 class Readme:

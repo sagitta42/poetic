@@ -7,8 +7,8 @@ from poetic.factory import PoeticFactory
 from poetic.logger import logg
 from poetic.settings.builder import SettingsBuilder
 from poetic.template.builder import TemplateBuilder
+from poetic.utils.files import path_exists_non_empty
 from poetic.utils.toml import PyProjectHandler
-from poetic.utils.utils import path_exists_non_empty
 
 
 def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
