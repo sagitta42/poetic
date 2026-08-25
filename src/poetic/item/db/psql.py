@@ -40,7 +40,7 @@ class PsqlDBSetup(BaseDBSetup):
             EnvVar(name="DB_HOST", value="localhost"),
             EnvVar(name="DB_NAME", value="db"),
             EnvVar(name="DB_USER", value="user"),
-            EnvVar(name="DB_PASSWORD", value="changeme"),
+            EnvVar(name="POSTGRES_PASSWORD", value="changeme"),
         ]
 
         self._port = EnvVar(name="DB_PORT", value=5432)
