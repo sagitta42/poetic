@@ -182,8 +182,8 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._readme.clean()
         self._readme.add_section(self.name, header=1)
 
-        readme_template_path = self._get_template_path("README.md")
-        self._readme.update_from_template(readme_template_path)
+        if readme_template_path.exists():
+            self._readme.update_from_template(readme_template_path)
 
     def setup_pyproject(self):
         """
