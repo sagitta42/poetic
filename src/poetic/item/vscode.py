@@ -13,9 +13,12 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
     """
 
     def __init__(
-        self, path: Path, settings: VSCodeSetupSettings = VSCodeSetupSettings()
+        self,
+        path: Path,
+        settings: VSCodeSetupSettings = VSCodeSetupSettings(),
+        core: bool = False,
     ) -> None:
-        super().__init__(path, settings)
+        super().__init__(path, settings, core)
 
         self._path_to_vscode = self.path / ".vscode"
 

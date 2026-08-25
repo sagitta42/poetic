@@ -12,7 +12,10 @@ class LoggerSetup(BaseDependencySetup[LoggerSettings]):
     """
 
     def __init__(
-        self, path: Path, settings: LoggerSettings = LoggerSettings(), core: bool = True
+        self,
+        path: Path,
+        settings: LoggerSettings = LoggerSettings(),
+        core: bool = False,
     ) -> None:
         super().__init__(path, settings, core)
 

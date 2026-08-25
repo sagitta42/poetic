@@ -25,14 +25,22 @@ class BaseSetup(Generic[T_Settings]):
         - copying templates
     """
 
-    def __init__(self, path: Path, settings: T_Settings) -> None:
+    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
         self._settings = settings
         self.path = path
+        self._core = core
 
         self._type: SetupType = settings.type
 
         self._templates = TemplateManager(self._type, self.path)
         self.git = Git(self.path)
+
+    @property
+    def title(self) -> str:
+        """
+        Setup title
+        """
+        return self._settings.type.value
 
     def global_setup(self):
         """
@@ -51,7 +59,12 @@ class BaseSetup(Generic[T_Settings]):
 
         Optionally return a flag representing whether this setup existed before.
         """
-        pass
+        line = "-" * 60
+        if self._core:
+            logg.info(line, header=True)
+        logg.info(f"@ Setting up {self.title}", header=True)
+        if self._core:
+            logg.info(line, header=True)
 
     @abstractmethod
     def launch(self) -> None:

@@ -20,12 +20,9 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
     """
 
     def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
-        super().__init__(path, settings)
+        super().__init__(path, settings, core)
 
-        self._core = core
-
-        self._path_to_venv = (self.path / "venv").resolve()
-        self._vscode_setup = VSCodeSetup(self.path)
+        self._vscode = VSCodeSetup(self.path, core=False)
 
     @abstractmethod
     def setup_dependencies(self) -> None:
@@ -45,12 +42,8 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
             - set up poetry: install poetry in current environment (the one from which poetic is launched)
             - set up dependencies
         """
-        line = "-" * 60
-        if self._core:
-            logg.info(line, header=True)
+
         super().setup()
-        if self._core:
-            logg.info(line, header=True)
 
         self.setup_dependencies()
 

@@ -29,17 +29,10 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         - .env template setup and update
     """
 
-    def __init__(self, path: Path, settings: T_Settings) -> None:
-        super().__init__(path, settings)
+    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
+        super().__init__(path, settings, core)
 
         self._readme = Readme(self.path)
-
-    @property
-    def title(self) -> str:
-        """
-        Functionality title
-        """
-        return self._settings.type.value
 
     @abstractmethod
     def setup(self) -> None:
@@ -47,9 +40,8 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         Main setup.
 
         Set up README.
-
         """
-        logg.info(f"@ Setting up {self.title}", header=True)
+        super().setup()
 
         self.setup_readme()
 

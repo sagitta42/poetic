@@ -170,6 +170,9 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         Add DB readme.
         Add alembic readme.
         """
+        super().setup_readme()
+        logg.info("...setting up README.md")
+
         self._readme.add_section("DB", header=2)
         path_to_db_readme = self._templates.get_filepath(
             "README.md", subdir=self._db_type.value
@@ -189,7 +192,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
 
         path_to_launch = self.path / ".vscode" / "launch.json"
         if not path_to_launch.exists():
-            self._vscode_setup.setup()
+            self._vscode.setup()
 
         with open(path_to_launch) as f:
             launch_dct = json.load(f)

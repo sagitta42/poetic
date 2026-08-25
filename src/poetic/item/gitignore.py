@@ -12,9 +12,12 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
     """
 
     def __init__(
-        self, path: Path, settings: GitignoreSetupSettings = GitignoreSetupSettings()
+        self,
+        path: Path,
+        settings: GitignoreSetupSettings = GitignoreSetupSettings(),
+        core: bool = False,
     ) -> None:
-        super().__init__(path, settings)
+        super().__init__(path, settings, core)
 
     def setup(self) -> None:
         """

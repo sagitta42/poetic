@@ -24,8 +24,8 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings], BaseCommandRunner):
     Includes additional operations: venv setup
     """
 
-    def __init__(self, path: Path, settings: T_Settings) -> None:
-        BaseFunctionalitySetup.__init__(self, path, settings)
+    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
+        BaseFunctionalitySetup.__init__(self, path, settings, core)
         BaseCommandRunner.__init__(self, path)
 
         self._path_to_venv = (self.path / "venv").resolve()
@@ -36,6 +36,7 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_Settings], BaseCommandRunner):
 
         In addition to previous setup: set up venv.
         """
+
         super().setup()
 
         if not self._path_to_venv.exists():

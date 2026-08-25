@@ -56,7 +56,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
         self._env_settings_setup: EnvSettingsSetup | None = None
-        self._vscode = VSCodeSetup(self.path)
         self._gitignore = GitignoreSetup(self.path)
         self._pyproject_handler = PyProjectHandler(self.path)
 
@@ -179,6 +178,8 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         Use package name as title.
         Include template if exists.
         """
+        super().setup_readme()
+        logg.info("...creating README.md", header=True)
 
         self._readme.clean()
         self._readme.add_section(self.name, header=1)
@@ -216,7 +217,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         if path_exists_non_empty(self.path):
             raise PoeticException(
-                f"{self.name} exists and non-empty! Change name of new or existing package; or run with --update flag if you wish to update existing package."
+                f"{self.name} exists and non-empty! Change name or (re)move existing packge; or run poetic update inside existing package if you wish to update it."
             )
 
     @abstractmethod

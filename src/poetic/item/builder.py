@@ -33,6 +33,5 @@ class ItemSetupBuilder(BaseSetupBuilder):
         Build item setup based on item type.
         """
         setup_class = ItemSetupClass.from_setup_type(settings.type).value
-        kwargs = {"core": core} if issubclass(setup_class, BaseDependencySetup) else {}
-        ret = setup_class(path, settings, **kwargs)
+        ret = setup_class(path, settings, core=core)
         return ret
