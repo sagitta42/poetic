@@ -1,13 +1,15 @@
 from abc import abstractmethod
+import enum
 from pathlib import Path
 import shutil
 from typing import Generic
 
 
-from poetic.settings.base import T_Settings
+from poetic.settings.base import SetupType, T_Settings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
+from poetic.utils.template import TemplateLocation, TemplateManager
 
 
 class BaseSetup(Generic[T_Settings]):
@@ -29,17 +31,10 @@ class BaseSetup(Generic[T_Settings]):
         self._settings = settings
         self.path = path
 
-        self._type: str = settings.type.value
+        self._type: SetupType = settings.type
 
-        # FIXME: changes if source file folder depth does
-        self._path_to_resources = Path(__file__).resolve().parent.parent
-        # TODO: try to use resources - Path() does not convert MultiplexedPath
-        # self._path_to_resources = Path(resources.files(__package__).__str__()).parent
-        self._path_to_templates = self._path_to_resources / "assets"
-        self._path_to_type_templates = self._path_to_templates / self._type
-
+        self._templates = TemplateManager(self._type, self.path)
         self.git = Git(self.path)
-
 
     def global_setup(self):
         """
@@ -72,89 +67,6 @@ class BaseSetup(Generic[T_Settings]):
         Post-setup actions (if any)
         """
         pass
-
-    def _copy_template(
-        self,
-        template_filename: str,
-        path_in_package: Path | None = None,
-        package_filename: str | None = None,
-        template_subdir: Path | str | None = None,
-        generic: bool = False,
-    ) -> tuple[Path, bool]:
-        """
-        Copy template into package source code.
-
-        template_filename (str): name of template to copy contained under templates of this package
-        generic (bool): template is generic (independent of setup type)
-        path_in_package (Path | None): path where to copy in package; default = root path
-        package_filename (str | None): filename of template in package; default = same as original template
-
-        Returns path to file in package and whether it existed before.
-        """
-        package_filename = package_filename or template_filename
-        path_in_package = path_in_package or self.path
-
-        path_to_package_file = self._get_filepath_in_package(
-            package_filename, path_in_package
-        )
-
-        existed_before = path_to_package_file.exists()
-
-        path_to_template = self._get_template_path(
-            template_filename, generic, template_subdir=template_subdir
-        )
-
-        logg.debug(f"Copying {path_to_template} -> {path_to_package_file}")
-        shutil.copy(path_to_template, path_to_package_file)
-
-        return path_to_package_file, existed_before
-
-    def _package_file_exists(
-        self,
-        filename_in_package: str,
-        path_in_package: Path | None = None,
-    ) -> bool:
-        """
-        Check if file already exists in package.
-
-        filename_in_package (str | None): filename in package
-        path_in_package (Path | None): file path in package; default = root path
-        """
-        filepath = self._get_filepath_in_package(filename_in_package, path_in_package)
-        return filepath.exists()
-
-    def _get_template_path(
-        self,
-        template_filename: str,
-        generic: bool = False,
-        template_subdir: Path | str | None = None,
-    ) -> Path:
-        """
-        Get path to given template in assets.
-        """
-        path_to_templates = (
-            self._path_to_templates if generic else self._path_to_type_templates
-        )
-        if template_subdir is not None:
-            path_to_templates = path_to_templates / template_subdir
-
-        ret = path_to_templates / template_filename
-        return ret
-
-    def _get_filepath_in_package(
-        self,
-        filename_in_package: str,
-        path_in_package: Path | None = None,
-    ) -> Path:
-        """
-        Get destination path of file in package being set up.
-
-        filename_in_package (str | None): filename in package
-        path_in_package (Path | None): file path in package; default = root path
-        """
-        path_in_package = path_in_package or self.path
-        ret = path_in_package / filename_in_package
-        return ret
 
     def _replace_str_in_file(self, str_original: str, str_replace: str, filepath: Path):
         """

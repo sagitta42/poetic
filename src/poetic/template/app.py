@@ -93,44 +93,44 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         """
         self._setup_subfolders()
 
-        self._copy_template("app_info.py")
+        self._templates.copy("app_info.py")
 
         package_filename = "dummy.py"
 
         path_to_core = self.path / "core"
-        self._copy_template(
+        self._templates.copy(
             "core.py",
-            path_in_package=path_to_core,
+            package_path=path_to_core,
             package_filename=package_filename,
         )
-        self._copy_template("db.py", path_in_package=path_to_core)
-        self._copy_template(
+        self._templates.copy("db.py", package_path=path_to_core)
+        self._templates.copy(
             "model.py",
-            path_in_package=path_to_core / "models",
+            package_path=path_to_core / "models",
             package_filename="example.py",
         )
 
         path_to_app = self.path / "app"
-        self._copy_template(
+        self._templates.copy(
             "service.py",
-            path_in_package=path_to_app / "services",
+            package_path=path_to_app / "services",
             package_filename=package_filename,
         )
-        self._copy_template(
+        self._templates.copy(
             "schemas.py",
-            path_in_package=path_to_app / "schemas",
+            package_path=path_to_app / "schemas",
             package_filename=package_filename,
         )
 
         path_to_api = path_to_app / "api"
-        self._copy_template(
+        self._templates.copy(
             "route.py",
-            path_in_package=path_to_api / "routes",
+            package_path=path_to_api / "routes",
             package_filename=package_filename,
         )
-        self._copy_template("router.py", path_in_package=path_to_api)
+        self._templates.copy("router.py", package_path=path_to_api)
 
-        self._copy_template("main.py")
+        self._templates.copy("main.py")
 
     def setup_docker_compose(self):
         """
@@ -140,7 +140,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         TODO: Set up DB URL in app service if exists.
         TODO: update DB service container name.
         """
-        path_to_template = self._get_template_path("docker-compose.yml")
+        path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._docker.update_docker_compose_from_template(path_to_template)
 
         self._docker.update_service_container_name("app", f"{self.name}_app")

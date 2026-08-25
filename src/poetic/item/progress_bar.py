@@ -22,7 +22,7 @@ class ProgressBarSetup(
     def setup(self) -> None:
         super().setup()
 
-        self._copy_template("progress_bar.py")
+        self._templates.copy("progress_bar.py")
 
     def setup_dependencies(self) -> None:
         super().setup_dependencies()

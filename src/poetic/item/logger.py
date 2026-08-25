@@ -1,9 +1,9 @@
 from pathlib import Path
-import shutil
-from typing import Any
 
 from poetic.settings.item import LoggerSettings
 from poetic.setup.dependency import BaseDependencySetup
+from poetic.utils.files import replace_str_in_file
+from poetic.utils.template import TemplateLocation
 
 
 class LoggerSetup(BaseDependencySetup[LoggerSettings]):
@@ -26,10 +26,14 @@ class LoggerSetup(BaseDependencySetup[LoggerSettings]):
         super().setup()
 
         output_dir = self.path / self._settings.subfolder
-        output_path = output_dir / "logger.py"
 
-        shutil.copy(self._path_to_resources / "logger.py", output_path)
-        self._replace_str_in_file("POETIC_DEBUG", "DEBUG", output_path)
+        path_in_package = self._templates.copy(
+            "logger.py",
+            package_path=output_dir,
+            template_location=TemplateLocation.poetic_src,
+        )
+
+        replace_str_in_file("POETIC_DEBUG", "DEBUG", path_in_package)
 
         self.setup_dotenv_template()
 

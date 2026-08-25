@@ -47,6 +47,8 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
+        self._db_type = self._settings.db
+
         self._db_name = EnvVar(name="DB_NAME", value="database")
         self._env_vars = [
             EnvVar(name="DB_TYPE", value=self._settings.db.value),
@@ -64,14 +66,14 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
 
     @property
     def title(self) -> str:
-        return f"{super().title}: {self._settings.db.value}"
+        return f"{super().title}: {self._db_type.value}"
 
     @abstractmethod
     def setup_db(self):
         """
         Set up DB.
         """
-        logg.info(f"...setting up {self._settings.db.value} DB", header=True)
+        logg.info(f"...setting up {self._db_type.value} DB", header=True)
 
     def setup(self) -> None:
         """
@@ -109,7 +111,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         logg.info("...setting up alembic", header=True)
         template_subdir = "alembic"
 
-        self._copy_template(
+        self._templates.copy(
             "alembic.ini.template",
             package_filename="alembic.ini",
             template_subdir=template_subdir,
@@ -122,8 +124,8 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
 
         self._env_settings_setup.setup()
 
-        self._copy_template(
-            "env.py", path_in_package=path_to_alembic, template_subdir=template_subdir
+        self._templates.copy(
+            "env.py", package_path=path_to_alembic, template_subdir=template_subdir
         )
 
         self._add_vscode_launch_configurations("alembic.launch.json")
@@ -132,23 +134,23 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         path_to_alembdandic = path_to_alembic / alembdantic_subdir
         os.makedirs(path_to_alembdandic, exist_ok=True)
         for filename in ["table_model.py", "opd.py"]:
-            self._copy_template(
+            self._templates.copy(
                 filename,
-                path_in_package=path_to_alembdandic,
+                package_path=path_to_alembdandic,
                 template_subdir=alembdantic_subdir,
             )
 
-        self._copy_template(
+        self._templates.copy(
             "models.py",
-            path_in_package=self.path / alembic_dir,
+            package_path=self.path / alembic_dir,
             template_subdir=template_subdir,
         )
 
         path_to_revisions = path_to_alembic / "versions"
         os.makedirs(path_to_revisions, exist_ok=True)
-        self._copy_template(
+        self._templates.copy(
             "2026_07_15_143709-36648a63d305-example.py",
-            path_in_package=path_to_revisions,
+            package_path=path_to_revisions,
             template_subdir=template_subdir,
         )
 
@@ -169,14 +171,14 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         Add alembic readme.
         """
         self._readme.add_section("DB", header=2)
-        path_to_db_readme = self._get_template_path(
-            "README.md", template_subdir=self._settings.db
+        path_to_db_readme = self._templates.get_filepath(
+            "README.md", subdir=self._db_type.value
         )
         self._readme.update_from_template(path_to_db_readme)
 
         self._readme.add_section("alembic", header=3)
-        path_to_alembic_readme = self._get_template_path(
-            "README.md", template_subdir="alembic"
+        path_to_alembic_readme = self._templates.get_filepath(
+            "README.md", subdir="alembic"
         )
         self._readme.update_from_template(path_to_alembic_readme)
 
@@ -192,8 +194,8 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         with open(path_to_launch) as f:
             launch_dct = json.load(f)
 
-        path_to_template = self._get_template_path(
-            template_filename, generic=False, template_subdir="alembic"
+        path_to_template = self._templates.get_filepath(
+            template_filename, subdir="alembic"
         )
         with open(path_to_template) as f:
             template_config = json.load(f)

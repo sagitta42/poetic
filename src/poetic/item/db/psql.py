@@ -64,7 +64,7 @@ class PsqlDBSetup(BaseDBSetup):
         """
         logg.info("...setting up PSQL docker-compose", header=True)
 
-        path_to_template = self._get_template_path("docker-compose.yml")
+        path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._docker.update_docker_compose_from_template(path_to_template)
         self._docker.update_service_container_name(
             self._service_name, f"db_{self._settings.db.value}"

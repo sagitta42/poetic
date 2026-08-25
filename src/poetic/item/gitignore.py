@@ -3,6 +3,7 @@ from pathlib import Path
 from poetic.logger import logg
 from poetic.settings.item import GitignoreSetupSettings
 from poetic.setup.functionality import BaseFunctionalitySetup
+from poetic.utils.template import TemplateLocation
 
 
 class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
@@ -24,8 +25,8 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
         """
         super().setup()
 
-        self._copy_template(
-            "Python.gitignore", package_filename=".gitignore", generic=True
+        self._templates.copy(
+            ".gitignore", template_location=TemplateLocation.poetic_root
         )
 
     def display(self, suggest_commit: str | None = None):

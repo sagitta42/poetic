@@ -59,7 +59,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._gitignore = GitignoreSetup(self.path)
         self._pyproject_handler = PyProjectHandler(self.path)
 
-        logg.info(f"Setting up {self._type}: {self.name}")
+        logg.info(f"Setting up {self._type.value}: {self.name}")
 
     def launch(self) -> None:
         """
@@ -182,6 +182,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._readme.clean()
         self._readme.add_section(self.name, header=1)
 
+        readme_template_path = self._templates.get_filepath("README.md")
         if readme_template_path.exists():
             self._readme.update_from_template(readme_template_path)
 

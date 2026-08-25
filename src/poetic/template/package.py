@@ -8,6 +8,7 @@ from poetic.item.progress_bar import ProgressBarSetup
 from poetic.settings.item import LoggerSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
+from poetic.utils.template import TemplateLocation
 from poetic.utils.utils import add_new_line_to_file
 
 
@@ -78,12 +79,12 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             self._path_to_src / "__init__.py", f"from {self._inner_name}.core import *"
         )
 
-        self._copy_template("foo.py", path_in_package=self._path_to_src)
+        self._templates.copy("foo.py", package_path=self._path_to_src)
 
-        source_file_path, _ = self._copy_template(
+        source_file_path = self._templates.copy(
             "models.py",
-            path_in_package=self._path_to_src,
-            generic=True,
+            package_path=self._path_to_src,
+            template_location=TemplateLocation.common,
         )
         self._replace_package_placeholder(source_file_path)
 
@@ -126,13 +127,13 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         path_to_configs = path_to_tests / "configs"
         os.makedirs(path_to_configs, exist_ok=True)
 
-        conftest_filepath, _ = self._copy_template("conftest.py", path_to_tests)
+        conftest_filepath = self._templates.copy("conftest.py", path_to_tests)
         self._replace_package_placeholder(conftest_filepath)
 
-        self._copy_template("test_model.json", path_in_package=path_to_configs)
+        self._templates.copy("test_model.json", package_path=path_to_configs)
 
-        test_unit_filepath, _ = self._copy_template(
-            "test_unit.py", path_in_package=path_to_tests
+        test_unit_filepath = self._templates.copy(
+            "test_unit.py", package_path=path_to_tests
         )
         self._replace_package_placeholder(test_unit_filepath)
 
