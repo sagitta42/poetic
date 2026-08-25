@@ -9,7 +9,8 @@ from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
 from poetic.setup.dependency import BaseDependencySetup
-from poetic.utils.path import Dir
+from poetic.utils.path import Dir, File
+from poetic.utils.template import TemplateLocation
 from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
 from poetic.utils.misc import POETIC_LINK
@@ -151,7 +152,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         Set up pydantic-settings class for if requested.
         Set up .vscode launch and settings.
         Set up pyproject.toml.
-        Add "made with poetic" line at the very end.
+        Set up poetic.toml.template.
         """
         super().setup()
 
@@ -163,6 +164,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         self._vscode.setup()
 
         self.setup_pyproject()
+        self.setup_poetic_toml()
 
     def setup_dependencies(self):
         super().setup_dependencies()
@@ -198,6 +200,18 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
             "tool.poetic", self._settings.core_settings()
         )
         self._pyproject_handler.save_toml()
+
+    def setup_poetic_toml(self):
+        """
+        Setup poetic.toml template.
+
+        Set up poetic.toml.template file.
+        Add poetic.toml to .gitignore.
+        """
+        self._templates.copy(
+            "poetic.toml.template", template_location=TemplateLocation.common_ass
+        )
+        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
 
     def display(self, suggest_commit: str | None = None):
         """

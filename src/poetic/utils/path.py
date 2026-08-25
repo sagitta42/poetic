@@ -20,8 +20,10 @@ class File(PathUtil):
     def __init__(self, path: Path) -> None:
         super().__init__(path)
 
-        with open(self._path) as f:
-            self._lines = [l.rstrip() for l in f.readlines()]
+        self._lines = []
+        if self._path.exists():
+            with open(self._path) as f:
+                self._lines = [l.rstrip() for l in f.readlines()]
 
     def add_new_line(self, line: str, prepend: bool = False):
         """
