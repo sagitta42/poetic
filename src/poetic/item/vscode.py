@@ -32,8 +32,7 @@ class VSCodeSetup(BaseFunctionalitySetup[VSCodeSetupSettings]):
                 f"{template}.json",
                 package_path=self._path_to_vscode,
                 package_filename=f"{template}.json",
-                template_location=TemplateLocation.poetic_root,
-                template_subdir=".vscode",
+                template_location=TemplateLocation.poetic_build,
             )
 
     def display(self, suggest_commit: str | None = None):

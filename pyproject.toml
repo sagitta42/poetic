@@ -1,5 +1,5 @@
 [project]
-authors = [{name = "sagitta42", email = "mariia.redchuk@gmail.com"}]
+authors = [{ name = "sagitta42", email = "mariia.redchuk@gmail.com" }]
 dependencies = [
   "poetry (>=2.3.4,<3.0.0)",
   "dotenv (>=0.9.9,<0.10.0)",
@@ -14,16 +14,24 @@ requires-python = ">=3.12,<4.0"
 version = "0.1.0"
 
 [tool.poetry]
-packages = [{include = "poetic", from = "src"}]
+packages = [{ include = "poetic", from = "src" }]
+include = [
+  { path = "src/poetic/_build_assets/**/*", format = [
+    "sdist",
+    "wheel",
+  ] },
+]
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = false
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 
 [dependency-groups]
-dev = [
-  "pytest (>=9.1.1,<10.0.0)",
-]
+dev = ["pytest (>=9.1.1,<10.0.0)"]
 
 [project.scripts]
 poetic = "poetic.__main__:main"

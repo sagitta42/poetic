@@ -26,7 +26,7 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
         super().setup()
 
         self._templates.copy(
-            ".gitignore", template_location=TemplateLocation.poetic_root
+            ".gitignore", template_location=TemplateLocation.poetic_build
         )
 
     def display(self, suggest_commit: str | None = None):

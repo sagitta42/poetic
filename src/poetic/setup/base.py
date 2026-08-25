@@ -1,7 +1,5 @@
 from abc import abstractmethod
-import enum
 from pathlib import Path
-import shutil
 from typing import Generic
 
 
@@ -9,7 +7,7 @@ from poetic.settings.base import SetupType, T_Settings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
-from poetic.utils.template import TemplateLocation, TemplateManager
+from poetic.utils.template import TemplateManager
 
 
 class BaseSetup(Generic[T_Settings]):

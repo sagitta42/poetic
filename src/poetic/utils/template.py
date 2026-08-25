@@ -7,10 +7,10 @@ from poetic.settings.base import SetupType
 
 
 class TemplateLocation(str, enum.Enum):
-    common = "common"
-    setup = "setup"
-    poetic_root = "poetic"
+    common_ass = "common_ass"
+    setup_ass = "setup_ass"
     poetic_src = "poetic_src"
+    poetic_build = "poetic_build"
 
 
 class TemplateManager:
@@ -29,14 +29,17 @@ class TemplateManager:
         # FIXME: changes if source file folder depth does
         # TODO: try to use resources - Path() does not convert MultiplexedPath
         # self._path_to_src = Path(resources.files(__package__).__str__()).parent
-        self._path_to_src = Path(__file__).resolve().parent.parent
-        self._path_to_assets = self._path_to_src / "assets"
+
+        # resolves to src/poetic during testing, site-packages/poetic during build;
+        # in either case contains poetic's own source files and assets
+        self._path_to_root = Path(__file__).resolve().parent.parent
+        self._path_to_ass = self._path_to_root / "assets"
 
         self._template_path_map: dict[TemplateLocation, Path] = {
-            TemplateLocation.poetic_root: self._path_to_src.parent.parent,
-            TemplateLocation.poetic_src: self._path_to_src,
-            TemplateLocation.common: self._path_to_assets,
-            TemplateLocation.setup: self._path_to_assets / self._setup_type,
+            TemplateLocation.common_ass: self._path_to_ass,
+            TemplateLocation.setup_ass: self._path_to_ass / self._setup_type,
+            TemplateLocation.poetic_src: self._path_to_root,
+            TemplateLocation.poetic_build: self._path_to_root / "_build_assets",
         }
 
     def copy(
@@ -45,7 +48,7 @@ class TemplateManager:
         package_path: Path | None = None,
         package_filename: str | None = None,
         template_subdir: Path | str | None = None,
-        template_location: TemplateLocation = TemplateLocation.setup,
+        template_location: TemplateLocation = TemplateLocation.setup_ass,
     ) -> Path:
         """
         Copy template into package source code.
@@ -58,8 +61,8 @@ class TemplateManager:
         template_location (TemplateLocation): location of template:
             common: independent of setup type, is under global common assets
             setup: setup specific, is under assets subfolder corresponding to setup type
-            poetic_root: poetic root directory
-            poetic_src: is under poetic's own source files
+            poetic_build: poetic build assets, ones not under src/poetic that are copied during build to _build_assets
+            poetic_src: poetic's own source files
 
         Returns path to file in package.
         """
@@ -79,7 +82,7 @@ class TemplateManager:
     def get_filepath(
         self,
         filename: str,
-        template_type: TemplateLocation = TemplateLocation.setup,
+        template_type: TemplateLocation = TemplateLocation.setup_ass,
         subdir: Path | str | None = None,
     ) -> Path:
         """

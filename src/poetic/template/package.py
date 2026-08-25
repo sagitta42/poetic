@@ -84,7 +84,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         source_file_path = self._templates.copy(
             "models.py",
             package_path=self._path_to_src,
-            template_location=TemplateLocation.common,
+            template_location=TemplateLocation.common_ass,
         )
         self._replace_package_placeholder(source_file_path)
 
