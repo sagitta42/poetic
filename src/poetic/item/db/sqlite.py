@@ -3,7 +3,7 @@ from pathlib import Path
 import sqlite3
 
 
-from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.base import BaseDBSetup, EnvVar
 from poetic.settings.item import DBSettings
 from poetic.utils.utils import add_new_line_to_file
 
@@ -11,6 +11,10 @@ from poetic.utils.utils import add_new_line_to_file
 class SQLiteSetup(BaseDBSetup):
     """
     SQLite DB setup.
+
+    In case of SQLite,
+        DB_HOST is treated as path to .db file
+        DB_NAME is treated as .db filename (without extension)
 
     db_dir: DB directory within the template; hard-coded db/
     filename: DB filename; hardcoded db.db
@@ -21,47 +25,30 @@ class SQLiteSetup(BaseDBSetup):
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
-        self._db_dir: Path = Path("db")
-        self._filename: str = "db.db"
+        self._db_host = EnvVar(name="DB_HOST", value="db")
+        self._env_vars += [self._db_host]
 
-        self._db_path: Path = self.path / self._db_dir / self._filename
+        self._db_dir = Path(self._db_host.value)
+        self._filename = f"{self._db_name.value}.db"
+
         self._local_db_path: str = str(self._db_dir / self._filename)
-
-    @property
-    def db_url(self) -> str:
-        """
-        SQLite DB URL.
-
-        Path to .db file.
-        """
-        return f"sqlite:///{self._local_db_path}"
 
     def setup_db(self):
         """
         Set up SQLite DB.
 
-        If not present, create the DB directory.
-        If not present, create the .db file and add to .gitignore.
+        If not present, create the .db file.
+        Add path to .db file to .gitignore if not yet present.
         """
         super().setup_db()
 
-        os.makedirs(self.path / self._db_dir, exist_ok=True)
-
-        if not self._db_path.exists():
-            conn = sqlite3.connect(self._db_path)
+        local_path_to_file = self._db_dir / self._filename
+        full_path_to_file = self.path / local_path_to_file
+        if not full_path_to_file.exists():
+            os.makedirs(full_path_to_file.parent, exist_ok=True)
+            conn = sqlite3.connect(full_path_to_file)
             conn.close()
 
-            add_new_line_to_file(
-                self.path / ".gitignore", f"{self._local_db_path}\n", prepend=True
-            )
-
-    def setup_dotenv_template(self):
-        """
-        Update .env.template
-
-        Add DB_URL to .env
-        DB_URL variable is read in alembic env.py
-        """
-        super().setup_dotenv_template()
-
-        self._update_env("DB_URL", self.db_url)
+        add_new_line_to_file(
+            self.path / ".gitignore", f"{local_path_to_file}\n", prepend=True
+        )

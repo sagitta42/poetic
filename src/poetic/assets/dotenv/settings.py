@@ -1,69 +1,54 @@
-from typing import Any, Self
+import enum
+import logging
+from typing import Self
 
 from pydantic import Field, model_validator
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class DBType(str, enum.Enum):
+    sqlite = "sqlite"
+    psql = "psql"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    db_url: str | None = Field(default=None, description="Direct DB URL")
-    db_name: str | None = Field(default=None, description="DB name")
-    db_host: str | None = Field(default=None, description="DB host")
-    db_port: int | None = Field(default=None, description="DB port")
-    db_user: str | None = Field(default=None, description="DB username")
-    db_password: str | None = Field(default=None, description="DB password")
+    db_type: DBType = Field(description="DB type codename")
+    db_name: str = Field(
+        description="DB name (psql) or .db filename without extension (SQLite)"
+    )
+    db_host: str = Field(description="DB host (psql) or .db directory path (SQLite)")
+    db_port: int | None = Field(default=None, description="DB port (psql only)")
+    db_user: str | None = Field(default=None, description="DB username (psql only)")
+    db_password: str | None = Field(default=None, description="DB password (psql only)")
     debug: bool = False
 
     @property
-    def db_components(self) -> list[Any]:
+    def has_psql_components(self) -> bool:
         """
-        Separate DB information components
+        Settings have all necessary psql components
         """
-        ret = [
-            self.db_name,
-            self.db_host,
-            self.db_port,
-            self.db_user,
-            self.db_password,
-        ]
-        return ret
+        psql_components = [self.db_port, self.db_user, self.db_password]
 
-    @property
-    def has_all_db_components(self) -> bool:
-        """
-        Settings contain all separate DB components.
-        """
-        ret = all(var is not None for var in self.db_components)
-        return ret
-
-    @property
-    def has_any_db_component(self) -> bool:
-        """
-        At least one of the separate DB components is present in settings.
-        """
-        ret = any(var is not None for var in self.db_components)
-        return ret
-
-    @property
-    def has_db_info(self) -> bool:
-        """
-        Settings contain full DB info
-        """
-        ret = self.db_url is not None or self.has_all_db_components
+        ret = not any(component is None for component in psql_components)
         return ret
 
     @model_validator(mode="after")
-    def check_url(self) -> Self:
+    def check_db_info(self) -> Self:
         """
-        Check for DB URL information conflicts.
+        Check that Settings contain full necessary DB info
         """
-        if self.has_db_info:
-            if self.db_url is not None and self.has_any_db_component:
-                raise ValueError(
-                    "Provide either direct DB URL or separate components, not both!"
-                )
+        if self.db_type == DBType.sqlite and self.has_psql_components:
+            logging.warning(
+                f"{self.db_type.value} driver is requested but extra psql components are found; ignoring"
+            )
+
+        if self.db_type == DBType.psql and not self.has_psql_components:
+            raise ValueError(
+                "psql components missing from .env! Provide DB port, username, and password"
+            )
 
         return self
 

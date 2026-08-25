@@ -1,24 +1,66 @@
 from abc import abstractmethod
+import enum
 import json
 import os
 from pathlib import Path
+from typing import Any, Optional
+
+from pydantic import BaseModel, Field
 
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
-from poetic.settings.item import DBSettings
+from poetic.settings.item import DBSettings, DBType
 from poetic.setup.dependency import BaseDependencySetup
+
+
+# TODO: generalize .env.template util
+class EnvVar(BaseModel):
+    name: str = Field(description="Variable name")
+    value: Any = Field(description="Variable value")
+    docker: Optional[str] = Field(
+        default=None,
+        description="Variable name in docker-compose environment; defaults to name",
+        exclude=True,
+    )
+
+    @property
+    def docker_env_name(self) -> str:
+        return self.docker or self.name
+
+    @property
+    def dollar(self) -> str:
+        """
+        Get ${var} string.
+        """
+        ret = f"${{{self.name}}}"
+        return ret
 
 
 class BaseDBSetup(BaseDependencySetup[DBSettings]):
     """
     DB setup.
+
+    env_vars: DB environment variables (e.g. in docker-compose)
     """
 
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
+        self._db_name = EnvVar(name="DB_NAME", value="db")
+        self._env_vars = [
+            EnvVar(name="DB_TYPE", value=self._settings.db.value),
+            self._db_name,
+        ]
+
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
+
+    @property
+    def dotenv_vars(self) -> list[EnvVar]:
+        """
+        .env variables
+        """
+        return self._env_vars
 
     @property
     def title(self) -> str:
@@ -110,6 +152,15 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
             template_subdir=template_subdir,
         )
 
+    def setup_dotenv_template(self):
+        """
+        Set up DB .env variables in .env.template.
+        """
+        super().setup_dotenv_template()
+
+        for env_var in self.dotenv_vars:
+            self._update_env(**env_var.model_dump())
+
     def setup_readme(self):
         """
         Set up README.
@@ -117,17 +168,17 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         Add DB readme.
         Add alembic readme.
         """
-        self._add_readme_section("DB", header=2)
+        self._readme.add_section("DB", header=2)
         path_to_db_readme = self._get_template_path(
             "README.md", template_subdir=self._settings.db
         )
-        self._update_readme_from_template(path_to_db_readme)
+        self._readme.update_from_template(path_to_db_readme)
 
-        self._add_readme_section("alembic", header=3)
+        self._readme.add_section("alembic", header=3)
         path_to_alembic_readme = self._get_template_path(
             "README.md", template_subdir="alembic"
         )
-        self._update_readme_from_template(path_to_alembic_readme)
+        self._readme.update_from_template(path_to_alembic_readme)
 
     def _add_vscode_launch_configurations(self, template_filename: str):
         """

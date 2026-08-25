@@ -3,41 +3,15 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.base import BaseDBSetup, EnvVar
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
 from poetic.utils.docker import DockerHandler
 
 
-# TODO: generalize .env.template util
-class EnvVar(BaseModel):
-    name: str = Field(description="Variable name")
-    value: Any = Field(description="Variable value")
-    docker: Optional[str] = Field(
-        default=None,
-        description="Variable name in docker-compose environment; defaults to name",
-        exclude=True,
-    )
-
-    @property
-    def docker_env_name(self) -> str:
-        return self.docker or self.name
-
-    @property
-    def dollar(self) -> str:
-        """
-        Get ${var} string.
-        """
-        ret = f"${{{self.name}}}"
-        return ret
-
-
 class PsqlDBSetup(BaseDBSetup):
     """
     PSQL database setup.
-
-    env_vars: environment variables in docker-compose
-    dotenv_vars: .env variables = env_vars + port
     """
 
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
@@ -45,18 +19,24 @@ class PsqlDBSetup(BaseDBSetup):
 
         self._service_name = "db"
 
-        self._env_vars = [
+        self._db_name.docker = "POSTGRES_DB"
+        self._env_vars += [
             EnvVar(name="DB_HOST", value="localhost"),
-            EnvVar(name="DB_NAME", value="db"),
-            EnvVar(name="DB_USER", value="user"),
+            EnvVar(name="DB_USER", value="user", docker="POSTGRES_USER"),
             EnvVar(name="DB_PASSWORD", value="changeme", docker="POSTGRES_PASSWORD"),
         ]
-
         self._port = EnvVar(name="DB_PORT", value=5432)
 
-        self._dotenv_vars = self._env_vars + [self._port]
-
         self._docker = DockerHandler(self.path)
+
+    @property
+    def dotenv_vars(self) -> list[EnvVar]:
+        """
+        .env variables
+
+        Composed of environment variables + port.
+        """
+        return super().dotenv_vars + [self._port]
 
     def setup_dependencies(self):
         """
@@ -91,15 +71,6 @@ class PsqlDBSetup(BaseDBSetup):
         )
         self._update_service_env_vars()
         self._update_service_port()
-
-    def setup_dotenv_template(self):
-        """
-        Set up PSQL variables in .env.template.
-        """
-        super().setup_dotenv_template()
-
-        for env_var in self._dotenv_vars:
-            self._update_env(**env_var.model_dump())
 
     def _update_service_env_vars(self):
         """

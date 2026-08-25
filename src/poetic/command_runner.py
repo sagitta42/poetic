@@ -3,6 +3,7 @@ import subprocess
 from typing import Callable
 
 from poetic.logger import logg
+from poetic.utils.utils import list_as_args
 
 
 class BaseCommandRunner:
@@ -48,7 +49,7 @@ class BaseCommandRunner:
         if self._main_command is not None:
             subprocess_args = [self._main_command] + subprocess_args
 
-        logg.debug(subprocess_args)
+        logg.debug(f"{self.path} $ {list_as_args(subprocess_args)}")
 
         ret = subprocess_func(subprocess_args, cwd=self.path, **kwargs)
         return ret

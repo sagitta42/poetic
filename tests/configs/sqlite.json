@@ -1,5 +1,5 @@
 {
     "type": "app",
-    "name": "test-app",
+    "name": "test-sqlite",
     "db": "sqlite"
 }

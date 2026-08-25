@@ -1,34 +1,81 @@
+from abc import ABC, abstractmethod
+import enum
 from logging.config import fileConfig
+from pathlib import Path
 
 from sqlalchemy import URL, engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
-from settings import settings
+from settings import DBType, settings
 
-def get_env_url(driver: str) -> URL:
+
+class DBDriver(str, enum.Enum):
+    sqlite = "sqlite"
+    psql = "postgresql+psycopg"
+
+    @classmethod
+    def from_db_type(cls, db_type: DBType):
+        return cls[db_type.name]
+
+
+class DBUrl(ABC):
+    def __init__(self, db_type: DBType) -> None:
+        self._type = db_type
+
+    @abstractmethod
+    def create(self) -> URL:
+        pass
+
+    def _get_drivername(self) -> str:
+        ret = DBDriver.from_db_type(self._type).value
+        return ret
+
+
+class SqliteUrl(DBUrl):
+    def create(self) -> URL:
+        db_path = Path(settings.db_host) / f"{settings.db_name}.db"
+        url = URL.create(
+            drivername=self._get_drivername(),
+            database=str(db_path),
+        )
+        return url
+
+
+class PsqlUrl(DBUrl):
+    def create(self) -> URL:
+        url = URL.create(
+            drivername=self._get_drivername(),
+            database=settings.db_name,
+            host=settings.db_host,
+            port=settings.db_port,
+            username=settings.db_user,
+            password=settings.db_password,
+        )
+        return url
+
+
+class DBUrlClass(enum.Enum):
+    sqlite = SqliteUrl
+    psql = PsqlUrl
+
+    @classmethod
+    def from_db_type(cls, db_type: DBType):
+        return cls[db_type.name].value
+
+
+def get_url() -> URL:
     """
     Get DB URL based on .env variables
     """
-    url = URL.create(
-        drivername=driver,
-        database=settings.db_name,
-        host=settings.db_host,
-        port=settings.db_port,
-        username=settings.db_user,
-        password=settings.db_password,
-    )   
-    return url 
+    db_url_class = DBUrlClass.from_db_type(settings.db_type)
+    db_url = db_url_class(settings.db_type)
 
-def get_url(driver: str = "postgresql+psycopg"):
-    """
-    Get DB URL directly from .env or constructed.
-    """
-    # "mysql+pymysql"
-    if settings.db_url is None:
-        return get_env_url(driver)
-    return settings.db_url
+    url = db_url.create()
+
+    return url
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
