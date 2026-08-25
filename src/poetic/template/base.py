@@ -81,7 +81,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         self.git.run("init")
 
-        self.setup()
+        self.global_setup()
 
         self.git.commit_all(f"template made with {self._poetic_link}")
 
@@ -126,7 +126,7 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         self.git.run("switch", update_branch)
 
-        self.setup()
+        self.global_setup()
 
         # FIXME: correctly get poetic commits
         # last_poetic_commit = self._git_auto.get_last_commit()
@@ -151,8 +151,8 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
         Set up source files.
         Set up pydantic-settings class for if requested.
         Set up .vscode launch and settings.
-        Set up README file.
         Set up pyproject.toml.
+        Add "made with poetic" line at the very end.
         """
         super().setup()
 
@@ -163,7 +163,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
             self._env_settings_setup.setup()
         self._vscode.setup()
 
-        self.setup_readme()
         self.setup_pyproject()
 
     def setup_dependencies(self):
@@ -177,24 +176,11 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         Use package name as title.
         Include template if exists
-        Add a made with poetic line.
         """
-        title = f"# {self.name}"
-        readme_lines = [title + "\n\n"]
-        readme_template_path = self._path_to_type_templates / "README.md"
-        if readme_template_path.exists():
-            with open(readme_template_path) as f:
-                readme_lines += f.readlines()
+        self._add_readme_section(self.name, header=1)
 
-        poetic_lines = []
-        poetic_lines.append("\n-----\n")
-        poetic_lines.append(f"*Made with {self._poetic_link}*\n")
-
-        readme_lines += poetic_lines
-
-        path_to_readme = self.path / "README.md"
-        with open(path_to_readme, "w") as f:
-            f.writelines(readme_lines)
+        readme_template_path = self._get_template_path("README.md")
+        self._update_readme_from_template(readme_template_path)
 
     def setup_pyproject(self):
         """

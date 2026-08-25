@@ -7,6 +7,7 @@ from dotenv import set_key
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.base import BaseSetup
+from poetic.utils.utils import get_readme_section_line
 
 
 class BaseFunctionalitySetup(BaseSetup[T_Settings]):
@@ -32,16 +33,24 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
 
     @abstractmethod
     def setup(self) -> None:
+        """
+        Main setup.
+
+        Set up README.
+
+        """
         logg.info(f"@ Setting up {self.title}", header=True)
+
+        self.setup_readme()
 
     def launch(self) -> None:
         """
         Launch independent functionality setup.
 
-        Perform setup.
+        Perform global setup.
         Commit setup if in git repository and files did not exist before.
         """
-        self.setup()
+        self.global_setup()
 
         if self.git.is_git_repo:
             if self._settings.no_commit:
@@ -51,6 +60,19 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
                 self.display()
         else:
             self.display()
+
+    def setup_dotenv_template(self):
+        """
+        Set up .env.template.
+        """
+        logg.info("...setting up .env template", header=True)
+        self._update_env("DEBUG", 1)
+
+    def setup_readme(self):
+        """
+        Set up README.md
+        """
+        pass
 
     def display(self, suggest_commit: str | None = None):
         """
@@ -63,13 +85,6 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         else:
             logg.info(f"{self.title} functionality setup DONE")
 
-    def setup_dotenv_template(self):
-        """
-        Set up .env.template.
-        """
-        logg.info("...setting up .env template", header=True)
-        self._update_env("DEBUG", 1)
-
     def _update_env(self, name: str, value: Any, path_to_dotenv: Path | None = None):
         """
         Update .env file with given variable value.
@@ -81,6 +96,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         filepath = path_to_dotenv or self.path / ".env.template"
 
         set_key(filepath, name, str(value), quote_mode="never")
+        logg.debug(f"{filepath} {name}={value}")
 
     def _commit_message(self, mod_type: str) -> str:
         """
@@ -90,3 +106,61 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         """
         message = f"{self.title} {mod_type} with {self._poetic_link}"
         return message
+
+    def _add_readme_section(self, title: str, header: int):
+        """
+        Add section to README.md.
+
+        Construct section title based on header.
+        Add empty line(s) above and below where needed.
+        """
+        title_line = get_readme_section_line(title, header)
+
+        title_lines = []
+        if header > 1:
+            title_lines.append("\n")
+        title_lines.append(title_line)
+        title_lines.append("\n")
+
+        self._add_lines_to_readme(title_lines)
+
+    def _update_readme_from_template(self, path_to_template_readme: Path):
+        """
+        Update README.md by appending lines from given path
+        """
+        with open(path_to_template_readme) as f:
+            template_lines = f.readlines()
+
+        self._add_lines_to_readme(template_lines)
+
+    def _add_lines_to_readme(self, lines: list[str] | str):
+        """
+        Update README.md with given lines.
+        """
+        path_to_readme = self.path / "README.md"
+
+        readme_lines = []
+        if path_to_readme.exists():
+            with open(path_to_readme) as f:
+                readme_lines = f.readlines()
+
+        final_lines = readme_lines
+
+        if len(final_lines) > 0:
+            final_lines += ["\n"]
+
+        lines_to_add = lines if isinstance(lines, list) else [lines]
+        final_lines += lines_to_add
+
+        with open(path_to_readme, "w") as f:
+            f.writelines(final_lines)
+
+    def _add_poetic_line(self):
+        """
+        Add a made with poetic line to README.
+        """
+        poetic_lines = []
+        poetic_lines.append("\n-----\n")
+        poetic_lines.append(f"*Made with {self._poetic_link}*\n")
+
+        self._add_lines_to_readme(poetic_lines)

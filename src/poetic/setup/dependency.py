@@ -52,8 +52,16 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
         if self._core:
             logg.info(line, header=True)
 
-        self.run("pip", "install", "poetry (>=2.0.0,<3.0.0)", env=True)
         self.setup_dependencies()
+
+    def post_setup(self):
+        """
+        Post-setup.
+
+        If core setup, add poetic line to readme at the end of setup.
+        """
+        if self._core:
+            self._add_poetic_line()
 
     def _poetry_add(self, package: str, group: str | None = None):
         """

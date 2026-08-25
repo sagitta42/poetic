@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,6 +13,15 @@ from poetic.utils.docker import DockerHandler
 class EnvVar(BaseModel):
     name: str = Field(description="Variable name")
     value: Any = Field(description="Variable value")
+    docker: Optional[str] = Field(
+        default=None,
+        description="Variable name in docker-compose environment; defaults to name",
+        exclude=True,
+    )
+
+    @property
+    def docker_env_name(self) -> str:
+        return self.docker or self.name
 
     @property
     def dollar(self) -> str:
@@ -40,7 +49,7 @@ class PsqlDBSetup(BaseDBSetup):
             EnvVar(name="DB_HOST", value="localhost"),
             EnvVar(name="DB_NAME", value="db"),
             EnvVar(name="DB_USER", value="user"),
-            EnvVar(name="POSTGRES_PASSWORD", value="changeme"),
+            EnvVar(name="DB_PASSWORD", value="changeme", docker="POSTGRES_PASSWORD"),
         ]
 
         self._port = EnvVar(name="DB_PORT", value=5432)
@@ -107,7 +116,7 @@ class PsqlDBSetup(BaseDBSetup):
         env = service["environment"]
 
         for env_var in self._env_vars:
-            env[env_var.name] = env_var.dollar
+            env[env_var.docker_env_name] = env_var.dollar
 
         self._docker.write_docker_compose(yml_info)
 

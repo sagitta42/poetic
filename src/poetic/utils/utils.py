@@ -46,3 +46,14 @@ def list_as_args(lst: Iterable) -> str:
     "install --no-root"
     """
     return " ".join(lst)
+
+
+def get_readme_section_line(title: str, header: int) -> str:
+    """
+    Get README section line.
+
+    >>> get_readme_section_line("Database", 2)
+    "## Database\n\n"
+    """
+    ret = f"{'#'*header} {title}"
+    return ret

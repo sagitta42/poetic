@@ -110,6 +110,25 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
             template_subdir=template_subdir,
         )
 
+    def setup_readme(self):
+        """
+        Set up README.
+
+        Add DB readme.
+        Add alembic readme.
+        """
+        self._add_readme_section("DB", header=2)
+        path_to_db_readme = self._get_template_path(
+            "README.md", template_subdir=self._settings.db
+        )
+        self._update_readme_from_template(path_to_db_readme)
+
+        self._add_readme_section("alembic", header=3)
+        path_to_alembic_readme = self._get_template_path(
+            "README.md", template_subdir="alembic"
+        )
+        self._update_readme_from_template(path_to_alembic_readme)
+
     def _add_vscode_launch_configurations(self, template_filename: str):
         """
         Add configurations to VSCode launch.json contained in given template.
