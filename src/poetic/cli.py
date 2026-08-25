@@ -19,6 +19,7 @@ class Subparser(str, enum.Enum):
     update = "update"
 
 
+# TODO: OOP encalsulate duplications
 def add_bool(
     parser: argparse.ArgumentParser,
     name: str,
@@ -32,6 +33,7 @@ def add_bool(
     exclusive: exclusive to these settings
     informative: True = flag not provided means False; False = flag not provided means no info (None)
     """
+
     parser.add_argument(
         f"--{name}",
         action="store_true",
@@ -45,6 +47,7 @@ def add_str(
     name: str,
     help: Type[SetupSettings],
     optional: bool,
+    flag: bool = True,
     exclusive: bool = False,
     informative: bool = True,
 ):
@@ -53,12 +56,18 @@ def add_str(
 
     optional (bool): make argument optional = if not provided assume const value
 
+    flag: add -- i.e. --name keyword argument
+
     exclusive (bool): this argument is exclusive to the given type of SetupSettings
 
     informative: True/False = flag not provided means use default/None (no info)
     """
+    arg_name = name
+    if flag:
+        arg_name = f"--{arg_name}"
+
     parser.add_argument(
-        f"--{name}",
+        arg_name,
         type=str,
         default=help.default(name) if informative else None,
         choices=help.options(name),
@@ -87,7 +96,7 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
     Add arguments for template creation/update to given parser.
     """
     parser.add_argument(
-        "type",
+        "--type",
         type=str,
         choices=[setup_type.value for setup_type in [SetupType.package, SetupType.app]],
         nargs="?",
@@ -118,7 +127,7 @@ def add_new_template_arguments(parser: argparse.ArgumentParser):
     Add arguments for new template creation.
     """
     add_str(
-        parser, "name", help=BaseTemplateSettings, optional=False, informative=False
+        parser, "name", help=BaseTemplateSettings, optional=False, flag=False, informative=False
     )
 
     add_template_arguments(parser, informative=True)
