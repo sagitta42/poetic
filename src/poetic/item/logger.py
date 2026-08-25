@@ -31,6 +31,8 @@ class LoggerSetup(BaseDependencySetup[LoggerSettings]):
         shutil.copy(self._path_to_resources / "logger.py", output_path)
         self._replace_str_in_file("POETIC_DEBUG", "DEBUG", output_path)
 
+        self.setup_dotenv_template()
+
     def setup_dependencies(self) -> None:
         super().setup_dependencies()
 

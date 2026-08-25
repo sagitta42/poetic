@@ -44,6 +44,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
 
         self.setup_db()
         self.setup_alembic()
+        self.setup_dotenv_template()
 
     def setup_dependencies(self):
         super().setup_dependencies()
