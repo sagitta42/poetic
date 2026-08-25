@@ -71,4 +71,4 @@ class File(PathUtil):
         Expects lines without the end of line characters.
         """
         with open(self._path, "w") as f:
-            f.writelines(lines)
+            f.writelines([f"{l}\n" for l in lines])
