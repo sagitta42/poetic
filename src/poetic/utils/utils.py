@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -56,4 +57,12 @@ def get_readme_section_line(title: str, header: int) -> str:
     "## Database\n\n"
     """
     ret = f"{'#'*header} {title}"
+    return ret
+
+
+def path_exists_non_empty(path: Path) -> bool:
+    """
+    Check if path exists and is not empty
+    """
+    ret = path.exists() and len(os.listdir(path)) > 0
     return ret

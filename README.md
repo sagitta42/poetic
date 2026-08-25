@@ -46,6 +46,8 @@ options:
   --progressbar         Set up progress bar source code (package only)
 ```
 
+Main note: `poetry new package-name` complains if directory `package-name` already exists; `poetic new package-name` only complains if it is non-empty
+
 Example:
 ```bash
 $ poetic new awesome-package --type pacakge --settings

@@ -1,5 +1,4 @@
 from abc import abstractmethod
-import os
 from pathlib import Path
 from typing import TypeVar
 
@@ -13,6 +12,7 @@ from poetic.logger import logg
 from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
+from poetic.utils.utils import path_exists_non_empty
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
@@ -205,11 +205,13 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
     def poetry_init(self):
         """
         Initialize package with poetry.
+
+        Check if setup path directory already exists and contains files.
         """
 
-        if os.path.exists(self.path):
+        if path_exists_non_empty(self.path):
             raise PoeticException(
-                f"{self.name} exists! Change name of new or existing package; or run with --update flag if you wish to update existing package."
+                f"{self.name} exists and non-empty! Change name of new or existing package; or run with --update flag if you wish to update existing package."
             )
 
     @abstractmethod

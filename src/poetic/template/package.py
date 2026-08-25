@@ -45,12 +45,23 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         Initialize package with poetry.
 
+        Run "poetry new" from within path if exists (and empty).
         Standard setup with src/package_name structure.
         Run poetry from same environment from which poetic is being called
             (not poetry from project's venv - does not exist yet)
         """
         super().poetry_init()
-        subprocess.run(["poetry", "new", self.name], cwd=self.path.parent)
+
+        poetry_args = ["poetry", "new"]
+
+        if self.path.exists():
+            package = "."
+            path = self.path
+        else:
+            package = self.name
+            path = self.path.parent
+
+        subprocess.run(poetry_args + [package], cwd=path)
 
     def setup_source_files(self):
         """

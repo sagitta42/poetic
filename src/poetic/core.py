@@ -1,5 +1,6 @@
+import os
 from pathlib import Path
-import shutil
+from send2trash import send2trash
 from time import sleep
 
 from poetic.factory import PoeticFactory
@@ -7,6 +8,7 @@ from poetic.logger import logg
 from poetic.settings.builder import SettingsBuilder
 from poetic.template.builder import TemplateBuilder
 from poetic.utils.toml import PyProjectHandler
+from poetic.utils.utils import path_exists_non_empty
 
 
 def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
@@ -22,14 +24,16 @@ def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
     poetic_factory = PoeticFactory()
     setupper = poetic_factory.build(setup_settings, path)
 
-    if overwrite and setupper.path.exists():
+    if overwrite and path_exists_non_empty(setupper.path):
         logg.warning(
-            f"Removing directory in path {setupper.path} before setup in 5 seconds! Press Ctrl+C or stop test to cancel",
+            f"Cleaning directory in path {setupper.path} before setup in 5 seconds! Press Ctrl+C, or stop test to cancel",
             important=True,
         )
         sleep(5)
-        shutil.rmtree(setupper.path)
-        logg.warning(f"Removed old directory in {setupper.path}", important=True)
+        for item in os.listdir(setupper.path):
+            send2trash(setupper.path / item)
+
+        logg.warning(f"Old contents of directory in {setupper.path} moved to trash", important=True)
 
     setupper.launch()
 

@@ -1,6 +1,12 @@
 [project]
 authors = [{name = "sagitta42", email = "mariia.redchuk@gmail.com"}]
-dependencies = ["poetry (>=2.3.4,<3.0.0)", "dotenv (>=0.9.9,<0.10.0)", "pyyaml (>=6.0.3,<7.0.0)", "pydantic (>=2.13.4,<3.0.0)"]
+dependencies = [
+  "poetry (>=2.3.4,<3.0.0)",
+  "dotenv (>=0.9.9,<0.10.0)",
+  "pyyaml (>=6.0.3,<7.0.0)",
+  "pydantic (>=2.13.4,<3.0.0)",
+  "send2trash (>=2.1.0,<3.0.0)",
+]
 description = ""
 name = "poetic"
 readme = "README.md"
