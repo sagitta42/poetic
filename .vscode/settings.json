@@ -13,5 +13,7 @@
     "python.analysis.typeCheckingMode": "standard",
     "files.refactoring.autoSave": true,
     "python.analysis.autoImportCompletions": true,
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "git.autofetch": true,
+    "git.autofetchPeriod": 180
 }
