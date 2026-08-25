@@ -17,7 +17,7 @@ def get_package_source(pip_str: str) -> tuple[str, str]:
 
     Remove final "/" in filepath.
     """
-    package, path = get_package_info(pip_str, "@")
+    package, path = get_package_info(pip_str, " @ ")
     path = path.removesuffix("/")
     return package, path
 
