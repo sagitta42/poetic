@@ -32,11 +32,14 @@ class SetupSettings(BaseModel):
     no_commit: bool = Field(default=False, description="Do not commit changes")
 
     @classmethod
-    def options(cls, arg: str) -> list | None:
+    def options(cls, arg: str, none_is_option: bool = False) -> list | None:
         field_type = cls._get_field(arg).annotation
         assert field_type is not None
         if issubclass(field_type, enum.Enum):
-            return [item.value for item in field_type if not item.name == "none"]
+            ret = [item.value for item in field_type]
+            if not none_is_option:
+                ret = [value for value in ret if not value == "none"]
+            return ret
         return None
 
     @classmethod

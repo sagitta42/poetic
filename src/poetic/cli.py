@@ -31,7 +31,7 @@ def add_bool(
     Add bool argument.
 
     exclusive: exclusive to these settings
-    
+
     informative: if just --flag is provided with no option, assume const value
     """
 
@@ -51,6 +51,7 @@ def add_str(
     flag: bool = True,
     exclusive: bool = False,
     informative: bool = True,
+    none_is_option: bool = False,
 ):
     """
     Add string argument.
@@ -71,7 +72,7 @@ def add_str(
         arg_name,
         type=str,
         default=help.default(name) if optional else None,
-        choices=help.options(name),
+        choices=help.options(name, none_is_option),
         nargs="?" if optional else None,
         const=help.const(name) if informative else None,
         help=help.description(name, exclusive=exclusive),
@@ -79,7 +80,10 @@ def add_str(
 
 
 def add_db_arguments(
-    parser: argparse.ArgumentParser, help: Type[SetupSettings], informative: bool = True
+    parser: argparse.ArgumentParser,
+    help: Type[SetupSettings],
+    informative: bool,
+    none_is_option: bool,
 ):
     """
     Add arguments for DB setup to given parser.
@@ -88,7 +92,13 @@ def add_db_arguments(
         (can be DBSettings or AppTemplateSettings, for example)
     """
     add_str(
-        parser, "db", help=help, optional=True, exclusive=True, informative=informative
+        parser,
+        "db",
+        help=help,
+        optional=True,
+        exclusive=True,
+        informative=informative,
+        none_is_option=none_is_option,
     )
 
 
@@ -105,7 +115,9 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
         help="Type of functionality",
     )
 
-    add_db_arguments(parser, AppTemplateSettings, informative=informative)
+    add_db_arguments(
+        parser, AppTemplateSettings, informative=informative, none_is_option=False
+    )
 
     add_bool(
         parser,
@@ -158,7 +170,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         help="Type of functionality",
     )
 
-    add_db_arguments(parser, DBSettings)
+    add_db_arguments(parser, DBSettings, informative=True, none_is_option=False)
     add_str(parser, "subfolder", LoggerSettings, optional=True, informative=False)
 
     add_bool(parser, "no-commit", SetupSettings)
