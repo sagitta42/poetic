@@ -73,7 +73,7 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
 
         if self._has_dual_packages() and self._settings.local:
             self._uninstall_dual_packages(InstallSource.local)
-            for package in self._get_dual_packages_of_interest():
+            for package in self._get_local_packages_of_interest():
                 self.pip("install", package.source)
 
     def _full_poetry_install(self):
@@ -92,7 +92,7 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
         """
         Determine if packages with dual dependencies are present.
         """
-        return len(self._all_dual_packages) > 0
+        return len(self._all_local_packages) > 0
 
     def _is_package_mode(self) -> bool:
         """
@@ -113,56 +113,60 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
         Skip if package is not present in pip freeze.
 
         Local install: do not perform uninstall if package already points to same install path in pip freeze.
+        Pyproject install: do not perform uninstall if package does NOT point to local path install source.
         """
-        for dual_package in self._get_dual_packages_of_interest():
-            pip_freeze_info = self._get_pip_package_info(dual_package.name)
+        for local_package in self._get_local_packages_of_interest():
+            pip_freeze_info = self._get_pip_package_info(local_package.name)
 
             if pip_freeze_info is None:
                 continue
 
-            if install_source == InstallSource.local:
-                if pip_freeze_info.source is None:
-                    continue
+            assert (
+                pip_freeze_info.source is not None
+            ), "how is there no source in pip freeze"
 
-                logg.debug(pip_freeze_info.source)
-                pip_raw_path = pip_freeze_info.source.removeprefix("file://")
-                logg.debug(pip_raw_path)
-                if dual_package.source == pip_raw_path:
+            pip_source = pip_freeze_info.source.removeprefix("file://")
+            logg.debug(pip_freeze_info.source)
+            logg.debug(pip_source)
+
+            if install_source == InstallSource.local:
+                if local_package.source == pip_source:
+                    continue
+            elif install_source == InstallSource.pyproject:
+                if local_package.source != pip_source:
                     continue
 
             logg.info(
-                f"Replacing dual package {dual_package.name} with {install_source} dependency:",
+                f"Replacing dual package {local_package.name} with {install_source} dependency:",
                 header=True,
             )
+            logg.info(f"{pip_freeze_info.source} -> {local_package.source}")
 
-            if pip_freeze_info.source is not None:
-                logg.info(f"{pip_freeze_info.source} -> {dual_package.source}")
+            self.pip("uninstall", local_package.name)
 
-            self.pip("uninstall", dual_package.name)
-
-    def _get_dual_packages_of_interest(self) -> list[PackageInfo]:
+    def _get_local_packages_of_interest(self) -> list[PackageInfo]:
         """
-        Get list of packages of interest for install.
+        Get list of local packages of interest for install.
 
-        All dual dependency packages if no specific package requested.
+        All local packages if no specific package requested.
         """
 
         ret = (
-            [self._dual_package_map[self._settings.package]]
+            [self._local_package_map[self._settings.package]]
             if self._settings.package != ""
-            else self._all_dual_packages
+            else self._all_local_packages
         )
         return ret
 
     @cached_property
-    def _dual_package_map(self) -> dict[str, PackageInfo]:
-        ret = {package.name: package for package in self._all_dual_packages}
+    def _local_package_map(self) -> dict[str, PackageInfo]:
+        ret = {package.name: package for package in self._all_local_packages}
         return ret
 
     @cached_property
-    def _all_dual_packages(self) -> list[PackageInfo]:
+    def _all_local_packages(self) -> list[PackageInfo]:
         """
-        Get list of all dual dependency packages from poetic toml.
+        Get list of all local packages from poetic toml.
         """
         poetic_settings = self._poetic_toml.get_section("dependency-groups")
         local_deps_items = poetic_settings.get("local", [])
