@@ -142,7 +142,7 @@ class InstallSetup(BaseDependencySetup[InstallSettings]):
             )
             logg.info(f"{pip_freeze_info.source} -> {local_package.source}")
 
-            self.pip("uninstall", local_package.name)
+            self.pip("uninstall", local_package.name, "-y")
 
     def _get_local_packages_of_interest(self) -> list[PackageInfo]:
         """
