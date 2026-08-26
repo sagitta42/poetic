@@ -4,7 +4,7 @@ from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
 from poetic.item.db.sqlite import SQLiteSetup
 from poetic.settings.item import DBSettings, DBType
-from poetic.utils.docker import EnvVar
+from poetic.utils.docker import DBEnvVars, EnvVar
 
 
 class DualDBSetup(BaseDBSetup):
@@ -20,20 +20,16 @@ class DualDBSetup(BaseDBSetup):
         db_setup_builder = DBSetupBuilder()
         db_settings = settings.model_copy()
         db_settings.dev_sqlite = False
-        self._db_setup = db_setup_builder.build(db_settings, self.path, core=False)
+        self._db_main = db_setup_builder.build(db_settings, self.path, core=False)
 
         self._sqlite_setup = SQLiteSetup(self.path, core=False)
 
     @property
-    def db_type(self) -> DBType:
-        return self._db_setup.db_type
-
-    @property
-    def env_vars(self) -> list[EnvVar]:
+    def env_vars(self) -> DBEnvVars:
         """
         docker env variables - vars of the main setup
         """
-        return self._db_setup.env_vars
+        return self._db_main.env_vars
 
     def setup(self):
         """
@@ -45,7 +41,7 @@ class DualDBSetup(BaseDBSetup):
         Add SQLite notes to README.
         """
 
-        self._db_setup.setup()
+        self._db_main.setup()
         self._sqlite_setup.setup_db()
         self._env.add_comment(
             "Comment out these variables to replace psql with SQLite in alembic migrations and app"

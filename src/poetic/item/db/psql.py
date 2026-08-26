@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Any
 
 
 from poetic.item.db.base import DBSetup
@@ -15,8 +14,6 @@ class PsqlDBSetup(DBSetup):
 
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
-
-        self._service_name = "db"
 
         self._env_vars.name.service_name = "POSTGRES_DB"
         self._env_vars.host = EnvVar(name="DB_HOST", value="localhost")
@@ -61,7 +58,7 @@ class PsqlDBSetup(DBSetup):
         Set up docker-compose with PSQL.
 
         Set up DB service in docker-compose.
-        Set container name.
+        Set service and container name.
         Set up environment variables in service environment.
         Set up port.
         """
@@ -69,11 +66,14 @@ class PsqlDBSetup(DBSetup):
 
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._docker.update_from_template(path_to_template)
+
+        self._docker.rename_service("db", self.service_name)
+
         self._docker.update_service_container_name(
-            self._service_name, f"db_{self._settings.db_type.value}"
+            self.service_name, f"db_{self._settings.db_type.value}"
         )
         self._docker.update_service_env_vars(
-            self._service_name, self._env_vars.set_vars, user_service_var_names=True
+            self.service_name, self._env_vars.set_vars, user_service_var_names=True
         )
         self._update_service_port()
 
@@ -83,7 +83,7 @@ class PsqlDBSetup(DBSetup):
         """
 
         service = self._docker.get_service(
-            self._service_name, create_if_not_present=True
+            self.service_name, create_if_not_present=True
         )
 
         if "ports" not in service:
@@ -96,4 +96,4 @@ class PsqlDBSetup(DBSetup):
         else:
             ports.append(port_str)
 
-        self._docker.update_service(self._service_name, service)
+        self._docker.update_service(self.service_name, service)

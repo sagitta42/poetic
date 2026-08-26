@@ -87,15 +87,6 @@ class DockerComposeHandler:
         # TODO: store docker compose in member, update, write at the end
         self._write(yml_info)
 
-    def update_service(self, service_name: str, service_dict: dict[str, Any]):
-        """
-        Update docker compose service with given dict.
-        """
-        yml_info = self._read()
-        yml_info["services"][service_name] = service_dict
-        # TODO: store docker compose in member, update, write at the end
-        self._write(yml_info)
-
     def update_service_env_vars(
         self, service_name: str, env_vars: list[EnvVar], user_service_var_names: bool
     ):
@@ -108,18 +99,33 @@ class DockerComposeHandler:
         Set environment variable to be picked up from .env.template
             with the same name i.e. ${VAR} format.
         """
+        for env_var in env_vars:
+            var_name = (
+                env_var.service_env_name if user_service_var_names else env_var.name
+            )
+            self.set_service_env_var(service_name, var_name, env_var.dollar)
+
+    def rename_service(self, old_name: str, new_name: str):
+        """
+        Rename service.
+        """
+        yml_info = self._read()
+
+        services = yml_info["services"]
+        services[new_name] = services.pop(old_name)
+        self._write(yml_info)
+
+    def set_service_env_var(self, service_name: str, var: str, value: str):
+        """
+        Set/update environment variable value in service.
+        """
         service = self.get_service(service_name, create_if_not_present=True)
 
         if "environment" not in service:
             service["environment"] = {}
         env = service["environment"]
 
-        for env_var in env_vars:
-            var_name = (
-                env_var.service_env_name if user_service_var_names else env_var.name
-            )
-            env[var_name] = env_var.dollar
-
+        env[var] = value
         self.update_service(service_name, service)
 
     def add_items_to_service(self, service_name: str, items: dict[str, Any]):
@@ -129,6 +135,15 @@ class DockerComposeHandler:
         service = self.get_service(service_name)
         service |= items
         self.update_service(service_name, service)
+
+    def update_service(self, service_name: str, service_dict: dict[str, Any]):
+        """
+        Update docker compose service with given dict.
+        """
+        yml_info = self._read()
+        yml_info["services"][service_name] = service_dict
+        # TODO: store docker compose in member, update, write at the end
+        self._write(yml_info)
 
     def get_service(
         self, service_name: str, create_if_not_present: bool = False

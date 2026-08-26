@@ -3,6 +3,7 @@ from pathlib import Path
 
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.factory import DBSetupFactory
+from poetic.item.db.psql import PsqlDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.base import SetupType
 from poetic.settings.item import DBSettings, DBType
@@ -142,7 +143,8 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         Set up docker compose.
 
         Copy template and set container name.
-        Set up DB env variables in app service if needed.
+        Set up DB env variables in app service.
+        Set app host env variable to db service name.
         """
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._docker.update_from_template(path_to_template)
@@ -153,6 +155,9 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
             self._docker.update_service_env_vars(
                 "app", self._db.env_vars.set_vars, user_service_var_names=False
             )
+
+            host = self._db.env_vars.host.model_copy()
+            self._docker.set_service_env_var("app", host.name, self._db.service_name)
 
     def _setup_subfolders(self):
         """

@@ -15,21 +15,27 @@ from poetic.utils.docker import DBEnvVars, EnvVar
 
 
 class BaseDBSetup(BaseDependencySetup[DBSettings]):
-    pass
+    """
+    Base class for DB setup.
 
-    @property
-    @abstractmethod
-    def db_type(self) -> DBType:
-        """
-        DB type
-        """
-        pass
+    service_name: Service name in docker-compose
+    """
 
+    def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
+        super().__init__(path, settings, core)
+
+        self.service_name: str = f"db_{self._settings.db_type.value}"
+        self.db_type = self._settings.db_type
+
+    # TODO: improve - not all DBs are docker related (e.g. SQLite) - possibly subclass
     @property
     @abstractmethod
     def env_vars(self) -> DBEnvVars:
         """
-        docker env variables
+        DB env variables.
+
+        Are set up in docker.
+        May be same as .env variables or contain fewer or more variables.
         """
         pass
 
@@ -53,10 +59,6 @@ class DBSetup(BaseDBSetup):
         self._env_settings_setup = EnvSettingsSetup(
             self.path, template_setup=self._type, core=False
         )
-
-    @property
-    def db_type(self) -> DBType:
-        return self._settings.db_type
 
     @property
     def env_vars(self) -> DBEnvVars:
