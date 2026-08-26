@@ -1,0 +1,6 @@
+{
+    "type": "app",
+    "name": "test-dual",
+    "db_type": "psql",
+    "dev_sqlite": true
+}

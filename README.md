@@ -33,17 +33,21 @@ options:
 
 ```bash
 $ poetic new -h
-usage: poetic new [-h] [--type {package,app}] [--db [{sqlite,psql}]] [--settings] [--progressbar] name
+usage: poetic new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--settings] [--progressbar] name
 
 positional arguments:
   name                  Template/repository name
 
 options:
   -h, --help            show this help message and exit
-  --type {package,app}  Template type
-  --db [{sqlite,psql}]  Create/update DB functionalities of given DB type (app only)
+  --type [{package,app}]
+                        Type of functionality
+  --db-type [{sqlite,psql}]
+                        Database type (app only)
+  --dev-sqlite          Development mode switch to SQLite (db only)
   --settings            Set up .env Settings class (package only)
   --progressbar         Set up progress bar source code (package only)
+
 ```
 
 Main note: `poetry new package-name` complains if directory `package-name` already exists; `poetic new package-name` only complains if it is non-empty
@@ -55,13 +59,15 @@ $ poetic new awesome-package --type pacakge --settings
 
 Available package types:
 - `package` to create a package template (default)
-- `p` to create a simple web app template
+- `app` to create a simple web app template
 
 Add `--db` flag to set up `alembic` migrations and DB of given type (applies to `app` template type only)
 
 Available DB types:
 - `sqlite` to set up a local SQLite DB (default)
-- `psql` to set up PostgreSQL service (currently only a minimal `docker-compose` template setup, more features to come)
+- `psql` to set up PostgreSQL service in `docker-compose.yml`
+
+Add `--dev-sqlite` flag to set up dual psql/SQLite setup with switch to SQLite via `.env` variables for local development testing.
 
 Add `--settings` flag to set up `pydantic_settings` based `Settings` class containing `.env` variables (applies to `package` template only; app template always includes this class / source file)
 
@@ -85,7 +91,7 @@ See detailed examples in [Template examples][#templates]
 
 ```bash
 $ poetic add -h
-usage: poetic add [-h] [--no-commit] [--db [{sqlite,psql}]] {vscode,gitignore,db,logger}
+usage: poetic add [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
 
 positional arguments:
   {vscode,gitignore,db,logger}
@@ -93,14 +99,19 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
+  --db-type [{sqlite,psql}]
+                        Database type (db only)
+  --dev-sqlite          Development mode switch to SQLite (db only)
+  --subfolder [SUBFOLDER]
+                        Subfolder of setup
   --no-commit           Do not commit changes
-  --db [{sqlite,psql}]  Database type (db only)
+
 ```
 
 Single functionalities added to current directory:
 - `poetic add vscode` - creates/updates `.vscode` setup
 - `poetic add gitignore` - creates/updates `.gitignore`
-- `poetic add db --db sqlite` - sets up DB of given type
+- `poetic add db --db psql --dev-sqlite` - sets up psql DB with dev mode switch to SQLite
 
 If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 

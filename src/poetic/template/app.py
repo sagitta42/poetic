@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from poetic.item.db.base import BaseDBSetup
-from poetic.item.db.builder import DBSetupBuilder
+from poetic.item.db.factory import DBSetupFactory
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.template import AppTemplateSettings
@@ -15,12 +15,14 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         super().__init__(settings, path)
 
         self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
-        db_setup_builder = DBSetupBuilder()
+        db_setup_builder = DBSetupFactory()
         self._db: BaseDBSetup | None = (
             None
             if settings.db_type == DBType.none
             else db_setup_builder.build(
-                DBSettings(db_type=settings.db_type), self.path, core=False
+                DBSettings(db_type=settings.db_type, dev_sqlite=settings.dev_sqlite),
+                self.path,
+                core=False,
             )
         )
 

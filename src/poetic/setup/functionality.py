@@ -7,6 +7,7 @@ from dotenv import set_key
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.base import BaseSetup
+from poetic.utils.env import DotEnv
 from poetic.utils.readme import Readme
 from poetic.utils.misc import POETIC_LINK
 
@@ -33,6 +34,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         super().__init__(path, settings, core)
 
         self._readme = Readme(self.path)
+        self._env = DotEnv(self.path)
 
     @abstractmethod
     def setup(self) -> None:
@@ -68,7 +70,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         Set up .env.template.
         """
         logg.info("...setting up .env template", header=True)
-        self._update_env("DEBUG", 1)
+        self._env.set("DEBUG", 1)
 
     def setup_readme(self):
         """
@@ -86,19 +88,6 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
             logg.info(f"[not committed] {suggest_commit}")
         else:
             logg.info(f"{self.title} functionality setup DONE")
-
-    def _update_env(self, name: str, value: Any, path_to_dotenv: Path | None = None):
-        """
-        Update .env file with given variable value.
-
-        Defaults to .env.template file in root directory of setup.
-
-        .env file will be created if does not exist.
-        """
-        filepath = path_to_dotenv or self.path / ".env.template"
-
-        set_key(filepath, name, str(value), quote_mode="never")
-        logg.debug(f"{filepath} {name}={value}")
 
     def _commit_message(self, mod_type: str) -> str:
         """

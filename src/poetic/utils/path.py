@@ -60,7 +60,7 @@ class File(PathUtil):
 
         prepend (bool): add to top of file instead of bottom
         """
-        new_line = f"{line}\n"
+        new_line = f"{line}"
         updated_lines = (
             [new_line] + self._lines if prepend else self._lines + [new_line]
         )

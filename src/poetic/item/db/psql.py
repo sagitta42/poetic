@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel, Field
 
-from poetic.item.db.base import BaseDBSetup, EnvVar
+from poetic.item.db.base import DBSetup, EnvVar
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
 from poetic.utils.docker import DockerHandler
 
 
-class PsqlDBSetup(BaseDBSetup):
+class PsqlDBSetup(DBSetup):
     """
     PSQL database setup.
     """

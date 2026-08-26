@@ -38,6 +38,10 @@ class EnvVar(BaseModel):
 
 
 class BaseDBSetup(BaseDependencySetup[DBSettings]):
+    pass
+
+
+class DBSetup(BaseDBSetup):
     """
     DB setup.
 
@@ -150,8 +154,14 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
         """
         super().setup_dotenv_template()
 
+        self.add_env_vars()
+
+    def add_env_vars(self, comment: bool = False):
+        """
+        Add env vars to .env template as values or commented out.
+        """
         for env_var in self.dotenv_vars:
-            self._update_env(**env_var.model_dump())
+            self._env.set(**env_var.model_dump(), comment=comment)
 
     def setup_readme(self):
         """
