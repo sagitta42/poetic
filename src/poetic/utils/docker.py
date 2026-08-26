@@ -6,6 +6,10 @@ import yaml
 
 
 class EnvVar(BaseModel):
+    """
+    Environment variable in .env template or docker-compose.yml
+    """
+
     name: str = Field(description="Variable name")
     value: Any = Field(description="Variable value")
     service_name: Optional[str] = Field(
@@ -24,6 +28,28 @@ class EnvVar(BaseModel):
         Get ${var} string.
         """
         ret = f"${{{self.name}}}"
+        return ret
+
+
+class DBEnvVars(BaseModel):
+    """
+    Database environment variables
+    """
+
+    db_type: EnvVar
+    host: EnvVar
+    name: EnvVar
+    user: EnvVar | None = None
+    password: EnvVar | None = None
+    port: EnvVar | None = None
+
+    @property
+    def set_vars(self) -> list[EnvVar]:
+        """
+        Non null variables
+        """
+        all_fields = self.__dict__.values()
+        ret = [var for var in all_fields if var is not None]
         return ret
 
 

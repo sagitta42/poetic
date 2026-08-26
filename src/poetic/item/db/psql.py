@@ -5,7 +5,7 @@ from typing import Any
 from poetic.item.db.base import DBSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
-from poetic.utils.docker import DockerComposeHandler, EnvVar
+from poetic.utils.docker import DBEnvVars, DockerComposeHandler, EnvVar
 
 
 class PsqlDBSetup(DBSetup):
@@ -18,33 +18,28 @@ class PsqlDBSetup(DBSetup):
 
         self._service_name = "db"
 
-        self._db_name.service_name = "POSTGRES_DB"
-        self._env_vars += [
-            EnvVar(name="DB_HOST", value="localhost"),
-            EnvVar(name="DB_USER", value="user", service_name="POSTGRES_USER"),
-            EnvVar(
-                name="DB_PASSWORD", value="changeme", service_name="POSTGRES_PASSWORD"
-            ),
-        ]
+        self._env_vars.name.service_name = "POSTGRES_DB"
+        self._env_vars.host = EnvVar(name="DB_HOST", value="localhost")
+        self._env_vars.user = EnvVar(
+            name="DB_USER", value="user", service_name="POSTGRES_USER"
+        )
+        self._env_vars.password = EnvVar(
+            name="DB_PASSWORD", value="changeme", service_name="POSTGRES_PASSWORD"
+        )
         self._port = EnvVar(name="DB_PORT", value=5432)
 
         self._docker = DockerComposeHandler(self.path)
 
     @property
-    def env_vars(self) -> list[EnvVar]:
-        """
-        docker env variables
-        """
-        return self._env_vars
-
-    @property
-    def dotenv_vars(self) -> list[EnvVar]:
+    def dotenv_vars(self) -> DBEnvVars:
         """
         .env variables
 
         Composed of environment variables + port.
         """
-        return super().dotenv_vars + [self._port]
+        ret = self.env_vars.model_copy()
+        ret.port = self._port
+        return ret
 
     def setup_dependencies(self):
         """
@@ -78,7 +73,7 @@ class PsqlDBSetup(DBSetup):
             self._service_name, f"db_{self._settings.db_type.value}"
         )
         self._docker.update_service_env_vars(
-            self._service_name, self._env_vars, user_service_var_names=True
+            self._service_name, self._env_vars.set_vars, user_service_var_names=True
         )
         self._update_service_port()
 

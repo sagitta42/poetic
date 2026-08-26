@@ -151,7 +151,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
         if self._db is not None and self._db.db_type == DBType.psql:
             self._docker.update_service_env_vars(
-                "app", self._db.env_vars, user_service_var_names=False
+                "app", self._db.env_vars.set_vars, user_service_var_names=False
             )
 
     def _setup_subfolders(self):

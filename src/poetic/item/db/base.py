@@ -11,7 +11,7 @@ from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType
 from poetic.setup.dependency import BaseDependencySetup
-from poetic.utils.docker import EnvVar
+from poetic.utils.docker import DBEnvVars, EnvVar
 
 
 class BaseDBSetup(BaseDependencySetup[DBSettings]):
@@ -27,7 +27,7 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
 
     @property
     @abstractmethod
-    def env_vars(self) -> list[EnvVar]:
+    def env_vars(self) -> DBEnvVars:
         """
         docker env variables
         """
@@ -44,11 +44,11 @@ class DBSetup(BaseDBSetup):
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
-        self._db_name = EnvVar(name="DB_NAME", value="database")
-        self._env_vars = [
-            EnvVar(name="DB_TYPE", value=self._settings.db_type.value),
-            self._db_name,
-        ]
+        self._env_vars = DBEnvVars(
+            db_type=EnvVar(name="DB_TYPE", value=self._settings.db_type.value),
+            name=EnvVar(name="DB_NAME", value="database"),
+            host=EnvVar(name="DB_HOST", value="changeme"),
+        )
 
         self._env_settings_setup = EnvSettingsSetup(
             self.path, template_setup=self._type, core=False
@@ -59,7 +59,14 @@ class DBSetup(BaseDBSetup):
         return self._settings.db_type
 
     @property
-    def dotenv_vars(self) -> list[EnvVar]:
+    def env_vars(self) -> DBEnvVars:
+        """
+        docker env variables
+        """
+        return self._env_vars
+
+    @property
+    def dotenv_vars(self) -> DBEnvVars:
         """
         .env variables
         """
@@ -157,7 +164,7 @@ class DBSetup(BaseDBSetup):
         """
         Add env vars to .env template as values or commented out.
         """
-        for env_var in self.dotenv_vars:
+        for env_var in self.dotenv_vars.set_vars:
             self._env.set(**env_var.model_dump(), comment=comment)
 
     def setup_readme(self):

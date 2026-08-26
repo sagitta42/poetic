@@ -31,20 +31,12 @@ class SQLiteSetup(DBSetup):
     ) -> None:
         super().__init__(path, settings, core)
 
-        self._db_host = EnvVar(name="DB_HOST", value="db")
-        self._env_vars += [self._db_host]
+        self._env_vars.host = EnvVar(name="DB_HOST", value="db")
 
-        self._db_dir = Path(self._db_host.value)
-        self._filename = f"{self._db_name.value}.db"
+        self._db_dir = Path(self._env_vars.host.value)
+        self._filename = f"{self._env_vars.name.value}.db"
 
         self._local_db_path: str = str(self._db_dir / self._filename)
-
-    @property
-    def env_vars(self) -> list[EnvVar]:
-        """
-        docker env variables
-        """
-        return []
 
     def setup_db(self):
         """
