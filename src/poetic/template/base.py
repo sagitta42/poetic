@@ -3,14 +3,12 @@ from pathlib import Path
 from typing import TypeVar
 
 from poetic.exceptions import PoeticException
-from poetic.item.gitignore import GitignoreSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
 from poetic.setup.poetry import BasePoetrySetup
-from poetic.utils.path import Dir, File
-from poetic.utils.template import TemplateLocation
+from poetic.utils.path import Dir
 from poetic.utils.tree import display
 from poetic.utils.misc import POETIC_LINK
 
@@ -55,7 +53,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
         self._env_settings_setup: EnvSettingsSetup | None = None
-        self._gitignore = GitignoreSetup(self.path)
 
         logg.info(f"Setting up {self._type.value}: {self.name}")
 
@@ -143,9 +140,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         Main setup.
 
-        Additional setup: set up repository.
-
-        Set up standard Python gitignore.
         Set up source files.
         Set up pydantic-settings class for if requested.
         Set up .vscode launch and settings.
@@ -154,7 +148,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         super().setup()
 
-        self._gitignore.setup()
         self.setup_source_files()
 
         if self._env_settings_setup is not None:
@@ -162,7 +155,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         self._vscode.setup()
 
         self.setup_pyproject()
-        self.setup_poetic_toml()
 
     def setup_dependencies(self):
         super().setup_dependencies()
@@ -198,18 +190,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
             "tool.poetic", self._settings.core_settings()
         )
         self._pyproject_handler.save_toml()
-
-    def setup_poetic_toml(self):
-        """
-        Setup poetic.toml template.
-
-        Set up poetic.toml.template file.
-        Add poetic.toml to .gitignore.
-        """
-        self._templates.copy(
-            "poetic.toml.template", template_location=TemplateLocation.common_ass
-        )
-        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
 
     def display(self, suggest_commit: str | None = None):
         """

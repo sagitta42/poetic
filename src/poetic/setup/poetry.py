@@ -2,10 +2,13 @@ from abc import abstractmethod
 import os
 from pathlib import Path
 
+from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.venv import BaseVenvSetup
+from poetic.utils.path import File
+from poetic.utils.template import TemplateLocation
 from poetic.utils.toml import PyProjectHandler
 
 
@@ -24,6 +27,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         super().__init__(path, settings, core)
 
         self._vscode = VSCodeSetup(self.path, core=False)
+        self._gitignore = GitignoreSetup(self.path)
         self._pyproject_handler = PyProjectHandler(self.path)
 
     @abstractmethod
@@ -36,25 +40,53 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         """
         logg.info("...setting up dependencies", header=True)
 
+    def launch(self) -> None:
+        """
+        Launch procedure for dependency setup.
+
+        When this setup is launched i.e. is the main setup,
+            - if it is not a git repository already, init git repository.
+            - Set up standard gitignore if does not exist.
+        """
+        if not self.git.is_git_repo:
+            self.git.run("init")
+
+        path_to_gitignore = self.path / ".gitignore"
+        if not path_to_gitignore.exists():
+            self._gitignore.setup()
+
+        super().launch()
+
     def setup(self) -> None:
         """
         Main setup.
 
-        In addition to previous setup:
-            - set up poetry: install poetry in current environment (the one from which poetic is launched)
-            - set up dependencies
-
         If no pyproject.toml found, do fresh init.
         (standalone setup rather than adding to existing)
         Consider name of directory in which setup is launched as project name.
+
+        Set up dependencies.
         """
 
         super().setup()
 
         if not self._pyproject_handler.path.exists():
             self._poetry_basic_init(self.path.stem)
-            
+
         self.setup_dependencies()
+        self.setup_poetic_toml()
+
+    def setup_poetic_toml(self):
+        """
+        Setup poetic.toml template.
+
+        Set up poetic.toml.template file.
+        Add poetic.toml to .gitignore.
+        """
+        self._templates.copy(
+            "poetic.toml.template", template_location=TemplateLocation.common_ass
+        )
+        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
 
     def post_setup(self):
         """
