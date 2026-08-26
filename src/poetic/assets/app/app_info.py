@@ -20,7 +20,7 @@ class PyProjectInfoBuilder:
     def build(self) -> AppInfo:
         with open(self._pyproject_path, "rb") as f:
             py_info = tomllib.load(f)
-        project_info = py_info["project"]
+        project_info = py_info["project"] if "project" in py_info else py_info["tool"]["poetry"]
         ret = AppInfo(name=project_info["name"], version=project_info["version"])
         return ret
 
