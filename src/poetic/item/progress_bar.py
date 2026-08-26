@@ -1,11 +1,11 @@
 from pathlib import Path
 
 from poetic.settings.item import ProgressBarSettings
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 
 
 class ProgressBarSetup(
-    BaseDependencySetup[ProgressBarSettings],
+    BasePoetrySetup[ProgressBarSettings],
 ):
     def __init__(
         self,

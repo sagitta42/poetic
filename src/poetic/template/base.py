@@ -8,17 +8,16 @@ from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 from poetic.utils.path import Dir, File
 from poetic.utils.template import TemplateLocation
-from poetic.utils.toml import PyProjectHandler
 from poetic.utils.tree import display
 from poetic.utils.misc import POETIC_LINK
 
 T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
 
-class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
+class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
     """
     General template setup.
 
@@ -57,7 +56,6 @@ class BaseTemplate(BaseDependencySetup[T_TemplateSettings]):
 
         self._env_settings_setup: EnvSettingsSetup | None = None
         self._gitignore = GitignoreSetup(self.path)
-        self._pyproject_handler = PyProjectHandler(self.path)
 
         logg.info(f"Setting up {self._type.value}: {self.name}")
 

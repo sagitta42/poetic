@@ -7,7 +7,7 @@ from poetic.exceptions import PoeticException
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 from poetic.setup.venv import PackageInfo
 from poetic.utils.pip import get_package_source
 from poetic.utils.toml import PyProjectHandler, TomlHandler
@@ -21,7 +21,7 @@ class InstallSource(str, enum.Enum):
         return self.value
 
 
-class InstallSetup(BaseDependencySetup[InstallSettings]):
+class InstallSetup(BasePoetrySetup[InstallSettings]):
     """
     Install functionalities on top of standard poetry.
 

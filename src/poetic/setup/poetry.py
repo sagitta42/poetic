@@ -6,9 +6,10 @@ from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.venv import BaseVenvSetup
+from poetic.utils.toml import PyProjectHandler
 
 
-class BaseDependencySetup(BaseVenvSetup[T_Settings]):
+class BasePoetrySetup(BaseVenvSetup[T_Settings]):
     """
     General functionality setup with poetry dependencies.
 
@@ -23,6 +24,7 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
         super().__init__(path, settings, core)
 
         self._vscode = VSCodeSetup(self.path, core=False)
+        self._pyproject_handler = PyProjectHandler(self.path)
 
     @abstractmethod
     def setup_dependencies(self) -> None:
@@ -41,10 +43,17 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
         In addition to previous setup:
             - set up poetry: install poetry in current environment (the one from which poetic is launched)
             - set up dependencies
+
+        If no pyproject.toml found, do fresh init.
+        (standalone setup rather than adding to existing)
+        Consider name of directory in which setup is launched as project name.
         """
 
         super().setup()
 
+        if not self._pyproject_handler.path.exists():
+            self._poetry_basic_init(self.path.stem)
+            
         self.setup_dependencies()
 
     def post_setup(self):
@@ -67,6 +76,20 @@ class BaseDependencySetup(BaseVenvSetup[T_Settings]):
             args += ["--group", group]
 
         self.poetry(*args)
+
+    def _poetry_basic_init(self, name: str):
+        """
+        Basic poetry init with no structure.
+        """
+        self.run(
+            "poetry",
+            "init",
+            "--no-interaction",
+            "--name",
+            name,
+            "--description",
+            "",
+        )
 
     def poetry(self, *args):
         """

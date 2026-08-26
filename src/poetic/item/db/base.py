@@ -10,11 +10,11 @@ from pydantic import BaseModel, Field
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 from poetic.utils.docker import DBEnvVars, EnvVar
 
 
-class BaseDBSetup(BaseDependencySetup[DBSettings]):
+class BaseDBSetup(BasePoetrySetup[DBSettings]):
     """
     Base class for DB setup.
 

@@ -1,12 +1,12 @@
 from pathlib import Path
 
 from poetic.settings.item import LoggerSettings
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 from poetic.utils.path import File
 from poetic.utils.template import TemplateLocation
 
 
-class LoggerSetup(BaseDependencySetup[LoggerSettings]):
+class LoggerSetup(BasePoetrySetup[LoggerSettings]):
     """
     Set up logger source file.
     """

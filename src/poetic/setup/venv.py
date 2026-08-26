@@ -19,10 +19,8 @@ class PackageInfo(BaseModel):
 
 class BaseVenvSetup(BaseFunctionalitySetup[T_Settings], BaseCommandRunner):
     """
-    General functionality setup with venv.
-
-    Includes additional operations: venv setup
-    """
+    General functionality setup with pip and venv.
+w    """
 
     def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
         BaseFunctionalitySetup.__init__(self, path, settings, core)

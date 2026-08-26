@@ -7,7 +7,7 @@ from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.settings.base import SetupSettings, SetupType
 from poetic.setup.builder import BaseSetupBuilder
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 
 
 class ItemSetupClass(enum.Enum):

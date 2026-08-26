@@ -39,17 +39,10 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         Disable package mode.
         """
         super().poetry_init()
+
         os.makedirs(self.path, exist_ok=True)
 
-        self.run(
-            "poetry",
-            "init",
-            "--no-interaction",
-            "--name",
-            self.name,
-            "--description",
-            "",
-        )
+        self._poetry_basic_init(self.name)
 
     def setup(self) -> None:
         """

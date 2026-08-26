@@ -18,7 +18,7 @@ class TomlHandler:
     """
 
     def __init__(self, path_to_toml: Path):
-        self._path = path_to_toml
+        self.path = path_to_toml
 
         self._toml_dict_original: dict | None = None
         self._toml_dict: dict = {}
@@ -62,7 +62,7 @@ class TomlHandler:
             self._toml_dict.pop(name)
 
     def save_toml(self):
-        with open(self._path, "w") as f:
+        with open(self.path, "w") as f:
             tomlkit.dump(self._toml_dict, f)
 
     def read(self):
@@ -74,9 +74,9 @@ class TomlHandler:
         It is supposed to be read only once, and changes kept track in class.
         """
         if self._toml_dict_original is not None:
-            raise RuntimeError(f"{self._path} has already been read!")
-        if self._path.exists():
-            with open(self._path, "rb") as f:
+            raise RuntimeError(f"{self.path} has already been read!")
+        if self.path.exists():
+            with open(self.path, "rb") as f:
                 self._toml_dict_original = tomlkit.load(f)
         else:
             self._toml_dict_original = {}
@@ -96,7 +96,7 @@ class PyProjectHandler(TomlHandler):
 
     def get_template_settings(self) -> dict:
         """
-        Get poetic settings from pyproject.toml (if any).
+        Get template settings from pyproject.toml (if any).
         """
         settings: dict[str, Any] = self.get_section("tool.poetic")
         if settings == {}:

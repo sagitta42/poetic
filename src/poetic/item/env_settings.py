@@ -2,11 +2,11 @@ from pathlib import Path
 
 from poetic.settings.base import SetupType
 from poetic.settings.item import DotenvSettings
-from poetic.setup.dependency import BaseDependencySetup
+from poetic.setup.poetry import BasePoetrySetup
 from poetic.utils.template import TemplateManager
 
 
-class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
+class EnvSettingsSetup(BasePoetrySetup[DotenvSettings]):
     """
     Environment Settings setup (pydantic-settings).
 
