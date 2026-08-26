@@ -4,6 +4,7 @@ from pathlib import Path
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.factory import DBSetupFactory
 from poetic.item.env_settings import EnvSettingsSetup
+from poetic.settings.base import SetupType
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.template import AppTemplateSettings
 from poetic.template.base import BaseTemplate
@@ -14,7 +15,9 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
     def __init__(self, settings: AppTemplateSettings, path: Path | None) -> None:
         super().__init__(settings, path)
 
-        self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
+        self._env_settings_setup = EnvSettingsSetup(
+            self.path, template_setup=SetupType.db, core=False
+        )
         db_setup_builder = DBSetupFactory()
         self._db: BaseDBSetup | None = (
             None

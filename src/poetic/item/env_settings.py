@@ -1,7 +1,9 @@
 from pathlib import Path
 
+from poetic.settings.base import SetupType
 from poetic.settings.item import DotenvSettings
 from poetic.setup.dependency import BaseDependencySetup
+from poetic.utils.template import TemplateManager
 
 
 class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
@@ -13,9 +15,15 @@ class EnvSettingsSetup(BaseDependencySetup[DotenvSettings]):
     """
 
     def __init__(
-        self, path: Path, settings: DotenvSettings = DotenvSettings(), core: bool = True
+        self,
+        path: Path,
+        settings: DotenvSettings = DotenvSettings(),
+        template_setup: SetupType | None = None,
+        core: bool = True,
     ) -> None:
         super().__init__(path, settings, core)
+
+        self._templates = TemplateManager(template_setup or self._type, self.path)
 
     def setup(self) -> None:
         """

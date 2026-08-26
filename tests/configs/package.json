@@ -1,6 +1,6 @@
 {
     "type": "package",
     "name": "test-package",
-    "settings": false,
+    "settings": true,
     "progressbar": false
 }

@@ -1,5 +1,4 @@
 from abc import abstractmethod
-import enum
 import json
 import os
 from pathlib import Path
@@ -10,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
-from poetic.settings.item import DBSettings, DBType
+from poetic.settings.item import DBSettings
 from poetic.setup.dependency import BaseDependencySetup
 
 
@@ -59,7 +58,9 @@ class DBSetup(BaseDBSetup):
             self._db_name,
         ]
 
-        self._env_settings_setup = EnvSettingsSetup(self.path, core=False)
+        self._env_settings_setup = EnvSettingsSetup(
+            self.path, template_setup=self._type, core=False
+        )
 
     @property
     def dotenv_vars(self) -> list[EnvVar]:
