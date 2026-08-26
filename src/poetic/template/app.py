@@ -142,13 +142,17 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         Set up docker compose.
 
         Copy template and set container name.
-        TODO: Set up DB URL in app service if exists.
-        TODO: update DB service container name.
+        Set up DB env variables in app service if needed.
         """
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._docker.update_from_template(path_to_template)
 
         self._docker.update_service_container_name("app", f"{self.name}_app")
+
+        if self._db is not None and self._db.db_type == DBType.psql:
+            self._docker.update_service_env_vars(
+                "app", self._db.env_vars, user_service_var_names=False
+            )
 
     def _setup_subfolders(self):
         """

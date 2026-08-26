@@ -31,6 +31,13 @@ class PsqlDBSetup(DBSetup):
         self._docker = DockerComposeHandler(self.path)
 
     @property
+    def env_vars(self) -> list[EnvVar]:
+        """
+        docker env variables
+        """
+        return self._env_vars
+
+    @property
     def dotenv_vars(self) -> list[EnvVar]:
         """
         .env variables
@@ -71,7 +78,7 @@ class PsqlDBSetup(DBSetup):
             self._service_name, f"db_{self._settings.db_type.value}"
         )
         self._docker.update_service_env_vars(
-            self._service_name, self._env_vars, use_service_name=True
+            self._service_name, self._env_vars, user_service_var_names=True
         )
         self._update_service_port()
 

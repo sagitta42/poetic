@@ -39,6 +39,13 @@ class SQLiteSetup(DBSetup):
 
         self._local_db_path: str = str(self._db_dir / self._filename)
 
+    @property
+    def env_vars(self) -> list[EnvVar]:
+        """
+        docker env variables
+        """
+        return []
+
     def setup_db(self):
         """
         Set up SQLite DB.

@@ -71,10 +71,13 @@ class DockerComposeHandler:
         self._write(yml_info)
 
     def update_service_env_vars(
-        self, service_name: str, env_vars: list[EnvVar], use_service_name: bool
+        self, service_name: str, env_vars: list[EnvVar], user_service_var_names: bool
     ):
         """
         Set/update environment variables db service.
+
+        user_service_var_names: use service variable names (e.g. POSTGRES_PASSWORD) in environment
+            instead of same as .env names
 
         Set environment variable to be picked up from .env.template
             with the same name i.e. ${VAR} format.
@@ -86,7 +89,9 @@ class DockerComposeHandler:
         env = service["environment"]
 
         for env_var in env_vars:
-            var_name = env_var.service_env_name if use_service_name else env_var.name
+            var_name = (
+                env_var.service_env_name if user_service_var_names else env_var.name
+            )
             env[var_name] = env_var.dollar
 
         self.update_service(service_name, service)

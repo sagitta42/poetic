@@ -3,7 +3,8 @@ from pathlib import Path
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
 from poetic.item.db.sqlite import SQLiteSetup
-from poetic.settings.item import DBSettings
+from poetic.settings.item import DBSettings, DBType
+from poetic.utils.docker import EnvVar
 
 
 class DualDBSetup(BaseDBSetup):
@@ -22,6 +23,17 @@ class DualDBSetup(BaseDBSetup):
         self._db_setup = db_setup_builder.build(db_settings, self.path, core=False)
 
         self._sqlite_setup = SQLiteSetup(self.path, core=False)
+
+    @property
+    def db_type(self) -> DBType:
+        return self._db_setup.db_type
+
+    @property
+    def env_vars(self) -> list[EnvVar]:
+        """
+        docker env variables - vars of the main setup
+        """
+        return self._db_setup.env_vars
 
     def setup(self):
         """

@@ -9,13 +9,29 @@ from pydantic import BaseModel, Field
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
-from poetic.settings.item import DBSettings
+from poetic.settings.item import DBSettings, DBType
 from poetic.setup.dependency import BaseDependencySetup
 from poetic.utils.docker import EnvVar
 
 
 class BaseDBSetup(BaseDependencySetup[DBSettings]):
     pass
+
+    @property
+    @abstractmethod
+    def db_type(self) -> DBType:
+        """
+        DB type
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def env_vars(self) -> list[EnvVar]:
+        """
+        docker env variables
+        """
+        pass
 
 
 class DBSetup(BaseDBSetup):
@@ -28,8 +44,6 @@ class DBSetup(BaseDBSetup):
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
-        self._db_type = self._settings.db_type
-
         self._db_name = EnvVar(name="DB_NAME", value="database")
         self._env_vars = [
             EnvVar(name="DB_TYPE", value=self._settings.db_type.value),
@@ -41,6 +55,10 @@ class DBSetup(BaseDBSetup):
         )
 
     @property
+    def db_type(self) -> DBType:
+        return self._settings.db_type
+
+    @property
     def dotenv_vars(self) -> list[EnvVar]:
         """
         .env variables
@@ -49,14 +67,14 @@ class DBSetup(BaseDBSetup):
 
     @property
     def title(self) -> str:
-        return f"{super().title}: {self._db_type.value}"
+        return f"{super().title}: {self.db_type.value}"
 
     @abstractmethod
     def setup_db(self):
         """
         Set up DB.
         """
-        logg.info(f"...setting up {self._db_type.value} DB", header=True)
+        logg.info(f"...setting up {self.db_type.value} DB", header=True)
 
     def setup(self) -> None:
         """
@@ -154,7 +172,7 @@ class DBSetup(BaseDBSetup):
 
         self._readme.add_section("DB", header=2)
         path_to_db_readme = self._templates.get_filepath(
-            "README.md", subdir=self._db_type.value
+            "README.md", subdir=self.db_type.value
         )
         self._readme.update_from_template(path_to_db_readme)
 
