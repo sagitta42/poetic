@@ -8,7 +8,7 @@ from poetic.settings.base import SetupType
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.template import AppTemplateSettings
 from poetic.template.base import BaseTemplate
-from poetic.utils.docker import DockerHandler
+from poetic.utils.docker import DockerComposeHandler
 
 
 class AppTemplate(BaseTemplate[AppTemplateSettings]):
@@ -29,7 +29,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
             )
         )
 
-        self._docker = DockerHandler(self.path)
+        self._docker = DockerComposeHandler(self.path)
 
     def poetry_init(self):
         """
@@ -146,7 +146,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         TODO: update DB service container name.
         """
         path_to_template = self._templates.get_filepath("docker-compose.yml")
-        self._docker.update_docker_compose_from_template(path_to_template)
+        self._docker.update_from_template(path_to_template)
 
         self._docker.update_service_container_name("app", f"{self.name}_app")
 

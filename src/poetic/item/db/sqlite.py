@@ -3,8 +3,9 @@ from pathlib import Path
 import sqlite3
 
 
-from poetic.item.db.base import DBSetup, EnvVar
+from poetic.item.db.base import DBSetup
 from poetic.settings.item import DBSettings, DBType
+from poetic.utils.docker import EnvVar
 from poetic.utils.path import File
 
 

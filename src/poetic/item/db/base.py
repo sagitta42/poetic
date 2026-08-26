@@ -11,29 +11,7 @@ from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
 from poetic.setup.dependency import BaseDependencySetup
-
-
-# TODO: generalize .env.template util
-class EnvVar(BaseModel):
-    name: str = Field(description="Variable name")
-    value: Any = Field(description="Variable value")
-    docker: Optional[str] = Field(
-        default=None,
-        description="Variable name in docker-compose environment; defaults to name",
-        exclude=True,
-    )
-
-    @property
-    def docker_env_name(self) -> str:
-        return self.docker or self.name
-
-    @property
-    def dollar(self) -> str:
-        """
-        Get ${var} string.
-        """
-        ret = f"${{{self.name}}}"
-        return ret
+from poetic.utils.docker import EnvVar
 
 
 class BaseDBSetup(BaseDependencySetup[DBSettings]):
