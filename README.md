@@ -336,4 +336,6 @@ For this reason, even if otherwise unnecessary:
 - field type annotation is always set
 - field description is always set
 
-[#development-notes]: 
+### build assets
+
+To run tests locally, need to first run `poetry build` to generate `src/poetic/_build_assets` (see `build.py`) for non-src assets

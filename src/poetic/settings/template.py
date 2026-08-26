@@ -1,6 +1,6 @@
-from typing import Literal, Self
+from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field
 
 from poetic.settings.base import SetupSettings, SetupType
 from poetic.settings.item import DBType
@@ -45,7 +45,7 @@ class AppTemplateSettings(BaseTemplateSettings):
     type: Literal[SetupType.app] = Field(
         default=SetupType.app, description="Template type"
     )
-    db: DBType = Field(default=DBType.none, description="Database type")
+    db_type: DBType = Field(default=DBType.none, description="Database type")
 
     @classmethod
     def const(cls, arg: str) -> str:

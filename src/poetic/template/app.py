@@ -18,9 +18,9 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         db_setup_builder = DBSetupBuilder()
         self._db: BaseDBSetup | None = (
             None
-            if settings.db == DBType.none
+            if settings.db_type == DBType.none
             else db_setup_builder.build(
-                DBSettings(db=settings.db), self.path, core=False
+                DBSettings(db_type=settings.db_type), self.path, core=False
             )
         )
 

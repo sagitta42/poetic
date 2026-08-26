@@ -19,7 +19,7 @@ class Subparser(str, enum.Enum):
     update = "update"
 
 
-# TODO: OOP encalsulate duplications
+# TODO: OOP encalsulate duplications -> pydantic-argparse
 def add_bool(
     parser: argparse.ArgumentParser,
     name: str,
@@ -93,7 +93,7 @@ def add_db_arguments(
     """
     add_str(
         parser,
-        "db",
+        "db-type",
         help=help,
         optional=True,
         exclusive=True,

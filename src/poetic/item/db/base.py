@@ -47,11 +47,11 @@ class BaseDBSetup(BaseDependencySetup[DBSettings]):
     def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
-        self._db_type = self._settings.db
+        self._db_type = self._settings.db_type
 
         self._db_name = EnvVar(name="DB_NAME", value="database")
         self._env_vars = [
-            EnvVar(name="DB_TYPE", value=self._settings.db.value),
+            EnvVar(name="DB_TYPE", value=self._settings.db_type.value),
             self._db_name,
         ]
 

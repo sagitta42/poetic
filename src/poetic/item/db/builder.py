@@ -27,6 +27,6 @@ class DBSetupBuilder(BaseSetupBuilder[DBSettings]):
         Build DB setup based on DB type.
         """
         # FIXME: avoid duplication with ItemSetupBuilder
-        setup_class = DBSetupClass.from_db_type(settings.db).value
+        setup_class = DBSetupClass.from_db_type(settings.db_type).value
         ret = setup_class(path, settings, core)
         return ret

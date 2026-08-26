@@ -1,5 +1,5 @@
 {
     "type": "app",
     "name": "test-psql",
-    "db": "psql"
+    "db_type": "psql"
 }
