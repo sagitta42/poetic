@@ -118,7 +118,7 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
     )
 
     add_db_arguments(
-        parser, AppTemplateSettings, informative=informative, none_is_option=False
+        parser, AppTemplateSettings, informative=informative, none_is_option=True
     )
 
     add_bool(

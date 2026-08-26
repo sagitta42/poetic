@@ -33,7 +33,7 @@ options:
 
 ```bash
 $ poetic new -h
-usage: poetic new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--settings] [--progressbar] name
+usage: poetic new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql,none}]] [--dev-sqlite] [--settings] [--progressbar] name
 
 positional arguments:
   name                  Template/repository name
@@ -42,12 +42,11 @@ options:
   -h, --help            show this help message and exit
   --type [{package,app}]
                         Type of functionality
-  --db-type [{sqlite,psql}]
+  --db-type [{sqlite,psql,none}]
                         Database type (app only)
   --dev-sqlite          Development mode switch to SQLite (db only)
   --settings            Set up .env Settings class (package only)
   --progressbar         Set up progress bar source code (package only)
-
 ```
 
 Main note: `poetry new package-name` complains if directory `package-name` already exists; `poetic new package-name` only complains if it is non-empty
