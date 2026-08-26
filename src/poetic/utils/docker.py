@@ -1,8 +1,11 @@
+import enum
 from pathlib import Path
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 import yaml
+
+from poetic.settings.item import DBType
 
 
 class EnvVar(BaseModel):
@@ -53,6 +56,23 @@ class DBEnvVars(BaseModel):
         return ret
 
 
+class DockerImage(str, enum.Enum):
+    psql = "postgres:16-alpine"
+
+    @classmethod
+    def from_db_type(cls, db_type: DBType) -> str:
+        return cls[db_type.name].value
+
+
+class DockerHealthCheck(str, enum.Enum):
+    psql = '[ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]'
+    mongo = "mongosh --eval \"db.adminCommand('ping')\" --quiet"
+
+    @classmethod
+    def from_db_type(cls, db_type: DBType) -> str:
+        return cls[db_type.name].value
+
+
 class DockerComposeHandler:
     """
     Handler for managing docker-compose.yml
@@ -61,109 +81,6 @@ class DockerComposeHandler:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.docker_compose = self.path / "docker-compose.yml"
-
-    def update_service_container_name(self, service_name: str, container_name: str):
-        """
-        Set/Update container name of given service.
-        """
-        service = self.get_service(service_name)
-        service["container_name"] = container_name
-        self.update_service(service_name, service)
-
-    def update_from_template(self, path_to_template: Path):
-        """
-        Update given docker-compose .yml file with contents of given template.
-
-        Default to docker-compose.yml in root of setup.
-        Create file if does not exist yet.
-        """
-        yml_info = self._read()
-
-        with open(path_to_template) as f:
-            yml_template = yaml.safe_load(f)
-
-        yml_info["services"] |= yml_template["services"]
-
-        # TODO: store docker compose in member, update, write at the end
-        self._write(yml_info)
-
-    def update_service_env_vars(
-        self, service_name: str, env_vars: list[EnvVar], user_service_var_names: bool
-    ):
-        """
-        Set/update environment variables db service.
-
-        user_service_var_names: use service variable names (e.g. POSTGRES_PASSWORD) in environment
-            instead of same as .env names
-
-        Set environment variable to be picked up from .env.template
-            with the same name i.e. ${VAR} format.
-        """
-        for env_var in env_vars:
-            var_name = (
-                env_var.service_env_name if user_service_var_names else env_var.name
-            )
-            self.set_service_env_var(service_name, var_name, env_var.dollar)
-
-    def rename_service(self, old_name: str, new_name: str):
-        """
-        Rename service.
-        """
-        yml_info = self._read()
-
-        services = yml_info["services"]
-        services[new_name] = services.pop(old_name)
-        self._write(yml_info)
-
-    def set_service_env_var(self, service_name: str, var: str, value: str):
-        """
-        Set/update environment variable value in service.
-        """
-        service = self.get_service(service_name, create_if_not_present=True)
-
-        if "environment" not in service:
-            service["environment"] = {}
-        env = service["environment"]
-
-        env[var] = value
-        self.update_service(service_name, service)
-
-    def add_items_to_service(self, service_name: str, items: dict[str, Any]):
-        """
-        Add given items to service.
-        """
-        service = self.get_service(service_name)
-        service |= items
-        self.update_service(service_name, service)
-
-    def update_service(self, service_name: str, service_dict: dict[str, Any]):
-        """
-        Update docker compose service with given dict.
-        """
-        yml_info = self._read()
-        yml_info["services"][service_name] = service_dict
-        # TODO: store docker compose in member, update, write at the end
-        self._write(yml_info)
-
-    def get_service(
-        self, service_name: str, create_if_not_present: bool = False
-    ) -> dict[str, Any]:
-        """
-        Get service info from docker-compose.
-        """
-        yml_info = self._read()
-        services = yml_info["services"]
-
-        if service_name not in services:
-            if create_if_not_present:
-                services[service_name] = {}
-            else:
-                raise ValueError(
-                    f"Service {services} not found under docker-compose services!"
-                )
-
-        service = services[service_name]
-        return service
 
     def _read(self) -> dict[str, Any]:
         """
@@ -182,7 +99,149 @@ class DockerComposeHandler:
 
         return yml_info
 
-    def _write(self, yml_info: dict[str, Any]):
+    def _write(self, info: dict[str, Any]):
         # FIXME: improve duplication
         with open(self.docker_compose, "w") as f:
-            yaml.dump(yml_info, f)
+            yaml.dump(info, f)
+
+
+class DockerComposeServiceHandler(DockerComposeHandler):
+    def __init__(self, path: Path, service_name: str) -> None:
+        super().__init__(path)
+
+        self._name = service_name
+
+    def rename(self, new_name: str):
+        """
+        Rename service.
+        """
+        yml_info = super()._read()
+
+        services = yml_info["services"]
+        services[new_name] = services.pop(self._name)
+        super()._write(yml_info)
+
+        self._name = new_name
+
+    def set_image(self, db_type: DBType):
+        """
+        Set service image for given DB type.
+        """
+        self._set_item("image", DockerImage.from_db_type(db_type))
+
+    def set_container_name(self, name: str):
+        """
+        Set container name of given service.
+        """
+        self._set_item("container_name", name)
+
+    def set_port(self, port: EnvVar):
+        """
+        Set service port.
+
+        Sets given port and does not replace existing ports
+        """
+        service_info = self._read()
+        if "ports" not in service_info:
+            service_info["ports"] = []
+        ports = service_info["ports"]
+
+        port_str = f"{port.dollar}:{port.value}"
+        if len(ports) > 0:
+            ports[0] = port_str
+        else:
+            ports.append(port_str)
+
+        self._set_item("ports", ports)
+
+    def set_env_var(self, var: str, value: str):
+        """
+        Set environment variable value in service.
+
+        Sets only given variable and does not replace existing environment.
+        """
+        service_info = self._read()
+
+        if "environment" not in service_info:
+            service_info["environment"] = {}
+        env = service_info["environment"]
+
+        env[var] = value
+        self._set_item("environment", env)
+
+    def update_env_vars(self, env_vars: list[EnvVar], user_service_var_names: bool):
+        """
+        Set/update environment variables db service.
+
+        user_service_var_names: use service variable names (e.g. POSTGRES_PASSWORD) in environment
+            instead of same as .env names
+
+        Set environment variable to be picked up from .env.template
+            with the same name i.e. ${VAR} format.
+        """
+        for env_var in env_vars:
+            var_name = (
+                env_var.service_env_name if user_service_var_names else env_var.name
+            )
+            self.set_env_var(var_name, env_var.dollar)
+
+    def set_from_template(self, path_to_template: Path):
+        """
+        Set service info based on one in given template.
+
+        Create file if does not exist yet.
+        Will replace whatever contents prior if existed prior.
+        """
+        service_info = self._read()
+
+        with open(path_to_template) as f:
+            yml_template = yaml.safe_load(f)
+
+        services_template = yml_template["services"]
+
+        if self._name not in services_template:
+            raise ValueError(
+                f"Service {self._name} not present in template {path_to_template}!"
+            )
+
+        service_info = services_template[self._name]
+
+        self._write(service_info)
+
+    def _set_item(self, name: str, value: Any):
+        """
+        Set item to value in service.
+
+        Will replace previous value.
+        """
+        service_info = self._read()
+        service_info[name] = value
+        self._write(service_info)
+
+    def _read(self) -> dict[str, Any]:
+        """
+        Get service info from docker-compose.
+
+        If service not present, will add empty info.
+        """
+        yml_info = super()._read()
+
+        services = yml_info["services"]
+
+        if self._name not in services:
+            services[self._name] = {}
+
+        ret = services[self._name]
+        return ret
+
+    def _write(self, info: dict[str, Any]):
+        """
+        Set docker compose service with given dict.
+
+        Will replace whatever info was there prior if any.
+        """
+        yml_info = super()._read()
+
+        yml_info["services"][self._name] = info
+        # TODO: store docker compose in member, update, write at the end
+        super()._write(yml_info)

@@ -3,13 +3,12 @@ from pathlib import Path
 
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.factory import DBSetupFactory
-from poetic.item.db.psql import PsqlDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.base import SetupType
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.template import AppTemplateSettings
 from poetic.template.base import BaseTemplate
-from poetic.utils.docker import DockerComposeHandler
+from poetic.utils.docker import DockerComposeServiceHandler
 
 
 class AppTemplate(BaseTemplate[AppTemplateSettings]):
@@ -30,7 +29,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
             )
         )
 
-        self._docker = DockerComposeHandler(self.path)
+        self._service = DockerComposeServiceHandler(self.path, "app")
 
     def poetry_init(self):
         """
@@ -147,17 +146,17 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         Set app host env variable to db service name.
         """
         path_to_template = self._templates.get_filepath("docker-compose.yml")
-        self._docker.update_from_template(path_to_template)
+        self._service.set_from_template(path_to_template)
 
-        self._docker.update_service_container_name("app", f"{self.name}_app")
+        self._service.set_container_name(f"{self.name}_app")
 
         if self._db is not None and self._db.db_type == DBType.psql:
-            self._docker.update_service_env_vars(
-                "app", self._db.env_vars.set_vars, user_service_var_names=False
+            self._service.update_env_vars(
+                self._db.env_vars.set_vars, user_service_var_names=False
             )
 
             host = self._db.env_vars.host.model_copy()
-            self._docker.set_service_env_var("app", host.name, self._db.service_name)
+            self._service.set_env_var(host.name, self._db.service_name)
 
     def _setup_subfolders(self):
         """

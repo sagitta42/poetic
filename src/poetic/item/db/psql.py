@@ -4,7 +4,11 @@ from pathlib import Path
 from poetic.item.db.base import DBSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
-from poetic.utils.docker import DBEnvVars, DockerComposeHandler, EnvVar
+from poetic.utils.docker import (
+    DBEnvVars,
+    DockerComposeServiceHandler,
+    EnvVar,
+)
 
 
 class PsqlDBSetup(DBSetup):
@@ -25,7 +29,7 @@ class PsqlDBSetup(DBSetup):
         )
         self._port = EnvVar(name="DB_PORT", value=5432)
 
-        self._docker = DockerComposeHandler(self.path)
+        self._service = DockerComposeServiceHandler(self.path, "db")
 
     @property
     def dotenv_vars(self) -> DBEnvVars:
@@ -57,43 +61,23 @@ class PsqlDBSetup(DBSetup):
         """
         Set up docker-compose with PSQL.
 
-        Set up DB service in docker-compose.
+        Set up DB service in docker-compose from template.
         Set service and container name.
+        Set up image.
         Set up environment variables in service environment.
         Set up port.
         """
         logg.info("...setting up PSQL docker-compose", header=True)
 
         path_to_template = self._templates.get_filepath("docker-compose.yml")
-        self._docker.update_from_template(path_to_template)
+        self._service.set_from_template(path_to_template)
 
-        self._docker.rename_service("db", self.service_name)
+        self._service.rename(self.service_name)
+        self._service.set_container_name(f"db_{self._settings.db_type.value}")
 
-        self._docker.update_service_container_name(
-            self.service_name, f"db_{self._settings.db_type.value}"
+        self._service.set_image(self.db_type)
+
+        self._service.update_env_vars(
+            self._env_vars.set_vars, user_service_var_names=True
         )
-        self._docker.update_service_env_vars(
-            self.service_name, self._env_vars.set_vars, user_service_var_names=True
-        )
-        self._update_service_port()
-
-    def _update_service_port(self):
-        """
-        Set/update db service ports.
-        """
-
-        service = self._docker.get_service(
-            self.service_name, create_if_not_present=True
-        )
-
-        if "ports" not in service:
-            service["ports"] = []
-        ports = service["ports"]
-
-        port_str = f"{self._port.dollar}:{self._port.value}"
-        if len(ports) > 0:
-            ports[0] = port_str
-        else:
-            ports.append(port_str)
-
-        self._docker.update_service(self.service_name, service)
+        self._service.set_port(self._port)
