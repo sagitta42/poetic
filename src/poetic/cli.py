@@ -25,20 +25,20 @@ def add_bool(
     name: str,
     help: Type[SetupSettings],
     exclusive: bool = False,
-    informative: bool = True,
+    optional: bool = True,
 ):
     """
     Add bool argument.
 
     exclusive: exclusive to these settings
 
-    informative: if just --flag is provided with no option, assume const value
+    optional (bool): if not provided, defaults to False
     """
 
     parser.add_argument(
         f"--{name}",
         action="store_true",
-        default=False if informative else None,
+        default=False if optional else None,
         help=help.description(name, exclusive=exclusive),
     )
 
@@ -101,6 +101,8 @@ def add_db_arguments(
         none_is_option=none_is_option,
     )
 
+    add_bool(parser, "dev-sqlite", help=DBSettings, exclusive=True)
+
 
 def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
     """
@@ -124,14 +126,14 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
         "settings",
         PackageTemplateSettings,
         exclusive=True,
-        informative=informative,
+        optional=informative,
     )
     add_bool(
         parser,
         "progressbar",
         PackageTemplateSettings,
         exclusive=True,
-        informative=informative,
+        optional=informative,
     )
 
 

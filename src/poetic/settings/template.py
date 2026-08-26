@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import Field
 
 from poetic.settings.base import SetupSettings, SetupType
-from poetic.settings.item import DBType
+from poetic.settings.item import DBSettings, DBType
 
 
 class BaseTemplateSettings(SetupSettings):
@@ -35,7 +35,7 @@ class PackageTemplateSettings(BaseTemplateSettings):
     )
 
 
-class AppTemplateSettings(BaseTemplateSettings):
+class AppTemplateSettings(BaseTemplateSettings, DBSettings):
     """
     Web app template settings.
 

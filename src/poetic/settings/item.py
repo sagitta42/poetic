@@ -1,9 +1,10 @@
 import enum
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
+from poetic.logger import logg
 from poetic.settings.base import SetupSettings, SetupType
 
 
@@ -45,6 +46,22 @@ class DBSettings(SetupSettings):
 
     type: Literal[SetupType.db] = Field(default=SetupType.db, description="Setup type")
     db_type: DBType = Field(default=DBType.sqlite, description="Database type")
+    dev_sqlite: bool = Field(
+        default=False, description="Development mode switch to SQLite"
+    )
+
+    @model_validator(mode="after")
+    def check_dev(self) -> Self:
+        """
+        Check DB type VS development mode.
+        """
+        if self.dev_sqlite and self.db_type == DBType.sqlite:
+            logg.warning(
+                f"Development mode with switch to SQLite requested but main DB type requested is SQLite; ignoring"
+            )
+            self.dev_sqlite = False
+            
+        return self
 
 
 class DotenvSettings(SetupSettings):
