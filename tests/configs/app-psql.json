@@ -1,0 +1,7 @@
+{
+    "settings": {
+        "type": "app",
+        "name": "app-psql",
+        "db_type": "psql"
+    }
+}

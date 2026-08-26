@@ -1,5 +1,0 @@
-{
-    "type": "app",
-    "name": "test-sqlite",
-    "db_type": "sqlite"
-}

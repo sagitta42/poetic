@@ -1,0 +1,7 @@
+{
+    "settings": {
+        "type": "db",
+        "db_type": "sqlite"
+    },
+    "dir_name": "db-sqlite"
+}

@@ -6,16 +6,23 @@ from poetic.core import launch, update
 test_path = Path.cwd().parent / "poetic_test"
 
 
-def test_launch(test_case_template):
+def test_launch(test_case_setup):
     """
-    Test template setup.
+    Test setup.
+
+    Create directory in test path in case of functionality setup.
     """
 
     if not test_path.exists():
         os.mkdir(test_path)
 
-    settings = test_case_template.settings
-    launch(settings, path=test_path / settings["name"], overwrite=True)
+    settings = test_case_setup.settings
+
+    test_dir = test_path / test_case_setup.dir_name
+    if not test_dir.exists():
+        os.makedirs(test_dir)
+
+    launch(settings, path=test_dir, overwrite=True)
 
 
 def test_update(test_case_template):
