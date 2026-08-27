@@ -104,7 +104,7 @@ class DBSetup(BaseDBSetup):
         super().setup_dependencies()
 
         self._poetry_add("alembic")
-        self._poetry_add("git+https://github.com/sagitta42/pydantibase.git@v0.1.0")
+        self._poetry_add("git+https://github.com/sagitta42/pydantic-table.git@v0.2.0")
 
     def setup_alembic(self):
         """
