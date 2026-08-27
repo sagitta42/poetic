@@ -154,6 +154,13 @@ class DockerComposeServiceHandler(DockerComposeHandler):
 
         self._set_item("ports", ports)
 
+    def set_dockerfile(self, name: str):
+        """
+        Set dockerfile with given name in build
+        """
+        build_info = {"context": ".", "dockerfile": name}
+        self._set_item("build", build_info)
+
     def set_env_var(self, var: str, value: str):
         """
         Set environment variable value in service.

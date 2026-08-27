@@ -135,13 +135,17 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         Set up docker compose.
 
         Copy template and set container name.
+        Set up dockerfile.
         Set up DB env variables in app service.
         Set app host env variable to db service name.
         """
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._service.set_from_template(path_to_template)
-
         self._service.set_container_name(f"{self.name}_app")
+
+        self._templates.copy("dockerfile")
+        self._service.set_dockerfile("dockerfile")
+
 
         if self._db is not None and self._db.db_type == DBType.psql:
             self._service.update_env_vars(
