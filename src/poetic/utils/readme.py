@@ -3,6 +3,7 @@ from pathlib import Path
 from send2trash import send2trash
 
 from poetic.utils.misc import POETIC_LINK
+from poetic.utils.path import File
 
 
 class Readme:
@@ -20,6 +21,8 @@ class Readme:
 
         Construct section title based on header.
         Add empty line(s) above and below where needed.
+        Appends section to existing readme.
+        FIXME: is not smart to check whether section exists.
         """
         title_line = f"{'#'*header} {title}"
 
@@ -34,6 +37,8 @@ class Readme:
     def add_lines(self, lines: list[str] | str):
         """
         Update README.md with given lines.
+
+        Appends lines.
         """
         readme_lines = self.read()
         final_lines = readme_lines.copy()
@@ -57,13 +62,16 @@ class Readme:
 
     def add_poetic_line(self):
         """
-        Add a made with poetic line to README.
+        Add a made with poetic line to README if does not exist.
         """
-        poetic_lines = []
-        poetic_lines.append("\n-----\n")
-        poetic_lines.append(f"*Made with {POETIC_LINK}*\n")
+        poetic_line = f"*Made with {POETIC_LINK}*\n"
 
-        self.add_lines(poetic_lines)
+        if not File(self._path_to_readme).has_line(poetic_line):
+            lines = []
+            lines.append("\n-----\n")
+            lines.append(poetic_line)
+
+            self.add_lines(lines)
 
     def read(self) -> list[str]:
         """

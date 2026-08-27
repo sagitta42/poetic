@@ -3,8 +3,8 @@ from pathlib import Path
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
 from poetic.item.db.sqlite import SQLiteSetup
-from poetic.settings.item import DBSettings, DBType
-from poetic.utils.docker import DBEnvVars, EnvVar
+from poetic.settings.item import DBSettings
+from poetic.utils.docker import DBEnvVars
 
 
 class DualDBSetup(BaseDBSetup):

@@ -42,16 +42,6 @@ class BaseSetup(Generic[T_Settings]):
         """
         return self._settings.type.value
 
-    def global_setup(self):
-        """
-        Global multistage setup.
-
-        Part 1 - Setup
-        Part 2 - Post-setup
-        """
-        self.setup()
-        self.post_setup()
-
     @abstractmethod
     def setup(self) -> bool | None:
         """
@@ -70,11 +60,5 @@ class BaseSetup(Generic[T_Settings]):
     def launch(self) -> None:
         """
         Launch action of this setup
-        """
-        pass
-
-    def post_setup(self):
-        """
-        Post-setup actions (if any)
         """
         pass

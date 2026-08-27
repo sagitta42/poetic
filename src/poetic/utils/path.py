@@ -29,7 +29,7 @@ class File(PathUtil):
         """
         Add line to file if it does not contain it.
         """
-        if not self._has_line(line):
+        if not self.has_line(line):
             self._add_line(line, prepend)
 
     def remove_line(self, line: str):
@@ -47,7 +47,7 @@ class File(PathUtil):
         new_lines = [line.replace(str_original, str_replace) for line in self._lines]
         self._write(new_lines)
 
-    def _has_line(self, line: str) -> bool:
+    def has_line(self, line: str) -> bool:
         """
         Check if file has given line
         """

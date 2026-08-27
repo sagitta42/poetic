@@ -31,18 +31,16 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
         self._service = DockerComposeServiceHandler(self.path, "app")
 
-    def poetry_init(self):
+    def _poetry_init(self):
         """
         Initialize package with poetry.
 
         Basic setup with only pyproject.toml.
         Disable package mode.
         """
-        super().poetry_init()
-
         os.makedirs(self.path, exist_ok=True)
 
-        self._poetry_basic_init(self.name)
+        super()._poetry_init()
 
     def setup(self) -> None:
         """
@@ -145,7 +143,6 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
         self._templates.copy("dockerfile")
         self._service.set_dockerfile("dockerfile")
-
 
         if self._db is not None and self._db.db_type == DBType.psql:
             self._service.update_env_vars(

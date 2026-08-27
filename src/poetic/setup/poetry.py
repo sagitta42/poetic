@@ -2,6 +2,7 @@ from abc import abstractmethod
 import os
 from pathlib import Path
 
+from poetic.exceptions import PoeticException
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
@@ -44,24 +45,30 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         """
         Launch procedure for dependency setup.
 
-        When this setup is launched i.e. is the main setup,
-            - if it is not a git repository already, init git repository.
-            - Set up standard gitignore if does not exist.
+        Initialize repository if necessary.
+        Since launch() is used for independent functionality setup,
+            it may be done in an already existing git repository
+            with existing poetry setup.
+            Do not initialize if already present.
+
+        Proceed with further setup.
         """
         self.init()
-
-        if not self.git.is_git_repo:
-            self.git.run("init")
-
-        path_to_gitignore = self.path / ".gitignore"
-        if not path_to_gitignore.exists():
-            self._gitignore.setup()
 
         super().launch()
 
     def init(self):
+        """
+        Initialize setup.
+
+        Initialize poetry.
+        Initialize git.
+        """
         if not self._pyproject_handler.path.exists():
-            self._poetry_basic_init(self.path.stem)
+            self._poetry_init()
+
+        if not self.git.is_git_repo:
+            self.git.run("init")
 
     def setup(self) -> None:
         """
@@ -76,41 +83,20 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
 
         super().setup()
 
+        path_to_gitignore = self.path / ".gitignore"
+        if not path_to_gitignore.exists():
+            self._gitignore.setup()
+
         self.setup_dependencies()
-        self.setup_poetic_toml()
+        self._setup_poetic_toml()
 
-    def setup_poetic_toml(self):
+    def _poetry_init(self):
         """
-        Setup poetic.toml template.
+        Poetry init.
 
-        Set up poetic.toml.template file.
-        Add poetic.toml to .gitignore.
+        Default poetry init for a poetry setup is basic init with no structure.
         """
-        self._templates.copy(
-            "poetic.toml.template", template_location=TemplateLocation.common_ass
-        )
-        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
-
-    def post_setup(self):
-        """
-        Post-setup.
-
-        If core setup, add poetic line to readme at the end of setup.
-        """
-        if self._core:
-            self._readme.add_poetic_line()
-
-    def _poetry_add(self, package: str, group: str | None = None):
-        """
-        Poetry add.
-
-        Invoke poetry add in template's venv to install added package while adding to pyproject.toml
-        """
-        args = ["add", package]
-        if group is not None:
-            args += ["--group", group]
-
-        self.poetry(*args)
+        self._poetry_basic_init(self.path.stem)
 
     def _poetry_basic_init(self, name: str):
         """
@@ -125,6 +111,33 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
             "--description",
             "",
         )
+
+    def _poetry_add(self, package: str, group: str | None = None):
+        """
+        Poetry add.
+
+        Invoke poetry add in template's venv to install added package while adding to pyproject.toml
+        """
+        args = ["add", package]
+        if group is not None:
+            args += ["--group", group]
+
+        self.poetry(*args)
+
+    def _setup_poetic_toml(self):
+        """
+        Setup poetic.toml template if does not exist.
+
+        Set up poetic.toml.template file.
+        Add poetic.toml to .gitignore.
+        """
+        path_to_toml = self.path / "poetic.toml.template"
+        if not path_to_toml.exists():
+            self._templates.copy(
+                "poetic.toml.template", template_location=TemplateLocation.common_ass
+            )
+
+        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
 
     def poetry(self, *args):
         """

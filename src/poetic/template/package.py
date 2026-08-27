@@ -42,7 +42,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             else None
         )
 
-    def poetry_init(self):
+    def _poetry_init(self):
         """
         Initialize package with poetry.
 
@@ -51,8 +51,6 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         Run poetry from same environment from which poetic is being called
             (not poetry from project's venv - does not exist yet)
         """
-        super().poetry_init()
-
         poetry_args = ["poetry", "new"]
 
         if self.path.exists():

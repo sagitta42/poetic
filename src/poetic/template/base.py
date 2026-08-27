@@ -59,23 +59,16 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
     def launch(self) -> None:
         """
         Template launch action: init template
+        Add poetic line to readme at the end of setup.
         """
+        if Dir(self.path).exists_and_non_empty():
+            raise PoeticException(
+                f"{self.name} exists and non-empty! Change name or (re)move existing packge; or run poetic update inside existing package if you wish to update it."
+            )
+
         super().launch()
 
         logg.info(f"Template setup DONE", header=True)
-        self.display()
-
-    def init(self):
-        """
-        Initial setup of the template.
-
-        Initialize package with poetry. Register resulting initial pyproject.toml.
-        Initialize git repository.
-        Set up repository.
-        Make initial commit.
-        Perform post-commit setup.
-        """
-        self.poetry_init()
 
     def update(self):
         """
@@ -115,7 +108,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
 
         self.git.run("switch", update_branch)
 
-        self.global_setup()
+        self.setup()
 
         # FIXME: correctly get poetic commits
         # last_poetic_commit = self._git_auto.get_last_commit()
@@ -191,19 +184,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         logg.info(self.name)
         display(self.path)
-
-    @abstractmethod
-    def poetry_init(self):
-        """
-        Initialize package with poetry.
-
-        Check if setup path directory already exists and contains files.
-        """
-
-        if Dir(self.path).exists_and_non_empty():
-            raise PoeticException(
-                f"{self.name} exists and non-empty! Change name or (re)move existing packge; or run poetic update inside existing package if you wish to update it."
-            )
 
     @abstractmethod
     def setup_source_files(self):

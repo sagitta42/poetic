@@ -53,8 +53,11 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
 
         Perform global setup.
         Commit setup if in git repository and files did not exist before.
+        Add "made with poetic" at the end of readme if does not exist.
         """
-        self.global_setup()
+        self.setup()
+
+        self._readme.add_poetic_line()
 
         if self.git.is_git_repo:
             if self._settings.no_commit:
