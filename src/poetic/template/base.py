@@ -60,7 +60,10 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         Template launch action: init template
         """
-        self.init()
+        super().launch()
+
+        logg.info(f"Template setup DONE", header=True)
+        self.display()
 
     def init(self):
         """
@@ -73,15 +76,6 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         Perform post-commit setup.
         """
         self.poetry_init()
-
-        self.git.run("init")
-
-        self.global_setup()
-
-        self.git.commit_all(f"template made with {POETIC_LINK}")
-
-        logg.info(f"Template setup DONE", header=True)
-        self.display()
 
     def update(self):
         """
@@ -217,3 +211,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         Set up source files.
         """
         pass
+
+    def _commit_message(self, mod_type: str) -> str:
+        ret = f"template {mod_type} with {POETIC_LINK}"
+        return ret

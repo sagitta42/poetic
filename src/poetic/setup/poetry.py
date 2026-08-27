@@ -48,6 +48,8 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
             - if it is not a git repository already, init git repository.
             - Set up standard gitignore if does not exist.
         """
+        self.init()
+
         if not self.git.is_git_repo:
             self.git.run("init")
 
@@ -56,6 +58,10 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
             self._gitignore.setup()
 
         super().launch()
+
+    def init(self):
+        if not self._pyproject_handler.path.exists():
+            self._poetry_basic_init(self.path.stem)
 
     def setup(self) -> None:
         """
@@ -69,9 +75,6 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         """
 
         super().setup()
-
-        if not self._pyproject_handler.path.exists():
-            self._poetry_basic_init(self.path.stem)
 
         self.setup_dependencies()
         self.setup_poetic_toml()
