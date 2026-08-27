@@ -83,9 +83,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
 
         super().setup()
 
-        path_to_gitignore = self.path / ".gitignore"
-        if not path_to_gitignore.exists():
-            self._gitignore.setup()
+        self._gitignore.setup()
 
         self.setup_dependencies()
         self._setup_poetic_toml()
