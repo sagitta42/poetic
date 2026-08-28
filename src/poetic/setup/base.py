@@ -1,16 +1,16 @@
 from abc import abstractmethod
 from pathlib import Path
-from typing import Generic
 
 
-from poetic.settings.setup import SetupType, T_Settings
+from poetic.action.base import BaseAction
+from poetic.settings.setup import SetupType, T_SetupSettings
 from poetic.utils.git import Git
 
 from poetic.logger import logg
 from poetic.utils.template import TemplateManager
 
 
-class BaseSetup(Generic[T_Settings]):
+class BaseSetup(BaseAction[T_SetupSettings]):
     """
     General setup of any kind.
 
@@ -25,15 +25,14 @@ class BaseSetup(Generic[T_Settings]):
         - copying templates
     """
 
-    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
-        self._settings = settings
-        self.path = path
-        self._core = core
+    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
+        super().__init__(path, settings)
 
+        self._core = core
         self._type: SetupType = settings.type
 
         self._templates = TemplateManager(self._type, self.path)
-        self.git = Git(self.path)
+        self._git = Git(self.path)
 
     @property
     def title(self) -> str:

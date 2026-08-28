@@ -6,7 +6,7 @@ import subprocess
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
-from poetic.settings.setup import T_Settings
+from poetic.settings.setup import T_SetupSettings
 from poetic.setup.venv import BaseVenvSetup
 from poetic.utils.misc import find_line
 from poetic.utils.path import File
@@ -16,7 +16,7 @@ from poetic.utils.template import TemplateLocation
 from poetic.utils.toml import PyProjectHandler
 
 
-class BasePoetrySetup(BaseVenvSetup[T_Settings]):
+class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
     """
     General functionality setup with poetry dependencies.
 
@@ -27,7 +27,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         - set up dependencies with poetry
     """
 
-    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
+    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
         self._vscode = VSCodeSetup(self.path, core=False)
@@ -72,8 +72,8 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         if not self._pyproject_handler.path.exists():
             self._poetry_init()
 
-        if not self.git.is_git_repo:
-            self.git.run("init", info=True)
+        if not self._git.is_git_repo:
+            self._git.run("init", info=True)
 
     def setup(self) -> None:
         """

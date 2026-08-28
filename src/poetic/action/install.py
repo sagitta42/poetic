@@ -4,11 +4,11 @@ from pathlib import Path
 import subprocess
 
 
+from poetic.action.base import BaseAction
 from poetic.exceptions import PoeticException
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
-from poetic.setup.base import BaseSetup
 from poetic.utils.pip import PackageInfo, Pip, get_package_source
 from poetic.utils.poetry import Poetry
 from poetic.utils.toml import PyProjectHandler, TomlHandler
@@ -22,7 +22,7 @@ class InstallSource(str, enum.Enum):
         return self.value
 
 
-class InstallSetup(BaseSetup[InstallSettings]):
+class InstallAction(BaseAction):
     """
     Install functionalities on top of standard poetry.
 
@@ -34,7 +34,7 @@ class InstallSetup(BaseSetup[InstallSettings]):
     """
 
     def __init__(self, path: Path, settings: InstallSettings) -> None:
-        super().__init__(path, settings, core=False)
+        super().__init__(path, settings)
 
         self._toml_file = "poetic.toml"
         self._poetic_toml = TomlHandler(self.path / self._toml_file)

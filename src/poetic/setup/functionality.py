@@ -2,14 +2,14 @@ from abc import abstractmethod
 from pathlib import Path
 
 from poetic.logger import logg
-from poetic.settings.setup import T_Settings
+from poetic.settings.setup import T_SetupSettings
 from poetic.setup.base import BaseSetup
 from poetic.utils.env import DotEnv
 from poetic.utils.readme import Readme
 from poetic.utils.misc import POETIC_LINK
 
 
-class BaseFunctionalitySetup(BaseSetup[T_Settings]):
+class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
     """
     General setup for functionalities.
 
@@ -27,7 +27,7 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
         - .env template setup and update
     """
 
-    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
+    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
         self._readme = Readme(self.path)
@@ -56,11 +56,11 @@ class BaseFunctionalitySetup(BaseSetup[T_Settings]):
 
         self._readme.add_poetic_line()
 
-        if self.git.is_git_repo:
+        if self._git.is_git_repo:
             if self._settings.no_commit:
                 self.display(self._commit_message("update"))
             else:
-                self.git.commit_all(self._commit_message("setup"))
+                self._git.commit_all(self._commit_message("setup"))
                 self.display()
         else:
             self.display()

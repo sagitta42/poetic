@@ -4,7 +4,7 @@ from send2trash import send2trash
 from time import sleep
 
 from poetic.factory import PoeticFactory
-from poetic.install import InstallSetup
+from poetic.action.install import InstallAction
 from poetic.logger import logg
 from poetic.settings.builder import SettingsBuilder
 from poetic.settings.install import InstallSettings
@@ -44,7 +44,7 @@ def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
 
 
 def install(settings: dict, path: Path = Path.cwd()):
-    install_setup = InstallSetup(path, InstallSettings(**settings))
+    install_setup = InstallAction(path, InstallSettings(**settings))
     install_setup.install()
 
 

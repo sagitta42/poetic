@@ -1,5 +1,5 @@
 import enum
-from typing import Any
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.fields import FieldInfo
@@ -59,3 +59,5 @@ class BaseSettings(BaseModel):
     @classmethod
     def _get_field(cls, arg: str) -> FieldInfo:
         return cls.model_fields[arg.replace("-", "_")]
+
+T_Settings = TypeVar("T_Settings", bound=BaseSettings)

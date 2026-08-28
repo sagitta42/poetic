@@ -31,4 +31,4 @@ class SetupSettings(BaseSettings):
     no_commit: bool = Field(default=False, description="Do not commit changes")
 
 
-T_Settings = TypeVar("T_Settings", bound=SetupSettings)
+T_SetupSettings = TypeVar("T_SetupSettings", bound=SetupSettings)

@@ -76,13 +76,13 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
 
         Attempt an update, switch to original branch in case of fail.
         """
-        current_branch = self.git.get_active_branch()
+        current_branch = self._git.get_active_branch()
         logg.info(f"Active branch: {current_branch}")
 
         try:
             self._update(current_branch)
         except Exception as e:
-            self.git.run("switch", current_branch)
+            self._git.run("switch", current_branch)
             raise e
 
     def _update(self, current_branch: str):
@@ -99,14 +99,14 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         Merge dev-poetic-update.
         """
         update_branch = "dev-poetic-update"
-        if not self.git.branch_exists(update_branch):
-            first_commit = self.git.get_first_commit()
+        if not self._git.branch_exists(update_branch):
+            first_commit = self._git.get_first_commit()
             logg.info(
                 f"Creating {update_branch} starting from first commit {first_commit}"
             )
-            self.git.run("branch", update_branch, first_commit)
+            self._git.run("branch", update_branch, first_commit)
 
-        self.git.run("switch", update_branch)
+        self._git.run("switch", update_branch)
 
         self.setup()
 
@@ -118,10 +118,10 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         # message = f"{self._poetic_link} update\ncommit: {last_poetic_commit}\nmessage: {last_poetic_commit_message}"
 
         message = f"latest {POETIC_LINK} update"
-        self.git.commit_all(message)
+        self._git.commit_all(message)
 
-        self.git.run("switch", current_branch)
-        self.git.run("merge", update_branch)
+        self._git.run("switch", current_branch)
+        self._git.run("merge", update_branch)
 
     def setup(self) -> None:
         """

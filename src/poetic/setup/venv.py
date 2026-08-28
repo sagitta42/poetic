@@ -1,17 +1,17 @@
 from pathlib import Path
 
 
-from poetic.settings.setup import T_Settings
+from poetic.settings.setup import T_SetupSettings
 from poetic.setup.functionality import BaseFunctionalitySetup
 from poetic.utils.venv import Venv
 
 
-class BaseVenvSetup(BaseFunctionalitySetup[T_Settings]):
+class BaseVenvSetup(BaseFunctionalitySetup[T_SetupSettings]):
     """
         General functionality setup with pip and venv.
     """
 
-    def __init__(self, path: Path, settings: T_Settings, core: bool) -> None:
+    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
         BaseFunctionalitySetup.__init__(self, path, settings, core)
 
         self._venv = Venv(self.path)
