@@ -54,10 +54,3 @@ class BaseSetup(BaseAction[T_SetupSettings]):
         logg.info(f"@ Setting up {self.title}", header=True)
         if self._core:
             logg.info(line, header=True)
-
-    @abstractmethod
-    def launch(self) -> None:
-        """
-        Launch action of this setup
-        """
-        pass

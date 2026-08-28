@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from poetic.action.add import AddAction
 from poetic.cli import (
     Subparser,
     add_install_arguments,
@@ -10,6 +11,7 @@ from poetic.cli import (
 from poetic.core import install, launch, update
 from poetic.exceptions import PoeticException
 from poetic.logger import logg
+from poetic.settings.add import AddSettings
 from poetic.utils.poetry import Poetry
 
 
@@ -57,7 +59,8 @@ def main():
             poetry = Poetry(Path.cwd())
             poetry.init_basic()
         elif command == Subparser.add:
-            logg.info("To be implemented")
+            add_action = AddAction(Path.cwd(), AddSettings(**settings_args))
+            add_action.launch()
         elif command == Subparser.update:
             update()
         elif command == Subparser.install:

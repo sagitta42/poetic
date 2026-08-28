@@ -44,8 +44,8 @@ def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
 
 
 def install(settings: dict, path: Path = Path.cwd()):
-    install_setup = InstallAction(path, InstallSettings(**settings))
-    install_setup.install()
+    install_action = InstallAction(path, InstallSettings(**settings))
+    install_action.launch()
 
 
 def update(path: Path = Path.cwd()):

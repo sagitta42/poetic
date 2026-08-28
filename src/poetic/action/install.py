@@ -46,7 +46,7 @@ class InstallAction(BaseAction):
         self._pip = Pip(self.path)
         self._poetry = Poetry(self.path)
 
-    def install(self):
+    def launch(self):
         """
         Run poetry install handling dual dependencies.
 
