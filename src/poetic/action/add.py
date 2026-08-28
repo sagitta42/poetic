@@ -1,9 +1,6 @@
-from pathlib import Path
-
-from poetic.action.base import BaseAction
 from poetic.action.poetic import PoeticAction
+from poetic.logger import logg
 from poetic.settings.add import AddSettings
-from poetic.utils.poetry import Poetry
 
 
 class AddAction(PoeticAction[AddSettings]):
@@ -48,4 +45,6 @@ class AddAction(PoeticAction[AddSettings]):
 
         entry = f"{self._settings.package} @ {self._settings.local}"
         self._poetic_toml._toml_dict[dep_section]["local"].append(entry)
+        logg.info(f"Added dependency to {self._toml_file}")
+        logg.info(entry, poetic=True)
         self._poetic_toml.write()

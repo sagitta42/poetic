@@ -39,7 +39,7 @@ class Git(BaseCommandRunner):
         Add and commit all files.
         """
         self.run("add", "*")
-        self.run("commit", "-am", commit_message)
+        self.run("commit", "-am", commit_message, info=True)
 
     def get_last_commit(self) -> str:
         """

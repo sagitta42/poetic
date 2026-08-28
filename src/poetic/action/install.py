@@ -70,13 +70,13 @@ class InstallAction(PoeticAction):
             try:
                 self._full_poetry_install()
             except subprocess.CalledProcessError as e:
-                logg.info(f"-> Running poetry lock", green=True)
+                logg.info(f"-> Running poetry lock", poetic=True)
                 self._poetry.run("lock")
 
         if self._has_dual_packages() and self._settings.local:
             self._uninstall_dual_packages(InstallSource.local)
             for package in self._get_local_packages_of_interest():
-                self._pip.run("install", package.source)
+                self._pip.run("install", package.source, info=True)
 
     def _full_poetry_install(self):
         """
@@ -144,7 +144,7 @@ class InstallAction(PoeticAction):
             )
             logg.info(f"{pip_freeze_info.source} -> {local_package.source}")
 
-            self._pip.run("uninstall", local_package.name, "-y")
+            self._pip.run("uninstall", local_package.name, "-y", info=True)
 
     def _get_local_packages_of_interest(self) -> list[PackageInfo]:
         """

@@ -26,10 +26,12 @@ class BaseCommandRunner:
         info (bool): display green poetic info
         """
         full_args = self._full_args(*args)
-        if info:
-            logg.info(f"poetic: {list_as_args(full_args)}", green=True)
-        else:
+        if logg.is_debug:
             logg.debug(f"{self.path} $ {list_as_args(full_args)}")
+        elif info:
+            if self._command is not None:
+                full_args[0] = Path(self._command).stem
+            logg.info(f"poetic: {list_as_args(full_args)}", poetic=True)
 
         command = self._get_command_list_output if check_output else self._run_command
         ret = command(*args, **kwargs)
@@ -63,6 +65,11 @@ class BaseCommandRunner:
         return ret
 
     def _full_args(self, *args) -> list[str]:
+        """
+        All arguments including main command if any.
+
+        Strip path to executable in command unless in debug mode.
+        """
         ret = list(args)
         if self._command is not None:
             ret = [self._command] + ret

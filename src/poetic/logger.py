@@ -11,6 +11,7 @@ class AnsiStyle(str, enum.Enum):
     bold = "1"
     start = "\033["
     end = "\033[0m"
+    fg8bit = "38;5"
 
     def __str__(self) -> str:
         return self.value
@@ -22,12 +23,19 @@ class AnsiColor(str, enum.Enum):
     red = "31"
     yellow = "33"
     white = "37"
+    lila = "91"
 
     def apply(self, message: Any, bold: bool = False) -> str:
         """
-        To be used with color based
+        To be used with color based.
+
+        Bold not implemented for 8 bit colors.
         """
-        style = AnsiStyle.bold if bold else AnsiStyle.normal
+        if self.is_8bit:
+            style = AnsiStyle.fg8bit
+        else:
+            style = AnsiStyle.bold if bold else AnsiStyle.normal
+
         ret = f"{AnsiStyle.start}{style};{self.value}m{message}{AnsiStyle.end}"
         return ret
 
@@ -37,6 +45,10 @@ class AnsiColor(str, enum.Enum):
         """
         ret = self.apply(message, bold=True)
         return ret
+
+    @property
+    def is_8bit(self) -> bool:
+        return self == AnsiColor.lila
 
     def __str__(self) -> str:
         return self.value
@@ -60,6 +72,8 @@ class LevelFormatter(logging.Formatter):
 
 class Logger:
     def __init__(self, log_level=logging.INFO):
+        self.log_level = log_level
+
         self._logger = logging.getLogger(__name__)
 
         full_format = "%(asctime)s [%(levelname)s] %(classname)s.%(funcName)s:%(lineno)d - %(message)s"
@@ -83,8 +97,8 @@ class Logger:
         self._logger.setLevel(log_level)
         self._logger.propagate = False
 
-    def info(self, message: Any, green: bool = False, header: bool = False):
-        color = AnsiColor.green if green or header else AnsiColor.white
+    def info(self, message: Any, poetic: bool = False, header: bool = False):
+        color = AnsiColor.lila if poetic or header else AnsiColor.white
         return self._log(logging.INFO, color.apply(message, header))
 
     def error(self, message: Any):
@@ -97,6 +111,10 @@ class Logger:
 
     def debug(self, message: Any):
         return self._log(logging.DEBUG, AnsiColor.grey.apply(message))
+
+    @property
+    def is_debug(self) -> bool:
+        return self.log_level == logging.DEBUG
 
     def _log(self, level, message: Any):
         """

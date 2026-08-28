@@ -27,7 +27,6 @@ class Venv(BaseCommandRunner):
         return super().run(
             self.exe(command),
             *args,
-            info=True,
             env={
                 **os.environ,
                 "VIRTUAL_ENV": self.venv,
