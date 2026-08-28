@@ -1,7 +1,7 @@
 import enum
 from pathlib import Path
 
-from poetic.settings.base import SetupType
+from poetic.settings.setup import SetupType
 from poetic.settings.template import BaseTemplateSettings
 from poetic.template.app import AppTemplate
 from poetic.template.base import BaseTemplate

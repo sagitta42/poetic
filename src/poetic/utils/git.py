@@ -12,9 +12,7 @@ class Git(BaseCommandRunner):
     """
 
     def __init__(self, path: Path | None) -> None:
-        super().__init__(path)
-
-        self._main_command = "git"
+        super().__init__(path, command="git")
 
     @property
     def is_git_repo(self) -> bool:
@@ -27,7 +25,7 @@ class Git(BaseCommandRunner):
         """
         Get name of active branch.
         """
-        output = self.run("rev-parse", "--abbrev-ref", "HEAD", check=True)
+        output = self.run("rev-parse", "--abbrev-ref", "HEAD")
         ret = output[0]
         return ret
 
@@ -47,7 +45,7 @@ class Git(BaseCommandRunner):
         """
         Get hash of last commit.
         """
-        output = self.run("rev-list", "HEAD", check=True)
+        output = self.run("rev-list", "HEAD")
         ret = output[0]
         return ret
 
@@ -55,7 +53,7 @@ class Git(BaseCommandRunner):
         """
         Get hash of first commit.
         """
-        output = self.run("rev-list", "HEAD", check=True)
+        output = self.run("rev-list", "HEAD")
         ret = output[-1]
         return ret
 
@@ -63,7 +61,7 @@ class Git(BaseCommandRunner):
         """
         Get list of branch names
         """
-        output = self.run("branch", "--list", check=True)
+        output = self.run("branch", "--list")
 
         def clean_branch_name(name: str) -> str:
             ret = name
@@ -79,6 +77,6 @@ class Git(BaseCommandRunner):
         """
         Get commit message of given commit hash.
         """
-        output = self.run("show", "--quiet", commit, check=True)
+        output = self.run("show", "--quiet", commit)
         ret = output[-1]
         return ret

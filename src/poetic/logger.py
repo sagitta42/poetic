@@ -83,8 +83,8 @@ class Logger:
         self._logger.setLevel(log_level)
         self._logger.propagate = False
 
-    def info(self, message: Any, header: bool = False):
-        color = AnsiColor.green if header else AnsiColor.white
+    def info(self, message: Any, green: bool = False, header: bool = False):
+        color = AnsiColor.green if green or header else AnsiColor.white
         return self._log(logging.INFO, color.apply(message, header))
 
     def error(self, message: Any):

@@ -1,13 +1,16 @@
 from abc import abstractmethod
 import os
 from pathlib import Path
+import subprocess
 
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
-from poetic.settings.base import T_Settings
+from poetic.settings.setup import T_Settings
 from poetic.setup.venv import BaseVenvSetup
+from poetic.utils.misc import find_line
 from poetic.utils.path import File
+from poetic.utils.pip import Pip
 from poetic.utils.poetry import Poetry
 from poetic.utils.template import TemplateLocation
 from poetic.utils.toml import PyProjectHandler
@@ -31,6 +34,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         self._gitignore = GitignoreSetup(self.path)
         self._pyproject_handler = PyProjectHandler(self.path)
         self._poetry = Poetry(self.path)
+        self._pip = Pip(self.path)
 
     @abstractmethod
     def setup_dependencies(self) -> None:
@@ -69,7 +73,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
             self._poetry_init()
 
         if not self.git.is_git_repo:
-            self.git.run("init")
+            self.git.run("init", info=True)
 
     def setup(self) -> None:
         """
@@ -103,11 +107,22 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
 
         Invoke poetry add in template's venv to install added package while adding to pyproject.toml
         """
-        args = ["add", package]
+        args = [package]
         if group is not None:
             args += ["--group", group]
 
-        self.poetry(*args)
+        try:
+            self._poetry.add(*args, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            if "EnvCommandError" in e.stdout:
+                stdout_lines = e.stdout.split("\n")
+                idx_process_error = find_line(stdout_lines, "CalledProcessError")
+                logg.warning(
+                    f"EnvCommandError when trying to run poetry add:", important=True
+                )
+                for line in stdout_lines[:idx_process_error]:
+                    logg.warning(line)
+                raise e
 
     def _setup_poetic_toml(self):
         """
@@ -123,32 +138,3 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
             )
 
         File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
-
-    def poetry(self, *args):
-        """
-        Run a poetry command adding to project's venv.
-
-        Poetry is envoked from current environment (one in which poetic is run)
-            rather than project's venv.
-        """
-        self.run("poetry", *args, env=True)
-
-    def run(self, *args, check: bool = False, env: bool = False) -> list[str] | None:
-        """
-        Run command in template root directory.
-
-        env (bool): run with poetry/venv environment variables.
-        """
-        return super().run(
-            *args,
-            check=check,
-            env=(
-                {
-                    **os.environ,
-                    "POETRY_VIRTUALENVS_CREATE": "false",
-                    "VIRTUAL_ENV": self._path_to_venv,
-                }
-                if env
-                else None
-            ),
-        )

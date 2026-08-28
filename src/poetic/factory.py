@@ -1,8 +1,7 @@
 from pathlib import Path
 
 from poetic.item.factory import ItemSetupFactory
-from poetic.logger import logg
-from poetic.settings.item import SetupSettings
+from poetic.settings.setup import SetupSettings
 from poetic.settings.template import BaseTemplateSettings
 from poetic.setup.functionality import BaseFunctionalitySetup
 from poetic.template.base import BaseTemplate

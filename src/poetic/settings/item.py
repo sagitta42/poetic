@@ -5,7 +5,7 @@ from typing import Literal, Self
 from pydantic import Field, model_validator
 
 from poetic.logger import logg
-from poetic.settings.base import SetupSettings, SetupType
+from poetic.settings.setup import SetupSettings, SetupType
 
 
 class VSCodeSetupSettings(SetupSettings):

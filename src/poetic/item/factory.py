@@ -2,8 +2,8 @@ from pathlib import Path
 
 from poetic.item.builder import ItemSetupBuilder
 from poetic.item.db.factory import DBSetupFactory
-from poetic.settings.base import SetupSettings
 from poetic.settings.item import DBSettings
+from poetic.settings.setup import SetupSettings
 from poetic.setup.base import BaseSetup
 
 

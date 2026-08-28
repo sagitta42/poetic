@@ -2,7 +2,8 @@ from typing import Literal
 
 from pydantic import Field
 
-from poetic.settings.base import SetupSettings, SetupType
+from poetic.settings.setup import SetupSettings, SetupType
+
 
 
 class InstallSettings(SetupSettings):

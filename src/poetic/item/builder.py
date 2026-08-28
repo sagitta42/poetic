@@ -2,12 +2,11 @@ import enum
 from pathlib import Path
 
 from poetic.item.logger import LoggerSetup
+from poetic.settings.setup import SetupSettings, SetupType
 from poetic.setup.base import BaseSetup
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
-from poetic.settings.base import SetupSettings, SetupType
 from poetic.setup.builder import BaseSetupBuilder
-from poetic.setup.poetry import BasePoetrySetup
 
 
 class ItemSetupClass(enum.Enum):

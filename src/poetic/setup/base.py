@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Generic
 
 
-from poetic.settings.base import SetupType, T_Settings
+from poetic.settings.setup import SetupType, T_Settings
 from poetic.utils.git import Git
 
 from poetic.logger import logg

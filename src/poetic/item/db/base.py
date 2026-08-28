@@ -130,7 +130,7 @@ class DBSetup(BaseDBSetup):
         alembic_dir = "alembic_migrations"
         path_to_alembic = self.path / alembic_dir
         if not os.path.exists(path_to_alembic):
-            self.run(self.venv("alembic"), "init", alembic_dir, env=True)
+            self._venv.run("alembic", "init", alembic_dir)
 
         self._env_settings_setup.setup()
 

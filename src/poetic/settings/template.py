@@ -2,8 +2,8 @@ from typing import Literal
 
 from pydantic import Field
 
-from poetic.settings.base import SetupSettings, SetupType
 from poetic.settings.item import DBSettings, DBType
+from poetic.settings.setup import SetupSettings, SetupType
 
 
 class BaseTemplateSettings(SetupSettings):

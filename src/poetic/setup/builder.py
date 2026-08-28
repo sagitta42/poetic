@@ -2,7 +2,7 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import Generic
 
-from poetic.settings.base import T_Settings
+from poetic.settings.setup import T_Settings
 from poetic.setup.base import BaseSetup
 
 

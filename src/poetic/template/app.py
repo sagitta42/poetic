@@ -4,8 +4,8 @@ from pathlib import Path
 from poetic.item.db.base import BaseDBSetup
 from poetic.item.db.factory import DBSetupFactory
 from poetic.item.env_settings import EnvSettingsSetup
-from poetic.settings.base import SetupType
 from poetic.settings.item import DBSettings, DBType
+from poetic.settings.setup import SetupType
 from poetic.settings.template import AppTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.docker import DockerComposeServiceHandler

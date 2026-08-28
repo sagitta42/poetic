@@ -2,9 +2,12 @@ import argparse
 import enum
 from typing import Type
 
-from poetic.settings.base import SetupSettings, SetupType
+from pydantic import Field
+
+from poetic.settings.base import BaseSettings
 from poetic.settings.install import InstallSettings
 from poetic.settings.item import DBSettings, LoggerSettings
+from poetic.settings.setup import SetupSettings, SetupType
 from poetic.settings.template import (
     AppTemplateSettings,
     BaseTemplateSettings,
@@ -24,7 +27,7 @@ class Subparser(str, enum.Enum):
 def add_bool(
     parser: argparse.ArgumentParser,
     name: str,
-    help: Type[SetupSettings],
+    help: Type[BaseSettings],
     exclusive: bool = False,
     optional: bool = True,
 ):
@@ -47,7 +50,7 @@ def add_bool(
 def add_str(
     parser: argparse.ArgumentParser,
     name: str,
-    help: Type[SetupSettings],
+    help: Type[BaseSettings],
     optional: bool,
     flag: bool = True,
     exclusive: bool = False,
@@ -61,7 +64,7 @@ def add_str(
 
     flag: add -- i.e. --name keyword argument
 
-    exclusive (bool): this argument is exclusive to the given type of SetupSettings
+    exclusive (bool): this argument is exclusive to the given type of settings
 
     informative: if just --flag is provided with no option, assume const value
     """

@@ -312,7 +312,7 @@ local_dependencies = [
 
 ### implement new independent functionality item setup (`setup`)
 
-1. Create new `SetupType` e.g. `SetupType.foo` (`settings.base`)
+1. Create new `SetupType` e.g. `SetupType.foo` (`settings.setup`)
 1. Add `SetupType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli`)
 1. Create item settings `FooSettings` in `poetic.settings.item` inheriting from `SetupSettings` with `type` as `Literal[SetupType.foo]`
 1. Add additional settings field if any under `FooSettings` e.g. `field`

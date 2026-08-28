@@ -1,7 +1,7 @@
 from typing import Type
 
-from poetic.settings.base import SetupSettings
 from poetic.settings.options import SettingsOptions, SetupOptions, TemplateOptions
+from poetic.settings.setup import SetupSettings
 from poetic.settings.template import BaseTemplateSettings
 from poetic.setup.functionality import BaseFunctionalitySetup
 

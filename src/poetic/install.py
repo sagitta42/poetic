@@ -7,9 +7,9 @@ from poetic.exceptions import PoeticException
 from poetic.settings.install import InstallSettings
 
 from poetic.logger import logg
-from poetic.setup.poetry import BasePoetrySetup
-from poetic.setup.venv import PackageInfo
-from poetic.utils.pip import get_package_source
+from poetic.setup.base import BaseSetup
+from poetic.utils.pip import PackageInfo, Pip, get_package_source
+from poetic.utils.poetry import Poetry
 from poetic.utils.toml import PyProjectHandler, TomlHandler
 
 
@@ -21,7 +21,7 @@ class InstallSource(str, enum.Enum):
         return self.value
 
 
-class InstallSetup(BasePoetrySetup[InstallSettings]):
+class InstallSetup(BaseSetup[InstallSettings]):
     """
     Install functionalities on top of standard poetry.
 
@@ -41,6 +41,9 @@ class InstallSetup(BasePoetrySetup[InstallSettings]):
 
         self._pyproject = PyProjectHandler(self.path)
         self._pyproject.read()
+
+        self._pip = Pip(self.path)
+        self._poetry = Poetry(self.path)
 
     def install(self):
         """
@@ -74,7 +77,7 @@ class InstallSetup(BasePoetrySetup[InstallSettings]):
         if self._has_dual_packages() and self._settings.local:
             self._uninstall_dual_packages(InstallSource.local)
             for package in self._get_local_packages_of_interest():
-                self.pip("install", package.source)
+                self._pip.run("install", package.source)
 
     def _full_poetry_install(self):
         """
@@ -86,7 +89,7 @@ class InstallSetup(BasePoetrySetup[InstallSettings]):
         if not self._is_package_mode():
             poetry_args.append("--no-root")
 
-        self.poetry(*poetry_args)
+        self._poetry.run(*poetry_args)
 
     def _has_dual_packages(self) -> bool:
         """
@@ -116,7 +119,7 @@ class InstallSetup(BasePoetrySetup[InstallSettings]):
         Pyproject install: do not perform uninstall if package does NOT point to local path install source.
         """
         for local_package in self._get_local_packages_of_interest():
-            pip_freeze_info = self._get_pip_package_info(local_package.name)
+            pip_freeze_info = self._pip.get_package_info(local_package.name)
 
             if pip_freeze_info is None:
                 continue
@@ -142,7 +145,7 @@ class InstallSetup(BasePoetrySetup[InstallSettings]):
             )
             logg.info(f"{pip_freeze_info.source} -> {local_package.source}")
 
-            self.pip("uninstall", local_package.name, "-y")
+            self._pip.run("uninstall", local_package.name, "-y")
 
     def _get_local_packages_of_interest(self) -> list[PackageInfo]:
         """

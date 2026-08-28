@@ -1,35 +1,18 @@
 import enum
-from typing import Any, TypeVar
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from pydantic.fields import FieldInfo
 
 
-class SetupType(str, enum.Enum):
-    package = "package"
-    app = "app"
-    db = "db"
-    dotenv = "dotenv"
-    vscode = "vscode"
-    gitignore = "gitignore"
-    progressbar = "progressbar"
-    logger = "logger"
-    install = "install"
-
-    @classmethod
-    def values(cls) -> list[str]:
-        return [item.value for item in cls]
-
-
-class SetupSettings(BaseModel):
+class BaseSettings(BaseModel):
     """
-    Base class for settings for any type of setup.
+    Base class for settings.
+
+    Adaptor utils to argparse.
     """
 
     model_config = ConfigDict(extra="ignore")
-
-    type: SetupType = Field(description="Setup type")
-    no_commit: bool = Field(default=False, description="Do not commit changes")
 
     @classmethod
     def options(cls, arg: str, none_is_option: bool = False) -> list | None:
@@ -76,6 +59,3 @@ class SetupSettings(BaseModel):
     @classmethod
     def _get_field(cls, arg: str) -> FieldInfo:
         return cls.model_fields[arg.replace("-", "_")]
-
-
-T_Settings = TypeVar("T_Settings", bound=SetupSettings)

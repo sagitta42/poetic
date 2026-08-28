@@ -1,11 +1,8 @@
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any
-
-from dotenv import set_key
 
 from poetic.logger import logg
-from poetic.settings.base import T_Settings
+from poetic.settings.setup import T_Settings
 from poetic.setup.base import BaseSetup
 from poetic.utils.env import DotEnv
 from poetic.utils.readme import Readme

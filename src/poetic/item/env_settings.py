@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from poetic.settings.base import SetupType
 from poetic.settings.item import DotenvSettings
+from poetic.settings.setup import SetupType
 from poetic.setup.poetry import BasePoetrySetup
 from poetic.utils.template import TemplateManager
 
