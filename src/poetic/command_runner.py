@@ -15,11 +15,15 @@ class BaseCommandRunner:
         self.path = path or Path.cwd()
         self._command = command
 
-    def run(self, *args, info: bool = False, **kwargs) -> list[str] | None:
+    def run(
+        self, *args, check_output: bool = False, info: bool = False, **kwargs
+    ) -> list[str] | None:
         """
         Simple command run in directory.
 
-        check (bool): check and return command output
+        check_output (bool): return command output with subprocess.check_output().
+            NOTE: if running with checking output, it is not displayed in terminal
+        info (bool): display green poetic info
         """
         full_args = self._full_args(*args)
         if info:
@@ -27,7 +31,8 @@ class BaseCommandRunner:
         else:
             logg.debug(f"{self.path} $ {list_as_args(full_args)}")
 
-        ret = self._get_command_list_output(*args, **kwargs)
+        command = self._get_command_list_output if check_output else self._run_command
+        ret = command(*args, **kwargs)
 
         return ret
 

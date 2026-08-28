@@ -25,7 +25,7 @@ class Git(BaseCommandRunner):
         """
         Get name of active branch.
         """
-        output = self.run("rev-parse", "--abbrev-ref", "HEAD")
+        output = self.run("rev-parse", "--abbrev-ref", "HEAD", check_output=True)
         ret = output[0]
         return ret
 
@@ -45,7 +45,7 @@ class Git(BaseCommandRunner):
         """
         Get hash of last commit.
         """
-        output = self.run("rev-list", "HEAD")
+        output = self.run("rev-list", "HEAD", check_output=True)
         ret = output[0]
         return ret
 
@@ -53,7 +53,7 @@ class Git(BaseCommandRunner):
         """
         Get hash of first commit.
         """
-        output = self.run("rev-list", "HEAD")
+        output = self.run("rev-list", "HEAD", check_output=True)
         ret = output[-1]
         return ret
 
@@ -61,7 +61,7 @@ class Git(BaseCommandRunner):
         """
         Get list of branch names
         """
-        output = self.run("branch", "--list")
+        output = self.run("branch", "--list", check_output=True)
 
         def clean_branch_name(name: str) -> str:
             ret = name
@@ -77,6 +77,6 @@ class Git(BaseCommandRunner):
         """
         Get commit message of given commit hash.
         """
-        output = self.run("show", "--quiet", commit)
+        output = self.run("show", "--quiet", commit, check_output=True)
         ret = output[-1]
         return ret

@@ -88,7 +88,7 @@ class InstallAction(PoeticAction):
         if not self._is_package_mode():
             poetry_args.append("--no-root")
 
-        self._poetry.run(*poetry_args)
+        self._poetry.run(*poetry_args, check=True)
 
     def _has_dual_packages(self) -> bool:
         """
