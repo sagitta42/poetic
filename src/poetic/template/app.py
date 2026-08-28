@@ -99,12 +99,13 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
             package_path=path_to_core,
             package_filename=package_filename,
         )
-        self._templates.copy("db.py", package_path=path_to_core)
-        self._templates.copy(
-            "model.py",
-            package_path=path_to_core / "models",
-            package_filename="example.py",
-        )
+        if self._db is not None:
+            self._templates.copy("db.py", package_path=path_to_core)
+            self._templates.copy(
+                "model.py",
+                package_path=path_to_core / "models",
+                package_filename="example.py",
+            )
 
         path_to_app = self.path / "app"
         self._templates.copy(
@@ -118,9 +119,10 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
             package_filename=package_filename,
         )
 
+        route_file = "route.py" if self._db is None else "route_db.py"
         path_to_api = path_to_app / "api"
         self._templates.copy(
-            "route.py",
+            route_file,
             package_path=path_to_api / "routes",
             package_filename=package_filename,
         )
