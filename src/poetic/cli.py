@@ -4,6 +4,7 @@ from typing import Type
 
 from pydantic import Field
 
+from poetic.settings.add import AddSettings
 from poetic.settings.base import BaseSettings
 from poetic.settings.install import InstallSettings
 from poetic.settings.item import DBSettings, LoggerSettings
@@ -17,6 +18,7 @@ from poetic.settings.template import (
 
 class Subparser(str, enum.Enum):
     init = "init"
+    add = "add"
     new = "new"
     setup = "setup"
     install = "install"
@@ -185,3 +187,7 @@ def add_install_arguments(parser: argparse.ArgumentParser):
     """
     add_bool(parser, "local", InstallSettings)
     add_str(parser, "package", help=InstallSettings, optional=True, flag=False)
+
+
+def add_poetic_add_arguments(parser: argparse.ArgumentParser):
+    add_str(parser, "package", help=AddSettings, optional=False, flag=False)

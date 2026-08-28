@@ -5,6 +5,7 @@ from poetic.cli import (
     add_install_arguments,
     add_microfunctionality_arguments,
     add_new_template_arguments,
+    add_poetic_add_arguments,
 )
 from poetic.core import install, launch, update
 from poetic.exceptions import PoeticException
@@ -21,9 +22,12 @@ def main():
     )
     add_new_template_arguments(new_template_subparser)
 
-    subparsers.add_parser(
-        Subparser.init.value, help="basic no-interaction init"
+    subparsers.add_parser(Subparser.init.value, help="basic no-interaction init")
+
+    add_subparser = subparsers.add_parser(
+        Subparser.add.value, help="poetry add with git+ auto-detect"
     )
+    add_poetic_add_arguments(add_subparser)
 
     update_subparser = subparsers.add_parser(
         Subparser.update.value,
@@ -47,10 +51,13 @@ def main():
     settings_args = vars(args).copy()
     command = Subparser(settings_args.pop("command"))
 
+    # TODO: attach exec() to parser, define elsewhere
     try:
         if command == Subparser.init:
             poetry = Poetry(Path.cwd())
             poetry.init_basic()
+        elif command == Subparser.add:
+            logg.info("To be implemented")
         elif command == Subparser.update:
             update()
         elif command == Subparser.install:

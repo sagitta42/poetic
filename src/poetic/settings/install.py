@@ -1,15 +1,9 @@
-from typing import Literal
-
 from pydantic import Field
 
-from poetic.settings.setup import SetupSettings, SetupType
+from poetic.settings.base import BaseSettings
 
 
-
-class InstallSettings(SetupSettings):
-    type: Literal[SetupType.install] = Field(
-        default=SetupType.install, description="Setup type"
-    )
+class InstallSettings(BaseSettings):
     local: bool = Field(
         default=False, description="Install local dependencies defined in .poetic.toml"
     )
