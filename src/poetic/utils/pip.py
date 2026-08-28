@@ -60,7 +60,7 @@ class Pip(BaseCommandRunner):
         """
         Get output of pip freeze in list format.
         """
-        ret = self.run("freeze")
+        ret = self.run("freeze", check_output=True)
         assert ret is not None
         return ret
 
