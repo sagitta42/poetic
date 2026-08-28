@@ -76,7 +76,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
         self._pyproject_handler.add_section("project", {"package-mode": False})
         self._pyproject_handler.del_section("build-system")
-        self._pyproject_handler.save_toml()
+        self._pyproject_handler.write()
 
     def setup_source_files(self):
         """

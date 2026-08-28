@@ -176,7 +176,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         self._pyproject_handler.add_section(
             "tool.poetic", self._settings.core_settings()
         )
-        self._pyproject_handler.save_toml()
+        self._pyproject_handler.write()
 
     def display(self, suggest_commit: str | None = None):
         """

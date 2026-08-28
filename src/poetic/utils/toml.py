@@ -36,7 +36,7 @@ class TomlHandler:
 
         return self._toml_dict.get(name, {})
 
-    def add_section(self, name: str, items: dict[str, Any]):
+    def add_section(self, name: str, items: dict[str, Any] = {}):
         """
         Add items to given section.
 
@@ -61,7 +61,7 @@ class TomlHandler:
         if name in self._toml_dict:
             self._toml_dict.pop(name)
 
-    def save_toml(self):
+    def write(self):
         with open(self.path, "w") as f:
             tomlkit.dump(self._toml_dict, f)
 
