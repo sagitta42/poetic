@@ -20,10 +20,10 @@ class File(PathUtil):
     def __init__(self, path: Path) -> None:
         super().__init__(path)
 
-        self._lines = []
+        self.lines = []
         if self._path.exists():
             with open(self._path) as f:
-                self._lines = [l.rstrip() for l in f.readlines()]
+                self.lines = [l.rstrip() for l in f.readlines()]
 
     def add_new_line(self, line: str, prepend: bool = False):
         """
@@ -44,14 +44,14 @@ class File(PathUtil):
 
         Replaces all instances of given string.
         """
-        new_lines = [line.replace(str_original, str_replace) for line in self._lines]
+        new_lines = [line.replace(str_original, str_replace) for line in self.lines]
         self._write(new_lines)
 
     def has_line(self, line: str) -> bool:
         """
         Check if file has given line
         """
-        ret = line.rstrip() in self._lines
+        ret = line.rstrip() in self.lines
         return ret
 
     def _add_line(self, line: str, prepend: bool):
@@ -62,7 +62,7 @@ class File(PathUtil):
         """
         new_line = f"{line}"
         updated_lines = (
-            [new_line] + self._lines if prepend else self._lines + [new_line]
+            [new_line] + self.lines if prepend else self.lines + [new_line]
         )
         self._write(updated_lines)
 

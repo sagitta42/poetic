@@ -71,7 +71,9 @@ class TemplateManager:
         path_to_package_file = path_in_package / filename_in_package
 
         path_to_template = self.get_filepath(
-            template_filename, template_type=template_location, subdir=template_subdir
+            template_filename,
+            template_location=template_location,
+            subdir=template_subdir,
         )
 
         logg.debug(f"Copying {path_to_template} -> {path_to_package_file}")
@@ -82,7 +84,7 @@ class TemplateManager:
     def get_filepath(
         self,
         filename: str,
-        template_type: TemplateLocation = TemplateLocation.setup_ass,
+        template_location: TemplateLocation = TemplateLocation.setup_ass,
         subdir: Path | str | None = None,
     ) -> Path:
         """
@@ -92,7 +94,7 @@ class TemplateManager:
         template_type: type of template; default setup specific (most typical)
         subdir (Path): subdirectory in main template directory; default = no subdirectory
         """
-        template_dir = self._get_templates_dir(template_type)
+        template_dir = self._get_templates_dir(template_location)
         if subdir is not None:
             template_dir = template_dir / subdir
         ret = template_dir / filename

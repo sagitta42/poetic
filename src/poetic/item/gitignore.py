@@ -3,6 +3,7 @@ from pathlib import Path
 from poetic.logger import logg
 from poetic.settings.item import GitignoreSetupSettings
 from poetic.setup.functionality import BaseFunctionalitySetup
+from poetic.utils.path import File
 from poetic.utils.template import TemplateLocation
 
 
@@ -19,6 +20,9 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
     ) -> None:
         super().__init__(path, settings, core)
 
+        self._file = ".gitignore"
+        self._path_to_file = self.path / self._file
+
     def setup(self) -> None:
         """
         Set up .gitignore.
@@ -28,10 +32,31 @@ class GitignoreSetup(BaseFunctionalitySetup[GitignoreSetupSettings]):
         """
         super().setup()
 
-        self._templates.copy(
-            ".gitignore", template_location=TemplateLocation.poetic_build
-        )
+        self._setup_gitignore()
 
     def display(self, suggest_commit: str | None = None):
         super().display(suggest_commit)
         logg.info("-> .gitignore")
+
+    def _setup_gitignore(self):
+        """
+        Set up standard python gitignore.
+
+        If .gitignore does not exist, simply copy the template.
+        Otherwise add lines missing in existing gitignore.
+        """
+
+        if not self._path_to_file.exists():
+            self._templates.copy(
+                self._file, template_location=TemplateLocation.poetic_build
+            )
+            return
+
+        gitignore_file = File(self._path_to_file)
+        path_to_template = self._templates.get_filepath(
+            self._file, template_location=TemplateLocation.poetic_build
+        )
+        gitignore_template = File(path_to_template)
+
+        for line in gitignore_template.lines:
+            gitignore_file.add_new_line(line)
