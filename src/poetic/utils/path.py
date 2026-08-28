@@ -17,13 +17,15 @@ class Dir(PathUtil):
 
 
 class File(PathUtil):
-    def __init__(self, path: Path) -> None:
-        super().__init__(path)
 
-        self.lines = []
+    @property
+    def lines(self) -> list[str]:
+        ret = []
         if self._path.exists():
             with open(self._path) as f:
-                self.lines = [l.rstrip() for l in f.readlines()]
+                ret = [l.rstrip() for l in f.readlines()]
+
+        return ret
 
     def add_new_line(self, line: str, prepend: bool = False):
         """
@@ -36,7 +38,8 @@ class File(PathUtil):
         """
         Remove all instances of line in file.
         """
-        pass
+        new_lines = [l for l in self.lines if l != line.rstrip()]
+        self._write(new_lines)
 
     def replace_str(self, str_original: str, str_replace: str):
         """
@@ -61,9 +64,7 @@ class File(PathUtil):
         prepend (bool): add to top of file instead of bottom
         """
         new_line = f"{line}"
-        updated_lines = (
-            [new_line] + self.lines if prepend else self.lines + [new_line]
-        )
+        updated_lines = [new_line] + self.lines if prepend else self.lines + [new_line]
         self._write(updated_lines)
 
     def _write(self, lines: list[str]):
