@@ -61,12 +61,9 @@ def add_str(
     Add string argument.
 
     optional (bool): if not provided, defaults to default
-
     flag: add -- i.e. --name keyword argument
-
     exclusive (bool): this argument is exclusive to the given type of settings
-
-    informative: if just --flag is provided with no option, assume const value
+    informative ( bool): (applies to flag only) if just --flag is provided with no option, assume const value
     """
     arg_name = name
     if flag:
@@ -78,7 +75,7 @@ def add_str(
         default=help.default(name) if optional else None,
         choices=help.options(name, none_is_option),
         nargs="?" if optional else None,
-        const=help.const(name) if informative else None,
+        const=help.const(name) if flag and informative else None,
         help=help.description(name, exclusive=exclusive),
     )
 
