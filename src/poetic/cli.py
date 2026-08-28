@@ -191,3 +191,4 @@ def add_install_arguments(parser: argparse.ArgumentParser):
 
 def add_poetic_add_arguments(parser: argparse.ArgumentParser):
     add_str(parser, "package", help=AddSettings, optional=False, flag=False)
+    add_bool(parser, "local", help=AddSettings, optional=True)
