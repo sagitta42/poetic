@@ -11,6 +11,7 @@ from poetic.exceptions import PoeticException
 from poetic.install import InstallSetup
 from poetic.logger import logg
 from poetic.settings.install import InstallSettings
+from poetic.utils.poetry import Poetry
 
 
 def main():
@@ -21,6 +22,10 @@ def main():
         Subparser.new.value, help="create new template"
     )
     add_new_template_arguments(new_template_subparser)
+
+    subparsers.add_parser(
+        Subparser.init.value, help="basic no-interaction init"
+    )
 
     update_subparser = subparsers.add_parser(
         Subparser.update.value,
@@ -45,7 +50,10 @@ def main():
     command = Subparser(settings_args.pop("command"))
 
     try:
-        if command == Subparser.update:
+        if command == Subparser.init:
+            poetry = Poetry(Path.cwd())
+            poetry.init_basic()
+        elif command == Subparser.update:
             update()
         elif command == Subparser.install:
             install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))

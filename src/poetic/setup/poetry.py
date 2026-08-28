@@ -2,13 +2,13 @@ from abc import abstractmethod
 import os
 from pathlib import Path
 
-from poetic.exceptions import PoeticException
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
 from poetic.settings.base import T_Settings
 from poetic.setup.venv import BaseVenvSetup
 from poetic.utils.path import File
+from poetic.utils.poetry import Poetry
 from poetic.utils.template import TemplateLocation
 from poetic.utils.toml import PyProjectHandler
 
@@ -30,6 +30,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
         self._vscode = VSCodeSetup(self.path, core=False)
         self._gitignore = GitignoreSetup(self.path)
         self._pyproject_handler = PyProjectHandler(self.path)
+        self._poetry = Poetry(self.path)
 
     @abstractmethod
     def setup_dependencies(self) -> None:
@@ -94,21 +95,7 @@ class BasePoetrySetup(BaseVenvSetup[T_Settings]):
 
         Default poetry init for a poetry setup is basic init with no structure.
         """
-        self._poetry_basic_init(self.path.stem)
-
-    def _poetry_basic_init(self, name: str):
-        """
-        Basic poetry init with no structure.
-        """
-        self.run(
-            "poetry",
-            "init",
-            "--no-interaction",
-            "--name",
-            name,
-            "--description",
-            "",
-        )
+        self._poetry.init_basic()
 
     def _poetry_add(self, package: str, group: str | None = None):
         """
