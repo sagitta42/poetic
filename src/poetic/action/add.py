@@ -28,9 +28,13 @@ class AddAction(PoeticAction[AddSettings]):
         package_source = self._settings.package
 
         prepend = ""
-        if package_source.startswith("git"):
+        if package_source.startswith("git") or package_source.endswith("git"):
             prepend = "git+"
-            if not any(package_source.startswith(start) for start in ["https", "ssh"]):
+            if not package_source.startswith("git@"):
+                prepend += "file://"
+            elif not any(
+                package_source.startswith(start) for start in ["https", "ssh"]
+            ):
                 prepend += "ssh://"
 
         self._poetry.add(prepend + package_source)
