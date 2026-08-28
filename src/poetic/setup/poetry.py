@@ -111,18 +111,7 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
         if group is not None:
             args += ["--group", group]
 
-        try:
-            self._poetry.add(*args, capture_output=True)
-        except subprocess.CalledProcessError as e:
-            if "EnvCommandError" in e.stdout:
-                stdout_lines = e.stdout.split("\n")
-                idx_process_error = find_line(stdout_lines, "CalledProcessError")
-                logg.warning(
-                    f"EnvCommandError when trying to run poetry add:", important=True
-                )
-                for line in stdout_lines[:idx_process_error]:
-                    logg.warning(line)
-                raise e
+        self._poetry.add(*args)
 
     def _setup_poetic_toml(self):
         """
