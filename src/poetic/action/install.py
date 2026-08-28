@@ -128,21 +128,20 @@ class InstallAction(PoeticAction):
             ), "how is there no source in pip freeze"
 
             pip_source = pip_freeze_info.source.removeprefix("file://")
-            logg.debug(pip_freeze_info.source)
-            logg.debug(pip_source)
 
             if install_source == InstallSource.local:
                 if local_package.source == pip_source:
                     continue
+                logg.info(f"{pip_freeze_info.source} -> {local_package.source}")
             elif install_source == InstallSource.pyproject:
-                if local_package.source != pip_source:
+                # TODO: compare to actual pyproject
+                if pip_source != local_package.source:
                     continue
 
             logg.info(
-                f"Replacing dual package {local_package.name} with {install_source} dependency:",
+                f"Replacing dual package {local_package.name} with {install_source} dependency",
                 header=True,
             )
-            logg.info(f"{pip_freeze_info.source} -> {local_package.source}")
 
             self._pip.run("uninstall", local_package.name, "-y", info=True)
 
