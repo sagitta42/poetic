@@ -16,13 +16,13 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ```bash
 $ poetic -h
-usage: poetic [-h] {new,update,add,install} ...
+usage: poetic [-h] {new,update,setup,install} ...
 
 positional arguments:
-  {new,update,add,install}
+  {new,update,setup,install}
     new                 create/update template
     update              update current template with new poetic updates
-    add                 add functionality to existing repo
+    setup               setup functionality in existing repo
     install             poetry install with added options
 
 options:
@@ -86,11 +86,11 @@ options:
 
 See detailed examples in [Template examples][#templates]
 
-### Add functionality
+### Set up functionality
 
 ```bash
-$ poetic add -h
-usage: poetic add [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
+$ poetic setup -h
+usage: poetic setup [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
 
 positional arguments:
   {vscode,gitignore,db,logger}
@@ -107,14 +107,14 @@ options:
 
 ```
 
-Single functionalities added to current directory:
-- `poetic add vscode` - creates/updates `.vscode` setup
-- `poetic add gitignore` - creates/updates `.gitignore`
-- `poetic add db --db psql --dev-sqlite` - sets up psql DB with dev mode switch to SQLite
+Single functionalities set up in current directory:
+- `poetic setup vscode` - creates/updates `.vscode` setup
+- `poetic setup gitignore` - creates/updates `.gitignore`
+- `poetic setup db --db psql --dev-sqlite` - sets up psql DB with dev mode switch to SQLite
 
 If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 
-See detailed examples in [Added functionality examples][#functionalities]
+See detailed examples in [Functionality setup examples][#functionalities]
 
 ### Install
 
@@ -255,7 +255,7 @@ commit d68f600af54ae2410557d19a5f72b09ed63aadbe
 ### Functionalities
 
 ```bash
-$ poetic add vscode
+$ poetic setup vscode
 VSCode update with [poetic](https://github.com/sagitta42/poetic)
 ├── settings.json
 └── launch.json
@@ -310,7 +310,7 @@ local_dependencies = [
 
 ## development notes
 
-### add new independent functionality item setup (`add`)
+### implement new independent functionality item setup (`setup`)
 
 1. Create new `SetupType` e.g. `SetupType.foo` (`settings.base`)
 1. Add `SetupType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli`)
@@ -325,7 +325,7 @@ local_dependencies = [
 
 After this, this setup is now usable with `poetic add foo`
 
-### add new DB setup
+### implement new DB setup
 
 1. Define new DB type in `DBType` e.g. `DBType.foo`
 1. Create DB setup class `FooDBSetup` inheriting from `BaseDBSetup`
@@ -335,7 +335,7 @@ After this, this setup is now usable with `poetic add foo`
 
 After this, this setup is now usable with
 - `poetic new awesome-app --db psql`
-- `poetic add db --db foo`
+- `poetic setup db --db foo`
 
 ### `pydantic` <-> `argparse` adapter
 

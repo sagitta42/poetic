@@ -34,7 +34,7 @@ def main():
     # add_update_arguments(update_subparser)
 
     micro_functionality_subparser = subparsers.add_parser(
-        Subparser.add.value, help="add functionality to existing repo"
+        Subparser.setup.value, help="setup functionality in existing repo/directory"
     )
     add_microfunctionality_arguments(micro_functionality_subparser)
 

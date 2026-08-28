@@ -15,7 +15,7 @@ from poetic.settings.template import (
 class Subparser(str, enum.Enum):
     init = "init"
     new = "new"
-    add = "add"
+    setup = "setup"
     install = "install"
     update = "update"
 
