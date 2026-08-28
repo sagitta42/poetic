@@ -1,5 +1,5 @@
 # build assets
-src/poetic/_build_assets
+src/*/_build_assets
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
