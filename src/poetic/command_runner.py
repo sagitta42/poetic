@@ -29,8 +29,8 @@ class BaseCommandRunner:
         if logg.is_debug:
             logg.debug(f"{self.path} $ {list_as_args(full_args)}")
         elif info:
-            if self._command is not None:
-                full_args[0] = Path(self._command).stem
+            if isinstance(full_args[0], Path):
+                full_args[0] = full_args[0].stem
             logg.info(f"poetic: {list_as_args(full_args)}", poetic=True)
 
         command = self._get_command_list_output if check_output else self._run_command
