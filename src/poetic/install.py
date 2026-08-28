@@ -1,6 +1,7 @@
 import enum
 from functools import cached_property
 from pathlib import Path
+import subprocess
 
 
 from poetic.exceptions import PoeticException
@@ -72,7 +73,11 @@ class InstallSetup(BaseSetup[InstallSettings]):
             self._uninstall_dual_packages(InstallSource.pyproject)
 
         if self._settings.package == "":
-            self._full_poetry_install()
+            try:
+                self._full_poetry_install()
+            except subprocess.CalledProcessError as e:
+                logg.info(f"-> Running poetry lock", green=True)
+                self._poetry.run("lock")
 
         if self._has_dual_packages() and self._settings.local:
             self._uninstall_dual_packages(InstallSource.local)
