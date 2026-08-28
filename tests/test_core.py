@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from poetic.core import launch, update
+from poetic.core import install, launch, update
 
 test_path = Path.cwd().parent / "poetic_test"
 
@@ -23,6 +23,11 @@ def test_launch(test_case_setup):
         os.makedirs(test_dir)
 
     launch(settings, path=test_dir, overwrite=True)
+
+
+def test_install(test_case_template):
+    template_path = test_path / test_case_template.settings["name"]
+    install({}, path=template_path)
 
 
 def test_update(test_case_template):

@@ -4,8 +4,10 @@ from send2trash import send2trash
 from time import sleep
 
 from poetic.factory import PoeticFactory
+from poetic.install import InstallSetup
 from poetic.logger import logg
 from poetic.settings.builder import SettingsBuilder
+from poetic.settings.install import InstallSettings
 from poetic.template.builder import TemplateBuilder
 from poetic.utils.path import Dir
 from poetic.utils.toml import PyProjectHandler
@@ -41,11 +43,14 @@ def launch(settings: dict, path: Path | None = None, overwrite: bool = False):
     setupper.launch()
 
 
-def update(path: Path | None = None):
+def install(settings: dict, path: Path = Path.cwd()):
+    install_setup = InstallSetup(path, InstallSettings(**settings))
+    install_setup.install()
+
+
+def update(path: Path = Path.cwd()):
     """
     Update existing template in given path.
-
-    path: default None = current directory
 
     Read pyproject.toml settings.
     Combine them with provided settings.

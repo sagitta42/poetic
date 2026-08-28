@@ -6,11 +6,9 @@ from poetic.cli import (
     add_microfunctionality_arguments,
     add_new_template_arguments,
 )
-from poetic.core import launch, update
+from poetic.core import install, launch, update
 from poetic.exceptions import PoeticException
-from poetic.install import InstallSetup
 from poetic.logger import logg
-from poetic.settings.install import InstallSettings
 from poetic.utils.poetry import Poetry
 
 
@@ -56,8 +54,7 @@ def main():
         elif command == Subparser.update:
             update()
         elif command == Subparser.install:
-            install_setup = InstallSetup(Path.cwd(), InstallSettings(**settings_args))
-            install_setup.install()
+            install(settings_args)
         else:
             launch(settings_args)
 
