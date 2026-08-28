@@ -97,8 +97,14 @@ class Logger:
         self._logger.setLevel(log_level)
         self._logger.propagate = False
 
-    def info(self, message: Any, poetic: bool = False, header: bool = False):
-        color = AnsiColor.lila if poetic or header else AnsiColor.white
+    def info(self, message: Any, header: bool = False, poetic: bool = False):
+        if poetic:
+            color = AnsiColor.lila
+        elif header:
+            color = AnsiColor.green
+        else:
+            color = AnsiColor.white
+
         return self._log(logging.INFO, color.apply(message, header))
 
     def error(self, message: Any):
