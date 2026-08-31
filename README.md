@@ -2,9 +2,9 @@
 
 A higher level wrapper for `poetry` that creates templates pre-filled with basic structure and setup that I find convenient as a starting point for my packages.
 
-- [Usage][#usage]: command line usage with examples
-- [Examples][#examples]: examples of templates and functionalities results
-- [development notes][#development-notes]: notes on how to add new features to `poetic`
+- [Usage](#usage): command line usage with examples
+- [Examples](#examples): examples of templates and functionalities results
+- [development notes](#development-notes): notes on how to add new features to `poetic`
 
 ## Install
 
@@ -16,13 +16,15 @@ pip install git+https://github.com/sagitta42/poetic.git
 
 ```bash
 $ poetic -h
-usage: poetic [-h] {new,update,setup,install} ...
+usage: poetic [-h] {new,init,add,update,setup,install} ...
 
 positional arguments:
-  {new,update,setup,install}
-    new                 create/update template
-    update              update current template with new poetic updates
-    setup               setup functionality in existing repo
+  {new,init,add,update,setup,install}
+    new                 create new template
+    init                basic no-interaction init
+    add                 poetry add with git+ auto-detect
+    update              update current template as is with new poetic updates
+    setup               setup functionality in existing repo/directory
     install             poetry install with added options
 
 options:
@@ -72,19 +74,39 @@ Add `--settings` flag to set up `pydantic_settings` based `Settings` class conta
 
 Add `--progressbar` flag to set up a simple `ProgressBar` util class in a package source file.
 
-See detailed examples in [Template examples][#templates]
+See detailed examples in [Template examples](#templates)
 
-## Update template
+### Init template
+
+`poetic init -h` to init a simple template in current direcotry with most basic no-interaction poetry pyproject init. Will treat current directory name as project name.
+
+### Add dependency
 
 ```bash
-$ $ poetic update -h
-usage: poetic update [-h]
+$ poetic add -h
+usage: poetic add [-h] [--local [LOCAL]] package
+
+positional arguments:
+  package          Package source (name, https, git)
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help       show this help message and exit
+  --local [LOCAL]  Add local dependency to poetic.toml
 ```
 
-See detailed examples in [Template examples][#templates]
+Running `poetic add package-name` is equivalent to `poetry add package-name`.
+
+Adding package from a repository, running `poetic add https://github.com/username/awesome-package` will automatically add `git+` (same for `ssh` hosted `git@...`)
+
+Use `--local` flag and path to a local clone/repository as `poetic add package-name --local /path/to/awesome-package` to add local dependency to `poetic.toml` - see [Install](#install) for `poetic install --local` usage to handle dual dependencies.
+
+### Update template
+
+Run `poetic update` inside an existing poetic template to update it after poetic itself was updated (new functionalities, bugfixes).
+
+The update will create a special separate update branch, run poetic template setup in it, and then merge the branch into the one you started from. This way, the updates do not all overwrite the changes you made afterwards. Make sure to handle the merge manually anyway, and be able to recover your original setup in case the merge it too complex.
+
+See detailed examples in [Template examples](#templates)
 
 ### Set up functionality
 
@@ -104,7 +126,6 @@ options:
   --subfolder [SUBFOLDER]
                         Subfolder of setup
   --no-commit           Do not commit changes
-
 ```
 
 Single functionalities set up in current directory:
@@ -114,7 +135,7 @@ Single functionalities set up in current directory:
 
 If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 
-See detailed examples in [Functionality setup examples][#functionalities]
+See detailed examples in [Functionality setup examples](#functionalities)
 
 ### Install
 
@@ -139,8 +160,9 @@ local = [
   "python-module @ /path/to/my/fork/of/python-module",
 ]
 ```
+or by running `poetic add my-package --local /path/to/my-package` (see [Add dependency](#add-dependency) section)
 
-See detailed examples in [Install examples][#install-examples]
+See detailed examples in [Install examples](#install-examples)
 
 ## Examples
 
@@ -191,7 +213,7 @@ awesome-app
 │   │   └── table_model.py # base class for alembdantic tables
 │   ├── versions
 |   |   └── 2026_07_15_143709-36648a63d305-example.py # example migration using alembdantic
-│   ├── env.py # alembic env with DB URL based on .env
+│   ├── env.py # alembic env with DB URL based on .env - compatible with SQLite/psql via only .env change
 │   ├── models.py # example alembdantic table schema
 │   ├── README
 │   └── script.py.mako
@@ -205,11 +227,12 @@ awesome-app
 │       └── routes
 │           └── dummy.py # dummy router with a single endpoint calling dummy service
 ├── core
+│	├── db.py # DB session with automatic dual SQLite/psql switch based on .env
 │   └── dummy.py # dummy core logic
 ├── db
 │   └── db.db # initial SQLite DB file if requested
 ├── .gitignore  # standard comprehensive Python .gitignore
-├── .env.template
+├── .env.template # controls switch from SQLite to psql with just a few variables with --dev-sqlite setup
 ├── alembic.ini
 ├── app_info.py # app info extraction from pyproject
 ├── docker-compose.yml # app service; psql service if requested
