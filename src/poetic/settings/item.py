@@ -42,6 +42,42 @@ class DBType(str, enum.Enum):
     mongo = "mongo"
     none = "none"
 
+    @classmethod
+    def all(cls) -> list[str]:
+        """
+        All DB types.
+
+        None (no DB) is excluded (not a DB type, a flag to set up no DB)
+        """
+        all_types = [db_type for db_type in cls if not db_type == cls.none]
+        ret = cls._values(all_types)
+        return ret
+
+    @classmethod
+    def sql(cls) -> list[str]:
+        """
+        SQL based DB types.
+        """
+        sql_types = [cls.sqlite, cls.psql]
+        ret = cls._values(sql_types)
+        return ret
+
+    @classmethod
+    def with_none(cls, db_types: list[str]) -> list[str]:
+        """
+        Include none (no DB) with given types
+        """
+        ret = db_types + [cls.none.value]
+        return ret
+
+    @classmethod
+    def _values(cls, db_types: list) -> list[str]:
+        """
+        Return str values of list of given db types.
+        """
+        ret = [db.value for db in db_types]
+        return ret
+
 
 class DBSettings(SetupSettings):
     """

@@ -1,13 +1,13 @@
 import argparse
 import enum
-from typing import Type
+from typing import Any, Type
 
 from pydantic import Field
 
 from poetic.settings.add import AddSettings
 from poetic.settings.base import BaseSettings
 from poetic.settings.install import InstallSettings
-from poetic.settings.item import DBSettings, LoggerSettings
+from poetic.settings.item import DBSettings, DBType, LoggerSettings
 from poetic.settings.setup import SetupSettings, SetupType
 from poetic.settings.template import (
     AppTemplateSettings,
@@ -57,7 +57,7 @@ def add_str(
     flag: bool = True,
     exclusive: bool = False,
     informative: bool = True,
-    none_is_option: bool = False,
+    choices: list[Any] | None = None,
 ):
     """
     Add string argument.
@@ -75,7 +75,7 @@ def add_str(
         arg_name,
         type=str,
         default=help.default(name) if optional else None,
-        choices=help.options(name, none_is_option),
+        choices=choices or help.options(name),
         nargs="?" if optional else None,
         const=help.const(name) if flag and informative else None,
         help=help.description(name, exclusive=exclusive),
@@ -86,7 +86,7 @@ def add_db_arguments(
     parser: argparse.ArgumentParser,
     help: Type[SetupSettings],
     informative: bool,
-    none_is_option: bool,
+    choices: list[str],
 ):
     """
     Add arguments for DB setup to given parser.
@@ -101,7 +101,7 @@ def add_db_arguments(
         optional=True,
         exclusive=True,
         informative=informative,
-        none_is_option=none_is_option,
+        choices=choices,
     )
 
     add_bool(parser, "dev-sqlite", help=DBSettings, exclusive=True)
@@ -122,7 +122,10 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
     )
 
     add_db_arguments(
-        parser, AppTemplateSettings, informative=informative, none_is_option=True
+        parser,
+        AppTemplateSettings,
+        informative=informative,
+        choices=DBType.with_none(DBType.sql()),
     )
 
     add_bool(
@@ -176,8 +179,15 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         help="Type of functionality",
     )
 
-    add_db_arguments(parser, DBSettings, informative=True, none_is_option=False)
-    add_str(parser, "subfolder", LoggerSettings, optional=True, informative=False, exclusive=True)
+    add_db_arguments(parser, DBSettings, informative=True, choices=DBType.all())
+    add_str(
+        parser,
+        "subfolder",
+        LoggerSettings,
+        optional=True,
+        informative=False,
+        exclusive=True,
+    )
 
     add_bool(parser, "no-commit", SetupSettings)
 

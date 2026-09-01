@@ -15,13 +15,11 @@ class BaseSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     @classmethod
-    def options(cls, arg: str, none_is_option: bool = False) -> list | None:
+    def options(cls, arg: str) -> list | None:
         field_type = cls._get_field(arg).annotation
         assert field_type is not None
         if issubclass(field_type, enum.Enum):
             ret = [item.value for item in field_type]
-            if not none_is_option:
-                ret = [value for value in ret if not value == "none"]
             return ret
         return None
 
