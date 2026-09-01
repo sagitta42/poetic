@@ -46,6 +46,7 @@ class AppTemplateSettings(BaseTemplateSettings, DBSettings):
         default=SetupType.app, description="Template type"
     )
     db_type: DBType = Field(default=DBType.none, description="Database type")
+    mongodb: bool = Field(default=False, description="Add MongoDB service")
 
     @classmethod
     def const(cls, arg: str) -> str:

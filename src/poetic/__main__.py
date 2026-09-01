@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 from poetic.action.add import AddAction
-from poetic.cli import (
+from poetic.cli.cli import (
     Subparser,
     add_install_arguments,
     add_microfunctionality_arguments,

@@ -1,11 +1,9 @@
 import argparse
 import enum
-from typing import Any, Type
 
-from pydantic import Field
-
+from poetic.cli.args import add_bool, add_str
+from poetic.cli.db import add_db_arguments
 from poetic.settings.add import AddSettings
-from poetic.settings.base import BaseSettings
 from poetic.settings.install import InstallSettings
 from poetic.settings.item import DBSettings, DBType, LoggerSettings
 from poetic.settings.setup import SetupSettings, SetupType
@@ -23,89 +21,6 @@ class Subparser(str, enum.Enum):
     setup = "setup"
     install = "install"
     update = "update"
-
-
-# TODO: OOP encalsulate duplications -> pydantic-argparse
-def add_bool(
-    parser: argparse.ArgumentParser,
-    name: str,
-    help: Type[BaseSettings],
-    exclusive: bool = False,
-    optional: bool = True,
-):
-    """
-    Add bool argument.
-
-    exclusive: exclusive to these settings
-
-    optional (bool): if not provided, defaults to False
-    """
-
-    parser.add_argument(
-        f"--{name}",
-        action="store_true",
-        default=False if optional else None,
-        help=help.description(name, exclusive=exclusive),
-    )
-
-
-def add_str(
-    parser: argparse.ArgumentParser,
-    name: str,
-    help: Type[BaseSettings],
-    optional: bool,
-    flag: bool = True,
-    exclusive: bool = False,
-    informative: bool = True,
-    choices: list[Any] | None = None,
-):
-    """
-    Add string argument.
-
-    optional (bool): if not provided, defaults to default
-    flag: add -- i.e. --name keyword argument
-    exclusive (bool): this argument is exclusive to the given type of settings
-    informative ( bool): (applies to flag only) if just --flag is provided with no option, assume const value
-    """
-    arg_name = name
-    if flag:
-        arg_name = f"--{arg_name}"
-
-    parser.add_argument(
-        arg_name,
-        type=str,
-        default=help.default(name) if optional else None,
-        choices=choices or help.options(name),
-        nargs="?" if optional else None,
-        const=help.const(name) if flag and informative else None,
-        help=help.description(name, exclusive=exclusive),
-    )
-
-
-def add_db_arguments(
-    parser: argparse.ArgumentParser,
-    help: Type[SetupSettings],
-    informative: bool,
-    choices: list[str],
-):
-    """
-    Add arguments for DB setup to given parser.
-
-    help: pydantic model to use for description; default, and const values.
-        (can be DBSettings or AppTemplateSettings, for example)
-    """
-    add_str(
-        parser,
-        "db-type",
-        help=help,
-        optional=True,
-        exclusive=True,
-        informative=informative,
-        choices=choices,
-    )
-
-    add_bool(parser, "dev-sqlite", help=DBSettings, exclusive=True)
-    add_bool(parser, "pydantic-table", help=DBSettings, exclusive=True)
 
 
 def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
@@ -127,6 +42,8 @@ def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
         informative=informative,
         choices=DBType.with_none(DBType.sql()),
     )
+
+    add_bool(parser, "mongodb", AppTemplateSettings, exclusive=True)
 
     add_bool(
         parser,
