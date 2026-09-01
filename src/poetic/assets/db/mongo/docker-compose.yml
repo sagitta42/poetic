@@ -1,0 +1,9 @@
+services:
+  mongodb:
+    healthcheck:
+      test: mongosh --eval "db.adminCommand('ping')" --quiet
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - db_mongo:/mongodb

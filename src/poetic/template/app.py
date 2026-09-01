@@ -4,6 +4,7 @@ from pathlib import Path
 from poetic.item.db.base.base import BaseDBSetup
 from poetic.item.db.base.docker import DockerDBSetup
 from poetic.item.db.factory import DBSetupFactory
+from poetic.item.db.mongo import MongoDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.setup import SetupType
@@ -19,15 +20,23 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         self._env_settings_setup = EnvSettingsSetup(
             self.path, template_setup=SetupType.db, core=False
         )
-        db_setup_builder = DBSetupFactory()
+        db_setup_factory = DBSetupFactory()
         self._db: BaseDBSetup | None = (
             None
             if settings.db_type == DBType.none
-            else db_setup_builder.build(
+            else db_setup_factory.build(
                 DBSettings(db_type=settings.db_type, dev_sqlite=settings.dev_sqlite),
                 self.path,
                 core=False,
             )
+        )
+
+        self._mongodb: BaseDBSetup | None = (
+            db_setup_factory.build(
+                DBSettings(db_type=DBType.mongo), self.path, core=False
+            )
+            if self._settings.mongodb
+            else None
         )
 
         self._service = DockerComposeServiceHandler(self.path, "app")
@@ -57,6 +66,9 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
         if self._db is not None:
             self._db.setup()
+
+        if self._mongodb is not None:
+            self._mongodb.setup()
 
     def setup_dependencies(self) -> None:
         """

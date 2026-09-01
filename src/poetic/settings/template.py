@@ -1,6 +1,6 @@
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.setup import SetupSettings, SetupType
@@ -40,6 +40,8 @@ class AppTemplateSettings(BaseTemplateSettings, DBSettings):
     Web app template settings.
 
     Web app template includes option to set up DB.
+
+    NOTE: SQL-type DB arrives via --db-type flag while mongodb with separate bool.
     """
 
     type: Literal[SetupType.app] = Field(
@@ -59,3 +61,9 @@ class AppTemplateSettings(BaseTemplateSettings, DBSettings):
         if arg == "db":
             return DBType.sqlite
         return super().const(arg)
+
+    @model_validator(mode="after")
+    def check_db_type(self) -> Self:
+        if self.db_type == DBType.mongo:
+            raise ValueError("Not accepting MongoDB as DB type in app settings - reserved for the mongodb setting")
+        return self

@@ -1,5 +1,22 @@
+from pathlib import Path
+
 from poetic.item.db.base.docker import DockerDBSetup
+from poetic.logger import logg
+from poetic.settings.item import DBSettings, DBType
+from poetic.utils.db import DBEnvVars
 
 
 class MongoDBSetup(DockerDBSetup):
-    pass
+    def __init__(
+        self,
+        path: Path,
+        env_vars: DBEnvVars,
+        settings: DBSettings = DBSettings(db_type=DBType.mongo),
+        core: bool = False,
+    ) -> None:
+        super().__init__(path, env_vars, settings, core)
+
+    def setup_db(self):
+        super().setup_db()
+
+        logg.info("Here will be MongoDB setup", poetic=True)

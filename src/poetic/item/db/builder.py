@@ -1,6 +1,7 @@
 import enum
 from pathlib import Path
 
+from poetic.item.db.mongo import MongoDBSetup
 from poetic.item.db.psql import PsqlDBSetup
 from poetic.item.db.base.single import SingleDBSetup
 from poetic.item.db.sqlite import SQLiteSetup
@@ -13,6 +14,7 @@ from poetic.utils.db import DBEnvVars, EnvVar
 class DBSetupClass(enum.Enum):
     sqlite = SQLiteSetup
     psql = PsqlDBSetup
+    mongo = MongoDBSetup
 
     @classmethod
     def from_db_type(cls, db_type: DBType):

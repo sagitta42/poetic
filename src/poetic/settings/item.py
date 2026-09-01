@@ -98,6 +98,10 @@ class DBSettings(SetupSettings):
         """
         Check DB type VS development mode.
         """
+        # TODO: improve - separate subclasses with settings for each DB type, discriminator db_type
+        if self.db_type == DBType.mongo and (self.pydantic_table or self.dev_sqlite):
+            raise ValueError("pydantic-table or dev-sqlite settings are not applicable for MongoDB!")
+        
         if self.dev_sqlite and self.db_type == DBType.sqlite:
             logg.warning(
                 f"Development mode with switch to SQLite requested but main DB type requested is SQLite; ignoring"

@@ -10,6 +10,7 @@ from poetic.utils.db import EnvVar
 
 class DockerImage(str, enum.Enum):
     psql = "postgres:16-alpine"
+    mongo = "mongo:8"
 
     @classmethod
     def from_db_type(cls, db_type: DBType) -> str:

@@ -1,0 +1,8 @@
+{
+    "settings": {
+        "type": "app",
+        "name": "app-mongo",
+        "db_type": "none",
+        "mongodb": true
+    }
+}
