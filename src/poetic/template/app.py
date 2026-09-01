@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.docker import DockerDBSetup
 from poetic.item.db.factory import DBSetupFactory
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType
@@ -146,12 +147,12 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         self._templates.copy("dockerfile")
         self._service.set_dockerfile("dockerfile")
 
-        if self._db is not None and self._db.db_type == DBType.psql:
+        if isinstance(self._db, DockerDBSetup):
             self._service.update_env_vars(
-                self._db.env_vars.set_vars, user_service_var_names=False
+                self._db.docker_env_vars.set_vars, user_service_var_names=False
             )
 
-            host = self._db.env_vars.host.model_copy()
+            host = self._db.docker_env_vars.host.model_copy()
             self._service.set_env_var(host.name, self._db.service_name)
 
     def _setup_subfolders(self):

@@ -3,13 +3,13 @@ from pathlib import Path
 import sqlite3
 
 
-from poetic.item.db.base import DBSetup
+from poetic.item.db.sql import DBSqlSetup
 from poetic.settings.item import DBSettings, DBType
-from poetic.utils.docker import EnvVar
+from poetic.utils.db import DBEnvVars
 from poetic.utils.path import File
 
 
-class SQLiteSetup(DBSetup):
+class SQLiteSetup(DBSqlSetup):
     """
     SQLite DB setup.
 
@@ -26,16 +26,14 @@ class SQLiteSetup(DBSetup):
     def __init__(
         self,
         path: Path,
+        env_vars: DBEnvVars,
         settings: DBSettings = DBSettings(db_type=DBType.sqlite),
         core: bool = False,
     ) -> None:
-        super().__init__(path, settings, core)
-
-        self._env_vars.host = EnvVar(name="DB_HOST", value="db")
+        super().__init__(path, env_vars, settings, core)
 
         self._db_dir = Path(self._env_vars.host.value)
         self._filename = f"{self._env_vars.name.value}.db"
-
         self._local_db_path: str = str(self._db_dir / self._filename)
 
     def setup_db(self):

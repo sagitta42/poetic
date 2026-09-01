@@ -1,59 +1,11 @@
 import enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel, Field
 import yaml
 
 from poetic.settings.item import DBType
-
-
-class EnvVar(BaseModel):
-    """
-    Environment variable in .env template or docker-compose.yml
-    """
-
-    name: str = Field(description="Variable name")
-    value: Any = Field(description="Variable value")
-    service_name: Optional[str] = Field(
-        default=None,
-        description="Variable name in service docker-compose environment; defaults to name",
-        exclude=True,
-    )
-
-    @property
-    def service_env_name(self) -> str:
-        return self.service_name or self.name
-
-    @property
-    def dollar(self) -> str:
-        """
-        Get ${var} string.
-        """
-        ret = f"${{{self.name}}}"
-        return ret
-
-
-class DBEnvVars(BaseModel):
-    """
-    Database environment variables
-    """
-
-    db_type: EnvVar
-    host: EnvVar
-    name: EnvVar
-    user: EnvVar | None = None
-    password: EnvVar | None = None
-    port: EnvVar | None = None
-
-    @property
-    def set_vars(self) -> list[EnvVar]:
-        """
-        Non null variables
-        """
-        all_fields = self.__dict__.values()
-        ret = [var for var in all_fields if var is not None]
-        return ret
+from poetic.utils.db import EnvVar
 
 
 class DockerImage(str, enum.Enum):
