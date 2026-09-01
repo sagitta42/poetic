@@ -20,15 +20,16 @@ down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-data = ExampleTable(id=42, name="Alice", value=2.718)
-
+id = 42
 
 def upgrade() -> None:
     """Upgrade schema."""
-    opp.create_table(ExampleTable, columns=["id", "name", "value"])
+    opp.create_table(ExampleTable)
+    data = ExampleTable(id=id, name="Alice", value=2.718)
     opp.insert(data)
 
 
 def downgrade() -> None:
     """Downgrade schema."""
+    opp.delete_by(ExampleTable, id=id)
     opp.drop_table(ExampleTable)
