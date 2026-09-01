@@ -5,7 +5,7 @@ import subprocess
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.item.logger import LoggerSetup
 from poetic.item.progress_bar import ProgressBarSetup
-from poetic.settings.item import LoggerSettings
+from poetic.settings.item import DotenvSettings, LoggerSettings, ProgressBarSettings
 from poetic.settings.template import PackageTemplateSettings
 from poetic.template.base import BaseTemplate
 from poetic.utils.path import File
@@ -28,16 +28,18 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             self.path, LoggerSettings(subfolder=src_subdir), core=False
         )
 
-        # FIXME: same issue as logger setup - provide subfolder to use correct project venv
         self._env_settings_setup = (
-            EnvSettingsSetup(self._path_to_src, core=False)
+            EnvSettingsSetup(
+                self.path, DotenvSettings(subfolder=src_subdir), core=False
+            )
             if self._settings.settings
             else None
         )
 
-        # FIXME: same issue as logger setup - provide subfolder to use correct project venv
         self._progressbar_setup: ProgressBarSetup | None = (
-            ProgressBarSetup(self._path_to_src, core=False)
+            ProgressBarSetup(
+                self.path, ProgressBarSettings(subfolder=src_subdir), core=False
+            )
             if self._settings.progressbar
             else None
         )

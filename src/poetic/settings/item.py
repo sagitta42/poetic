@@ -8,6 +8,10 @@ from poetic.logger import logg
 from poetic.settings.setup import SetupSettings, SetupType
 
 
+class ItemSetupSettings(SetupSettings):
+    subfolder: Path = Field(default=Path(""), description="Subfolder of setup")
+
+
 class VSCodeSetupSettings(SetupSettings):
     type: Literal[SetupType.vscode] = Field(
         default=SetupType.vscode, description="Setup type"
@@ -20,17 +24,16 @@ class GitignoreSetupSettings(SetupSettings):
     )
 
 
-class ProgressBarSettings(SetupSettings):
+class ProgressBarSettings(ItemSetupSettings):
     type: Literal[SetupType.progressbar] = Field(
         default=SetupType.progressbar, description="Setup type"
     )
 
 
-class LoggerSettings(SetupSettings):
+class LoggerSettings(ItemSetupSettings):
     type: Literal[SetupType.logger] = Field(
         default=SetupType.logger, description="Setup type"
     )
-    subfolder: Path = Field(default=Path(""), description="Subfolder of setup")
 
 
 class DBType(str, enum.Enum):
@@ -46,7 +49,9 @@ class DBSettings(SetupSettings):
 
     type: Literal[SetupType.db] = Field(default=SetupType.db, description="Setup type")
     db_type: DBType = Field(default=DBType.sqlite, description="Database type")
-    pydantic_table: bool = Field(default=False, description="Set up pydantic-table for alembic migrations")
+    pydantic_table: bool = Field(
+        default=False, description="Set up pydantic-table for alembic migrations"
+    )
     dev_sqlite: bool = Field(
         default=False, description="Development mode switch to SQLite"
     )
@@ -61,11 +66,11 @@ class DBSettings(SetupSettings):
                 f"Development mode with switch to SQLite requested but main DB type requested is SQLite; ignoring"
             )
             self.dev_sqlite = False
-            
+
         return self
 
 
-class DotenvSettings(SetupSettings):
+class DotenvSettings(ItemSetupSettings):
     """
     Settings for .env Settings class setup
     """
