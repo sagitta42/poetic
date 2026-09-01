@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from pathlib import Path
 
+from poetic.exceptions import PoeticException
 from poetic.logger import logg
 from poetic.settings.setup import T_SetupSettings
 from poetic.setup.base import BaseSetup
@@ -54,6 +55,11 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         Commit setup if in git repository and files did not exist before.
         Add "made with poetic" at the end of readme if does not exist.
         """
+        if self._git.is_git_repo and self._git.has_uncommitted_changes:
+            raise PoeticException(
+                f"Repository {self.path} has uncommitted changes! Commit or stash before proceeding with {self._type.value} setup."
+            )
+
         self.setup()
 
         self._add_poetic_line()

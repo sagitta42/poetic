@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from poetic.command_runner import BaseCommandRunner
+from poetic.logger import logg
 
 
 class Git(BaseCommandRunner):
@@ -20,6 +21,13 @@ class Git(BaseCommandRunner):
         Is current path a git repository.
         """
         return ".git" in os.listdir(self.path)
+
+    @property
+    def has_uncommitted_changes(self) -> bool:
+        output = self.run("diff", check_output=True)
+        logg.debug(output)
+        ret = len(output) > 0
+        return ret
 
     def get_active_branch(self) -> str:
         """
