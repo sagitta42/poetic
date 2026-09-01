@@ -35,7 +35,7 @@ options:
 
 ```bash
 $ poetic new -h
-usage: poetic new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql,none}]] [--dev-sqlite] [--settings] [--progressbar] name
+usage: poetic new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql,none}]] [--dev-sqlite] [--pydantic-table] [--mongodb] [--settings] [--progressbar] name
 
 positional arguments:
   name                  Template/repository name
@@ -46,7 +46,9 @@ options:
                         Type of functionality
   --db-type [{sqlite,psql,none}]
                         Database type (app only)
-  --dev-sqlite          Development mode switch to SQLite (db only)
+  --dev-sqlite          Development mode switch to SQLite (app only)
+  --pydantic-table      Set up pydantic-table for alembic migrations (app only)
+  --mongodb             Add MongoDB service (app only)
   --settings            Set up .env Settings class (package only)
   --progressbar         Set up progress bar source code (package only)
 ```
@@ -69,6 +71,8 @@ Available DB types:
 - `psql` to set up PostgreSQL service in `docker-compose.yml`
 
 Add `--dev-sqlite` flag to set up dual psql/SQLite setup with switch to SQLite via `.env` variables for local development testing.
+
+Add `--mongodb` flag to set up MongoDB service in `docker-compose.yml` and related source files and dependencies in the app code (app only).
 
 Add `--settings` flag to set up `pydantic_settings` based `Settings` class containing `.env` variables (applies to `package` template only; app template always includes this class / source file)
 
@@ -112,7 +116,7 @@ See detailed examples in [Template examples](#templates)
 
 ```bash
 $ poetic setup -h
-usage: poetic setup [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
+usage: poetic setup [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--pydantic-table] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
 
 positional arguments:
   {vscode,gitignore,db,logger}
@@ -123,8 +127,9 @@ options:
   --db-type [{sqlite,psql}]
                         Database type (db only)
   --dev-sqlite          Development mode switch to SQLite (db only)
+  --pydantic-table      Set up pydantic-table for alembic migrations (db only)
   --subfolder [SUBFOLDER]
-                        Subfolder of setup
+                        Subfolder of setup (logger only)
   --no-commit           Do not commit changes
 ```
 
@@ -150,7 +155,7 @@ options:
 
 Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
 
-Add `--local` flag if you want to install some of the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
+Add `--local` flag if you want to install the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
 
 Provide paths to local dependencies via `.poetic.toml` file. Format:
 ```toml
@@ -162,13 +167,15 @@ local = [
 ```
 or by running `poetic add my-package --local /path/to/my-package` (see [Add dependency](#add-dependency) section)
 
+Specify a packge to perform local install with `poetic install --local my-package` or simply `--local` to perform local install for all dual packages.
+
 See detailed examples in [Install examples](#install-examples)
 
 ## Examples
 
 ### Templates
 
-#### `poetic new awesome-package --package --settings --progressbar`
+#### `poetic new awesome-package --type package --settings --progressbar`
 
 Result
 
@@ -198,7 +205,7 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-#### `poetic new awesome-app --app --db`
+#### `poetic new awesome-app --type app --db psql --dev-sqlite --mongodb`
 
 Result
 
@@ -208,40 +215,42 @@ awesome-app
 │   ├── launch.json # debug test setup
 │   └── settings.json # pytest, format on save, pylance, auto-import, ...
 ├── alembic_migrations # migrations for SQLite if requested; adaptation for PostgreSQL coming soon
-│   ├── alembdantic # pydantic controlled alembic
-│   │   ├── opd.py # pydantic controlled alembic.op
-│   │   └── table_model.py # base class for alembdantic tables
 │   ├── versions
-|   |   └── 2026_07_15_143709-36648a63d305-example.py # example migration using alembdantic
-│   ├── env.py # alembic env with DB URL based on .env - compatible with SQLite/psql via only .env change
-│   ├── models.py # example alembdantic table schema
+│   ├── env.py # auto DB URL using settings.py - compatible with SQLite/psql via only .env change
 │   ├── README
 │   └── script.py.mako
 ├── app
-│   ├── services
-│   │   └── dummy.py # dummy service using dummy core logic
+│   ├── api
+│   │   ├── routes
+│   │   │   └── dummy.py
+│   │   └── router.py # main API router that includes dummy router
 │   ├── schemas
 │   │   └── dummy.py # dummy request and response schemas
-│   └── api
-│       ├── router.py # main API router that includes dummy router
-│       └── routes
-│           └── dummy.py # dummy router with a single endpoint calling dummy service
+│   └── services
+│       └── dummy.py # dummy service using dummy core logic
 ├── core
-│	├── db.py # DB session with automatic dual SQLite/psql switch based on .env
-│   └── dummy.py # dummy core logic
+│   ├── models
+│   │   ├── example.py # DeclarativeBase for sqlalchemy session
+│   │   └── mongo_document.py
+│   ├── db.py # DB session with automatic dual SQLite/psql switch based on .env
+│   ├── db_mongo.py # dummy MongoDB client
+│   ├── dummy.py # dummy core logic
+│   └── mongo_config.py # MongoDB client config using settings.py
 ├── db
-│   └── db.db # initial SQLite DB file if requested
-├── .gitignore  # standard comprehensive Python .gitignore
-├── .env.template # controls switch from SQLite to psql with just a few variables with --dev-sqlite setup
+│   └── database.db # initial SQLite DB file, not tracked
+├── venv # venv with pyproject.toml dependencies installed: dotenv, fastapi, pydantic, ...
+├── .env.template # controls switch from SQLite to psql with just a few variables
+├── .gitignore # standard comprehensive Python .gitignore
 ├── alembic.ini
 ├── app_info.py # app info extraction from pyproject
-├── docker-compose.yml # app service; psql service if requested
+├── docker-compose.yml # app, psql, and mongodb services, env variables set based on .env
+├── dockerfile # app service dockerfile
 ├── main.py # main API launcher
+├── poetic.toml.template
 ├── poetry.lock
 ├── pyproject.toml
 ├── README.md
-├── settings.py # pydantic_settings based Settings class containing .env variables
-└── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev); fastapi, pydantic, pydantic-settings, uvicorn
+└── settings.py  # pydantic_settings based Settings class containing .env variables for sqlite/psql dual setup and MongoDB; shared by alembic migrations, SQLAlchemy Session, and MongoDB client
 ```
 
 #### Update template
@@ -336,10 +345,10 @@ local_dependencies = [
 ### implement new independent functionality item setup (`setup`)
 
 1. Create new `SetupType` e.g. `SetupType.foo` (`settings.setup`)
-1. Add `SetupType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli`)
+1. Add `SetupType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli/cli.py`)
 1. Create item settings `FooSettings` in `poetic.settings.item` inheriting from `SetupSettings` with `type` as `Literal[SetupType.foo]`
 1. Add additional settings field if any under `FooSettings` e.g. `field`
-1. Create function adding those settings to given CLI parser in `cli` e.g. `add_foo_arguments(parser)` utilizing `FooSettings` to translate them to CLI arguments. Append call to this function under `add_microfunctionality_arguments()`
+1. Create function adding those settings to given CLI parser in `cli/cli.py` e.g. `add_foo_arguments(parser)` utilizing `FooSettings` to translate them to CLI arguments. Append call to this function under `add_microfunctionality_arguments()`
 1. Add `FooSettings` to accepted setup settings ( `settings.options`)
 1. Create item setup class `FooSetup` in a new source file `poetic.item.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if item includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
 1. Define `setup()` method, calling parent `setup()`, and adding specific setup actions for this item. This method must return `bool` representing whether this setup already existed before.
