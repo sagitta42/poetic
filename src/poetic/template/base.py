@@ -187,6 +187,9 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         logg.info(self.name)
         display(self.path)
 
+    def _add_poetic_line(self):
+        self._readme.add_poetic_line(prep="with")
+
     def _setup_poetic_toml(self):
         """
         Setup poetic.toml template if does not exist.

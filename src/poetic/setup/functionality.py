@@ -54,7 +54,7 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         """
         self.setup()
 
-        self._readme.add_poetic_line()
+        self._add_poetic_line()
 
         if self._git.is_git_repo:
             if self._settings.no_commit:
@@ -88,6 +88,9 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
             logg.info(f"[not committed] {suggest_commit}")
         else:
             logg.info(f"{self.title} functionality setup DONE")
+
+    def _add_poetic_line(self):
+        self._readme.add_poetic_line(prep="using")
 
     def _commit_message(self, mod_type: str) -> str:
         """

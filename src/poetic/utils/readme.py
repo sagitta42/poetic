@@ -60,11 +60,11 @@ class Readme:
 
         self.add_lines(template_lines)
 
-    def add_poetic_line(self):
+    def add_poetic_line(self, prep: str):
         """
         Add a made with poetic line to README if does not exist.
         """
-        poetic_line = f"*Made with {POETIC_LINK}*\n"
+        poetic_line = f"*Made {prep} {POETIC_LINK}*\n"
 
         if not File(self._path_to_readme).has_line(poetic_line):
             lines = []
