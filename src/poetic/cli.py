@@ -176,7 +176,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     )
 
     add_db_arguments(parser, DBSettings, informative=True, none_is_option=False)
-    add_str(parser, "subfolder", LoggerSettings, optional=True, informative=False)
+    add_str(parser, "subfolder", LoggerSettings, optional=True, informative=False, exclusive=True)
 
     add_bool(parser, "no-commit", SetupSettings)
 
