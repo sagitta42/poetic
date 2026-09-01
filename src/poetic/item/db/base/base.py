@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from pathlib import Path
+from typing import Self
 
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
@@ -21,6 +22,14 @@ class BaseDBSetup(BasePoetrySetup[DBSettings]):
     @property
     def title(self) -> str:
         return f"{super().title}: {self.db_type.value}"
+
+    @property
+    @abstractmethod
+    def main(self) -> Self:
+        """
+        Main DB of the setup.
+        """
+        pass
 
     def setup(self) -> None:
         super().setup()

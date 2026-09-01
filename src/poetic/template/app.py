@@ -4,7 +4,6 @@ from pathlib import Path
 from poetic.item.db.base.base import BaseDBSetup
 from poetic.item.db.base.docker import DockerDBSetup
 from poetic.item.db.factory import DBSetupFactory
-from poetic.item.db.mongo import MongoDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType
 from poetic.settings.setup import SetupType
@@ -160,8 +159,8 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         self._service.set_dockerfile("dockerfile")
 
         docker_dbs = []
-        if isinstance(self._db, DockerDBSetup):
-            docker_dbs.append(self._db)
+        if self._db is not None and isinstance(self._db.main, DockerDBSetup):
+            docker_dbs.append(self._db.main)
         if self._mongodb is not None:
             docker_dbs.append(self._mongodb)
 

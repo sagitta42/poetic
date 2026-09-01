@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Generic
+from typing import Generic, Self
 
 from poetic.item.db.base.base import BaseDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
@@ -23,6 +23,10 @@ class SingleDBSetup(BaseDBSetup, Generic[T_DBEnvVars]):
         self._env_settings_setup = EnvSettingsSetup(
             self.path, template_setup=self._type, core=False
         )
+
+    @property
+    def main(self) -> Self:
+        return self
 
     @property
     def dotenv_vars(self) -> DBEnvVars:
