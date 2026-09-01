@@ -1,17 +1,14 @@
 import shutil
 from pathlib import Path
 
-# def build(setup_kwargs=None):
-#     src = Path(".vscode")
-#     dst = Path("src/poetic/_build_assets")
-#     if dst.exists():
-#         shutil.rmtree(dst)
-#     shutil.copytree(src, dst)
-
 
 def build(setup_kwargs=None):
     internal_assets = [".vscode", ".gitignore"]
     dst = Path("src/poetic/_build_assets")
+
+    # sdist VS pip install /path/to/poetic or git+https://
+    if not all(Path(ass).exists() for ass in internal_assets):
+        return
 
     if dst.exists():
         shutil.rmtree(dst)
