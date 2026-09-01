@@ -8,7 +8,7 @@ import os
 
 from dotenv import dotenv_values
 
-from poetic.logger import logg
+from poetiq.logger import logg
 
 env_config = dotenv_values()
 is_debug = env_config.get("DEBUG", "").lower() in ("true", "1")

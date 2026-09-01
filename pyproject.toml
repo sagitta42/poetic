@@ -8,15 +8,15 @@ dependencies = [
   "send2trash (>=2.1.0,<3.0.0)",
 ]
 description = ""
-name = "poetic"
+name = "poetiq"
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
 version = "0.1.0"
 
 [tool.poetry]
-packages = [{ include = "poetic", from = "src" }]
+packages = [{ include = "poetiq", from = "src" }]
 include = [
-  { path = "src/poetic/_build_assets/**/*", format = [
+  { path = "src/poetiq/_build_assets/**/*", format = [
     "sdist",
     "wheel",
   ] },
@@ -34,4 +34,4 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 dev = ["pytest (>=9.1.1,<10.0.0)"]
 
 [project.scripts]
-poetic = "poetic.__main__:main"
+poetiq = "poetiq.__main__:main"

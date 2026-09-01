@@ -1,0 +1,1 @@
+from poetiq.__version__ import __version__

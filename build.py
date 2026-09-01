@@ -4,9 +4,9 @@ from pathlib import Path
 
 def build(setup_kwargs=None):
     internal_assets = [".vscode", ".gitignore"]
-    dst = Path("src/poetic/_build_assets")
+    dst = Path("src/poetiq/_build_assets")
 
-    # sdist VS pip install /path/to/poetic or git+https://
+    # sdist VS pip install /path/to/poetiq or git+https://
     if not all(Path(ass).exists() for ass in internal_assets):
         return
 

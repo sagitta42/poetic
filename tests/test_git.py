@@ -1,6 +1,6 @@
-from poetic.utils.git import Git
+from poetiq.utils.git import Git
 
-from poetic.logger import logg
+from poetiq.logger import logg
 
 
 def test_active_branch():

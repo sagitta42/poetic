@@ -1,29 +1,35 @@
-# Poetic
+# Poetiq
 
 A higher level wrapper for `poetry` that creates templates pre-filled with basic structure and setup that I find convenient as a starting point for my packages.
 
 - [Usage](#usage): command line usage with examples
 - [Examples](#examples): examples of templates and functionalities results
-- [development notes](#development-notes): notes on how to add new features to `poetic`
+- [development notes](#development-notes): notes on how to add new features to `poetiq`
 
 ## Install
 
 ```bash
-pip install git+https://github.com/sagitta42/poetic.git
+pip install poetiq
+```
+
+or for most recent developments:
+
+```bash
+pip install git+https://github.com/sagitta42/poetiq.git
 ```
 
 ## Usage
 
 ```bash
-$ poetic -h
-usage: poetic [-h] {new,init,add,update,setup,install} ...
+$ poetiq -h
+usage: poetiq [-h] {new,init,add,update,setup,install} ...
 
 positional arguments:
   {new,init,add,update,setup,install}
     new                 create new template
     init                basic no-interaction init
     add                 poetry add with git+ auto-detect
-    update              update current template as is with new poetic updates
+    update              update current template as is with new poetiq updates
     setup               setup functionality in existing repo/directory
     install             poetry install with added options
 
@@ -34,8 +40,8 @@ options:
 ### Create template
 
 ```bash
-$ poetic new -h
-usage: poetic new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql,none}]] [--dev-sqlite] [--pydantic-table] [--mongodb] [--settings] [--progressbar] name
+$ poetiq new -h
+usage: poetiq new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql,none}]] [--dev-sqlite] [--pydantic-table] [--mongodb] [--settings] [--progressbar] name
 
 positional arguments:
   name                  Template/repository name
@@ -53,11 +59,11 @@ options:
   --progressbar         Set up progress bar source code (package only)
 ```
 
-Main note: `poetry new package-name` complains if directory `package-name` already exists; `poetic new package-name` only complains if it is non-empty
+Main note: `poetry new package-name` complains if directory `package-name` already exists; `poetiq new package-name` only complains if it is non-empty
 
 Example:
 ```bash
-$ poetic new awesome-package --type pacakge --settings
+$ poetiq new awesome-package --type pacakge --settings
 ```
 
 Available package types:
@@ -82,41 +88,41 @@ See detailed examples in [Template examples](#templates)
 
 ### Init template
 
-`poetic init -h` to init a simple template in current direcotry with most basic no-interaction poetry pyproject init. Will treat current directory name as project name.
+`poetiq init -h` to init a simple template in current direcotry with most basic no-interaction poetry pyproject init. Will treat current directory name as project name.
 
 ### Add dependency
 
 ```bash
-$ poetic add -h
-usage: poetic add [-h] [--local [LOCAL]] package
+$ poetiq add -h
+usage: poetiq add [-h] [--local [LOCAL]] package
 
 positional arguments:
   package          Package source (name, https, git)
 
 options:
   -h, --help       show this help message and exit
-  --local [LOCAL]  Add local dependency to poetic.toml
+  --local [LOCAL]  Add local dependency to poetiq.toml
 ```
 
-Running `poetic add package-name` is equivalent to `poetry add package-name`.
+Running `poetiq add package-name` is equivalent to `poetry add package-name`.
 
-Adding package from a repository, running `poetic add https://github.com/username/awesome-package` will automatically add `git+` (same for `ssh` hosted `git@...`)
+Adding package from a repository, running `poetiq add https://github.com/username/awesome-package` will automatically add `git+` (same for `ssh` hosted `git@...`)
 
-Use `--local` flag and path to a local clone/repository as `poetic add package-name --local /path/to/awesome-package` to add local dependency to `poetic.toml` - see [Install](#install) for `poetic install --local` usage to handle dual dependencies.
+Use `--local` flag and path to a local clone/repository as `poetiq add package-name --local /path/to/awesome-package` to add local dependency to `poetiq.toml` - see [Install](#install) for `poetiq install --local` usage to handle dual dependencies.
 
 ### Update template
 
-Run `poetic update` inside an existing poetic template to update it after poetic itself was updated (new functionalities, bugfixes).
+Run `poetiq update` inside an existing poetiq template to update it after poetiq itself was updated (new functionalities, bugfixes).
 
-The update will create a special separate update branch, run poetic template setup in it, and then merge the branch into the one you started from. This way, the updates do not all overwrite the changes you made afterwards. Make sure to handle the merge manually anyway, and be able to recover your original setup in case the merge it too complex.
+The update will create a special separate update branch, run poetiq template setup in it, and then merge the branch into the one you started from. This way, the updates do not all overwrite the changes you made afterwards. Make sure to handle the merge manually anyway, and be able to recover your original setup in case the merge it too complex.
 
 See detailed examples in [Template examples](#templates)
 
 ### Set up functionality
 
 ```bash
-$ poetic setup -h
-usage: poetic setup [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--pydantic-table] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
+$ poetiq setup -h
+usage: poetiq setup [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--pydantic-table] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
 
 positional arguments:
   {vscode,gitignore,db,logger}
@@ -134,9 +140,9 @@ options:
 ```
 
 Single functionalities set up in current directory:
-- `poetic setup vscode` - creates/updates `.vscode` setup
-- `poetic setup gitignore` - creates/updates `.gitignore`
-- `poetic setup db --db psql --dev-sqlite` - sets up psql DB with dev mode switch to SQLite
+- `poetiq setup vscode` - creates/updates `.vscode` setup
+- `poetiq setup gitignore` - creates/updates `.gitignore`
+- `poetiq setup db --db psql --dev-sqlite` - sets up psql DB with dev mode switch to SQLite
 
 If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 
@@ -145,19 +151,19 @@ See detailed examples in [Functionality setup examples](#functionalities)
 ### Install
 
 ```bash
-$ poetic install -h
-usage: poetic install [-h] [--local]
+$ poetiq install -h
+usage: poetiq install [-h] [--local]
 
 options:
   -h, --help  show this help message and exit
-  --local     Install local dependencies defined in .poetic.toml
+  --local     Install local dependencies defined in poetiq.toml
 ```
 
 Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
 
 Add `--local` flag if you want to install the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
 
-Provide paths to local dependencies via `.poetic.toml` file. Format:
+Provide paths to local dependencies via `poetiq.toml` file. Format:
 ```toml
 [dependency-groups]
 local = [
@@ -165,9 +171,9 @@ local = [
   "python-module @ /path/to/my/fork/of/python-module",
 ]
 ```
-or by running `poetic add my-package --local /path/to/my-package` (see [Add dependency](#add-dependency) section)
+or by running `poetiq add my-package --local /path/to/my-package` (see [Add dependency](#add-dependency) section)
 
-Specify a packge to perform local install with `poetic install --local my-package` or simply `--local` to perform local install for all dual packages.
+Specify a packge to perform local install with `poetiq install --local my-package` or simply `--local` to perform local install for all dual packages.
 
 See detailed examples in [Install examples](#install-examples)
 
@@ -175,7 +181,7 @@ See detailed examples in [Install examples](#install-examples)
 
 ### Templates
 
-#### `poetic new awesome-package --type package --settings --progressbar`
+#### `poetiq new awesome-package --type package --settings --progressbar`
 
 Result
 
@@ -205,7 +211,7 @@ awesome-package
 └── venv # venv with pyproject.toml dependencies: dotenv; poetry and pytest (dev)
 ```
 
-#### `poetic new awesome-app --type app --db psql --dev-sqlite --mongodb`
+#### `poetiq new awesome-app --type app --db psql --dev-sqlite --mongodb`
 
 Result
 
@@ -246,7 +252,7 @@ awesome-app
 ├── docker-compose.yml # app, psql, and mongodb services, env variables set based on .env
 ├── dockerfile # app service dockerfile
 ├── main.py # main API launcher
-├── poetic.toml.template
+├── poetiq.toml.template
 ├── poetry.lock
 ├── pyproject.toml
 ├── README.md
@@ -255,13 +261,13 @@ awesome-app
 
 #### Update template
 
-`poetic update`
+`poetiq update`
 
-On the first update, will create a branch dedicated to poetic updates starting from the first commit.
+On the first update, will create a branch dedicated to poetiq updates starting from the first commit.
 
 ```bash
 $ git branch
-  dev-poetic-update
+  dev-poetiq-update
 * main
 ```
 
@@ -270,51 +276,51 @@ The standard setup is run in the update branch, and the differences/additions ar
 ```bash
 commit cac874d5f2cf07199f00890c4d4cefbb57d3206b (HEAD -> main)
 Merge: a01eefc b4bb541
-    Merge branch 'dev-poetic-update'
+    Merge branch 'dev-poetiq-update'
 
-commit b4bb54109bf78b85618566c3df082128a3f93dd8 (dev-poetic-update)
-    poetic update
+commit b4bb54109bf78b85618566c3df082128a3f93dd8 (dev-poetiq-update)
+    poetiq update
     commit: d68f600af54ae2410557d19a5f72b09ed63aadbe
-    message: <last poetic commit message>
+    message: <last poetiq commit message>
 
 commit a01eefcfe8fff4372c9ad337d40e9ad991b32f9d
     readme update
 
 commit d68f600af54ae2410557d19a5f72b09ed63aadbe
-    template made with poetic
+    template made with poetiq
 ```
 
 ### Functionalities
 
 ```bash
-$ poetic setup vscode
-VSCode update with [poetic](https://github.com/sagitta42/poetic)
+$ poetiq setup vscode
+VSCode update with [poetiq](https://pypi.org/project/poetiq)
 ├── settings.json
 └── launch.json
 ```
 
 ### Install examlpes
 
-Poetic automatically determines `--no-root` flag analyzing `pyproject.toml` for `package-mode=false`:
+Poetiq automatically determines `--no-root` flag analyzing `pyproject.toml` for `package-mode=false`:
 
 ```bash
-$ poetic install --local
-Local install requested but no dual dependencies found in .poetic.toml
-poetic: poetry install --no-root
+$ poetiq install --local
+Local install requested but no dual dependencies found in poetiq.toml
+poetiq: poetry install --no-root
 Installing dependencies from lock file
 
 No dependencies to install or update
 ```
 
-Poetic uninstalls and re-installs dual dependencies:
+Poetiq uninstalls and re-installs dual dependencies:
 ```bash
-$ poetic install --local
-poetic: poetry install --no-root
+$ poetiq install --local
+poetiq: poetry install --no-root
 Installing dependencies from lock file
 
 No dependencies to install or update
 Replacing dual packages with local dependencies
-poetic: pip uninstall python-module
+poetiq: pip uninstall python-module
 Found existing installation: python-module 2.13.4
 Uninstalling python-module-2.13.4:
   Would remove:
@@ -324,7 +330,7 @@ Proceed (Y/n)?
 
 ...
 
-poetic: pip install /path/to/my/fork/of/python-module
+poetiq: pip install /path/to/my/fork/of/python-module
 Processing /path/to/my/fork/of/python-module
 
 ...
@@ -332,10 +338,10 @@ Processing /path/to/my/fork/of/python-module
 Successfully installed python-module-2.14.0a1 ...
 ```
 
-with `.poetic.toml`:
+with `.poetiq.toml`:
 ```toml
-[poetic]
-local_dependencies = [
+[dependency-groups]
+local = [
   "python-module @ /path/to/my/fork/of/python-module",
 ]
 ```
@@ -346,16 +352,16 @@ local_dependencies = [
 
 1. Create new `SetupType` e.g. `SetupType.foo` (`settings.setup`)
 1. Add `SetupType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli/cli.py`)
-1. Create item settings `FooSettings` in `poetic.settings.item` inheriting from `SetupSettings` with `type` as `Literal[SetupType.foo]`
+1. Create item settings `FooSettings` in `poetiq.settings.item` inheriting from `SetupSettings` with `type` as `Literal[SetupType.foo]`
 1. Add additional settings field if any under `FooSettings` e.g. `field`
 1. Create function adding those settings to given CLI parser in `cli/cli.py` e.g. `add_foo_arguments(parser)` utilizing `FooSettings` to translate them to CLI arguments. Append call to this function under `add_microfunctionality_arguments()`
 1. Add `FooSettings` to accepted setup settings ( `settings.options`)
-1. Create item setup class `FooSetup` in a new source file `poetic.item.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if item includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
+1. Create item setup class `FooSetup` in a new source file `poetiq.item.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if item includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
 1. Define `setup()` method, calling parent `setup()`, and adding specific setup actions for this item. This method must return `bool` representing whether this setup already existed before.
 1. In case of dependency setup, add dependencies in `setup_dependencies()` using `_poetry_add("package-name")`
 1. Add `FooSetup` under `ItemSetupClass` enum in `item.builder`, matching enum name with `SetupType` name (`foo`)
 
-After this, this setup is now usable with `poetic add foo`
+After this, this setup is now usable with `poetiq add foo`
 
 ### implement new DB setup
 
@@ -363,11 +369,11 @@ After this, this setup is now usable with `poetic add foo`
 1. Create DB setup class `FooDBSetup` inheriting from `BaseDBSetup`
 1. Define its `setup_db()` method with actions for this DB setup. Return bool representing whether this setup existed before
 1. Define DB URL under `db_url` property
-1. Add `FooDBSetup` under `DBSetupClass` in `poetic.item.db.builder` using the same enum name as defined `DBType` (`foo`)
+1. Add `FooDBSetup` under `DBSetupClass` in `poetiq.item.db.builder` using the same enum name as defined `DBType` (`foo`)
 
 After this, this setup is now usable with
-- `poetic new awesome-app --db psql`
-- `poetic setup db --db foo`
+- `poetiq new awesome-app --db psql`
+- `poetiq setup db --db foo`
 
 ### `pydantic` <-> `argparse` adapter
 
@@ -380,4 +386,4 @@ For this reason, even if otherwise unnecessary:
 
 ### build assets
 
-To run tests locally, need to first run `poetry build` to generate `src/poetic/_build_assets` (see `build.py`) for non-src assets
+To run tests locally, need to first run `poetry build` to generate `src/poetiq/_build_assets` (see `build.py`) for non-src assets

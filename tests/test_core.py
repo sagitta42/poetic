@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
 
-from poetic.core import install, launch, update
+from poetiq.core import install, launch, update
 
-test_path = Path.cwd().parent / "poetic_test"
+test_path = Path.cwd().parent / "poetiq_test"
 
 
 def test_launch(test_case_setup):
