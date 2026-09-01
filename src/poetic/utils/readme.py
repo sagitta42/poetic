@@ -14,10 +14,11 @@ class Readme:
     def __init__(self, path: Path) -> None:
         self.path = path
         self._path_to_readme = self.path / "README.md"
+        self._file = File(self._path_to_readme)
 
-    def add_section(self, title: str, header: int):
+    def add_new_section(self, title: str, header: int):
         """
-        Add section to README.md.
+        Add section header to README.md.
 
         Construct section title based on header.
         Add empty line(s) above and below where needed.
@@ -25,6 +26,8 @@ class Readme:
         FIXME: is not smart to check whether section exists.
         """
         title_line = f"{'#'*header} {title}"
+        if self._file.has_line(title_line):
+            return
 
         title_lines = []
         if header > 1:
@@ -66,7 +69,7 @@ class Readme:
         """
         poetic_line = f"*Made {prep} {POETIC_LINK}*\n"
 
-        if not File(self._path_to_readme).has_line(poetic_line):
+        if not self._file.has_line(poetic_line):
             lines = []
             lines.append("\n-----\n")
             lines.append(poetic_line)

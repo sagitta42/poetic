@@ -25,3 +25,7 @@ class MongoDBSetup(DockerDBSetup[ServiceDBEnvVars]):
         super().setup_dependencies()
 
         self._poetry_add("pymongo")
+
+    def setup_readme(self):
+        self._readme.add_new_section("MongoDB", header=3)
+        super().setup_readme()

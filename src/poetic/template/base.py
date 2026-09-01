@@ -171,7 +171,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         logg.info("...creating README.md", header=True)
 
         self._readme.clean()
-        self._readme.add_section(self.name, header=1)
+        self._readme.add_new_section(self.name, header=1)
 
         readme_template_path = self._templates.get_filepath("README.md")
         if readme_template_path.exists():

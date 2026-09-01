@@ -85,7 +85,7 @@ class DBSqlSetup(SingleDBSetup[T_SqlDBEnvVars]):
     def setup_readme(self):
         super().setup_readme()
 
-        self._readme.add_section("alembic", header=3)
+        self._readme.add_new_section("alembic", header=3)
         path_to_alembic_readme = self._templates.get_filepath(
             "README.md", subdir="alembic"
         )

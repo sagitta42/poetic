@@ -15,7 +15,9 @@ class SingleDBSetup(BaseDBSetup, Generic[T_DBEnvVars]):
     dotenv_vars: DB environment variables in .env template
     """
 
-    def __init__(self, path: Path, env_vars: T_DBEnvVars, settings: DBSettings, core: bool) -> None:
+    def __init__(
+        self, path: Path, env_vars: T_DBEnvVars, settings: DBSettings, core: bool
+    ) -> None:
         super().__init__(path, settings, core)
 
         self._env_vars = env_vars
@@ -56,9 +58,10 @@ class SingleDBSetup(BaseDBSetup, Generic[T_DBEnvVars]):
         Add alembic readme.
         """
         super().setup_readme()
+
         logg.info("...setting up README.md")
 
-        self._readme.add_section("DB", header=2)
+        self._readme.add_new_section("DB", header=2)
         path_to_db_readme = self._templates.get_filepath(
             "README.md", subdir=self.db_type.value
         )
