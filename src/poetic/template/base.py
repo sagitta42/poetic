@@ -8,7 +8,8 @@ from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
 from poetic.setup.poetry import BasePoetrySetup
-from poetic.utils.path import Dir
+from poetic.utils.path import Dir, File
+from poetic.utils.template import TemplateLocation
 from poetic.utils.tree import display
 from poetic.utils.misc import POETIC_LINK
 
@@ -142,6 +143,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         self._vscode.setup()
 
         self.setup_pyproject()
+        self._setup_poetic_toml()
 
     def setup_dependencies(self):
         super().setup_dependencies()
@@ -184,6 +186,21 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         logg.info(self.name)
         display(self.path)
+
+    def _setup_poetic_toml(self):
+        """
+        Setup poetic.toml template if does not exist.
+
+        Set up poetic.toml.template file.
+        Add poetic.toml to .gitignore.
+        """
+        path_to_toml = self.path / "poetic.toml.template"
+        if not path_to_toml.exists():
+            self._templates.copy(
+                "poetic.toml.template", template_location=TemplateLocation.common_ass
+            )
+
+        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
 
     @abstractmethod
     def setup_source_files(self):

@@ -1,18 +1,13 @@
 from abc import abstractmethod
-import os
 from pathlib import Path
-import subprocess
 
 from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
 from poetic.settings.setup import T_SetupSettings
 from poetic.setup.venv import BaseVenvSetup
-from poetic.utils.misc import find_line
-from poetic.utils.path import File
 from poetic.utils.pip import Pip
 from poetic.utils.poetry import Poetry
-from poetic.utils.template import TemplateLocation
 from poetic.utils.toml import PyProjectHandler
 
 
@@ -91,7 +86,6 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
         self._gitignore.setup()
 
         self.setup_dependencies()
-        self._setup_poetic_toml()
 
     def _poetry_init(self):
         """
@@ -112,18 +106,3 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
             args += ["--group", group]
 
         self._poetry.add(*args)
-
-    def _setup_poetic_toml(self):
-        """
-        Setup poetic.toml template if does not exist.
-
-        Set up poetic.toml.template file.
-        Add poetic.toml to .gitignore.
-        """
-        path_to_toml = self.path / "poetic.toml.template"
-        if not path_to_toml.exists():
-            self._templates.copy(
-                "poetic.toml.template", template_location=TemplateLocation.common_ass
-            )
-
-        File(self.path / ".gitignore").add_new_line("poetic.toml", prepend=True)
