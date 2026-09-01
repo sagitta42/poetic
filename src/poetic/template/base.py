@@ -79,6 +79,8 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
 
         Attempt an update, switch to original branch in case of fail.
         """
+        self._check_for_changes()
+
         current_branch = self._git.get_active_branch()
         logg.info(f"Active branch: {current_branch}")
 

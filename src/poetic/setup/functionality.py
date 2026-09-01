@@ -55,10 +55,7 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         Commit setup if in git repository and files did not exist before.
         Add "made with poetic" at the end of readme if does not exist.
         """
-        if self._git.is_git_repo and self._git.has_uncommitted_changes:
-            raise PoeticException(
-                f"Repository {self.path} has uncommitted changes! Commit or stash before proceeding with {self._type.value} setup."
-            )
+        self._check_for_changes()
 
         self.setup()
 
@@ -100,6 +97,12 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
 
     def _add_poetic_line(self):
         self._readme.add_poetic_line(prep="using")
+
+    def _check_for_changes(self):
+        if self._git.is_git_repo and self._git.has_uncommitted_changes:
+            raise PoeticException(
+                f"Repository {self.path} has uncommitted changes! Commit or stash before proceeding with {self._type.value} setup."
+            )
 
     def _commit_message(self, mod_type: str) -> str:
         """
