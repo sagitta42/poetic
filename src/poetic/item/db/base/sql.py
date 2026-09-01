@@ -4,9 +4,10 @@ import os
 
 from poetic.item.db.base.single import SingleDBSetup
 from poetic.logger import logg
+from poetic.utils.db import T_SqlDBEnvVars
 
 
-class DBSqlSetup(SingleDBSetup):
+class DBSqlSetup(SingleDBSetup[T_SqlDBEnvVars]):
     """
     SQL type DB setup (SQLite, psql).
 

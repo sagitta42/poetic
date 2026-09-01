@@ -5,17 +5,17 @@ from poetic.item.db.base.base import BaseDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
-from poetic.utils.db import DBEnvVars
+from poetic.utils.db import DBEnvVars, T_DBEnvVars
 
 
-class SingleDBSetup(BaseDBSetup):
+class SingleDBSetup(BaseDBSetup, Generic[T_DBEnvVars]):
     """
     Single DB setup.
 
     dotenv_vars: DB environment variables in .env template
     """
 
-    def __init__(self, path: Path, env_vars: DBEnvVars, settings: DBSettings, core: bool) -> None:
+    def __init__(self, path: Path, env_vars: T_DBEnvVars, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
         self._env_vars = env_vars

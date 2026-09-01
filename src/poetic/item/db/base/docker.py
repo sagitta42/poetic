@@ -3,11 +3,11 @@ from pathlib import Path
 from poetic.item.db.base.single import SingleDBSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
-from poetic.utils.db import DBEnvVars
+from poetic.utils.db import ServiceDBEnvVars, T_ServiceDBEnvVars
 from poetic.utils.docker import DockerComposeServiceHandler
 
 
-class DockerDBSetup(SingleDBSetup):
+class DockerDBSetup(SingleDBSetup[T_ServiceDBEnvVars]):
     """
     DB setup that includes setting up docker-compose.
 
@@ -17,7 +17,7 @@ class DockerDBSetup(SingleDBSetup):
     """
 
     def __init__(
-        self, path: Path, env_vars: DBEnvVars, settings: DBSettings, core: bool
+        self, path: Path, env_vars: T_ServiceDBEnvVars, settings: DBSettings, core: bool
     ) -> None:
         super().__init__(path, env_vars, settings, core)
 
@@ -25,13 +25,14 @@ class DockerDBSetup(SingleDBSetup):
         self._service = DockerComposeServiceHandler(self.path, "db")
 
     @property
-    def docker_env_vars(self) -> DBEnvVars:
+    def docker_env_vars(self) -> ServiceDBEnvVars:
         """
         Docker env variables.
 
         .env template DB variables except port
         """
-        ret = DBEnvVars(**self._env_vars.model_dump(exclude={"port": True}))
+        ret = self._env_vars.model_copy()
+        ret.port = None
         return ret
 
     def setup(self):
@@ -49,7 +50,7 @@ class DockerDBSetup(SingleDBSetup):
         Set up environment variables in service environment.
         Set up port.
         """
-        logg.info("...setting up PSQL docker-compose", header=True)
+        logg.info(f"...setting up {self.db_type} docker-compose", header=True)
 
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._service.set_from_template(path_to_template)
@@ -60,7 +61,7 @@ class DockerDBSetup(SingleDBSetup):
         self._service.set_image(self.db_type)
 
         self._service.update_env_vars(
-            self._env_vars.set_vars, user_service_var_names=True
+            self.docker_env_vars.set_vars, user_service_var_names=True
         )
         assert self._env_vars.port is not None, "got None for port for docker DB setup"
         self._service.set_port(self._env_vars.port)

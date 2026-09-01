@@ -5,11 +5,11 @@ import sqlite3
 
 from poetic.item.db.base.sql import DBSqlSetup
 from poetic.settings.item import DBSettings, DBType
-from poetic.utils.db import DBEnvVars
+from poetic.utils.db import SqlDBEnvVars
 from poetic.utils.path import File
 
 
-class SQLiteSetup(DBSqlSetup):
+class SQLiteSetup(DBSqlSetup[SqlDBEnvVars]):
     """
     SQLite DB setup.
 
@@ -26,7 +26,7 @@ class SQLiteSetup(DBSqlSetup):
     def __init__(
         self,
         path: Path,
-        env_vars: DBEnvVars,
+        env_vars: SqlDBEnvVars,
         settings: DBSettings = DBSettings(db_type=DBType.sqlite),
         core: bool = False,
     ) -> None:

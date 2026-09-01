@@ -34,12 +34,7 @@ class DBEnvVars(BaseModel):
     Database environment variables
     """
 
-    db_type: EnvVar
-    name: EnvVar
     host: EnvVar
-    user: EnvVar | None = None
-    password: EnvVar | None = None
-    port: EnvVar | None = None
 
     @property
     def set_vars(self) -> list[EnvVar]:
@@ -49,3 +44,23 @@ class DBEnvVars(BaseModel):
         all_fields = self.__dict__.values()
         ret = [var for var in all_fields if var is not None]
         return ret
+
+
+class SqlDBEnvVars(DBEnvVars):
+    db_type: EnvVar
+    name: EnvVar
+
+
+class ServiceDBEnvVars(DBEnvVars):
+    port: EnvVar | None
+    user: EnvVar
+    password: EnvVar
+
+
+class PsqlDBEnvVars(SqlDBEnvVars, ServiceDBEnvVars):
+    pass
+
+
+T_DBEnvVars = TypeVar("T_DBEnvVars", bound=DBEnvVars)
+T_SqlDBEnvVars = TypeVar("T_SqlDBEnvVars", bound=SqlDBEnvVars)
+T_ServiceDBEnvVars = TypeVar("T_ServiceDBEnvVars", bound=ServiceDBEnvVars)

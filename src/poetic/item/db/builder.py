@@ -8,7 +8,13 @@ from poetic.item.db.sqlite import SQLiteSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType
 from poetic.setup.builder import BaseSetupBuilder
-from poetic.utils.db import DBEnvVars, EnvVar
+from poetic.utils.db import (
+    DBEnvVars,
+    EnvVar,
+    PsqlDBEnvVars,
+    ServiceDBEnvVars,
+    SqlDBEnvVars,
+)
 
 
 class DBSetupClass(enum.Enum):
@@ -28,6 +34,16 @@ class DBPort(int, enum.Enum):
     @classmethod
     def from_db_type(cls, db_type: DBType) -> int:
         return cls[db_type.name].value
+
+
+class DBEnvVarsClass(enum.Enum):
+    sqlite = SqlDBEnvVars
+    psql = PsqlDBEnvVars
+    mongo = ServiceDBEnvVars
+
+    @classmethod
+    def from_db_type(cls, db_type: DBType):
+        return cls[db_type.name]
 
 
 class DBSetupBuilder(BaseSetupBuilder[DBSettings]):
@@ -52,39 +68,40 @@ class DBSetupBuilder(BaseSetupBuilder[DBSettings]):
 
         In case of SQLite, host = directory of .db file, name = filename; otherwise host and name of database
         """
-        host_var_name = "MONGO_HOST" if db_type == DBType.mongo else "DB_HOST"
+        db_env_vars_class = DBEnvVarsClass.from_db_type(db_type).value
 
-        if db_type == DBType.sqlite:
-            host_var_value = "db"
-            user = None
-            password = None
-            port = None
-        else:
-            host_var_value = "localhost"
+        host_var_name = "MONGO_HOST" if db_type == DBType.mongo else "DB_HOST"
+        host_var_value = "db" if db_type == DBType.sqlite else "localhost"
+        host_var = EnvVar(name=host_var_name, value=host_var_value)
+
+        db_env_kwargs = {}
+        if db_type.value in DBType.sql():
+            db_env_kwargs["db_type"] = EnvVar(name="DB_TYPE", value=db_type.value)
+            db_env_kwargs["name"] = EnvVar(
+                name="DB_NAME",
+                value="database",
+                service_name="POSTGRES_DB" if db_type == DBType.psql else None,
+            )
+
+        if db_type in DBType.service():
+            port_var_name_prefix = "MONGO" if db_type == DBType.mongo else "DB"
+            db_env_kwargs["port"] = EnvVar(
+                name=f"{port_var_name_prefix}_PORT", value=DBPort.from_db_type(db_type)
+            )
+
             auth_name_prefix = "MONGO_INITDB_ROOT" if db_type == DBType.mongo else "DB"
-            user = EnvVar(
+            db_env_kwargs["user"] = EnvVar(
                 name=f"{auth_name_prefix}_USER",
                 value="changeme",
                 service_name="POSTGRES_USER" if db_type == DBType.psql else None,
             )
-            password = EnvVar(name=f"{auth_name_prefix}_PASSWORD", value="changeme", service_name="POSTGRES_PASSWORD" if db_type == DBType.psql else None)
-            port_var_name_prefix = "MONGO" if db_type == DBType.mongo else "DB"
-            port = EnvVar(
-                name=f"{port_var_name_prefix}_PORT", value=DBPort.from_db_type(db_type)
+            db_env_kwargs["password"] = EnvVar(
+                name=f"{auth_name_prefix}_PASSWORD",
+                value="changeme",
+                service_name="POSTGRES_PASSWORD" if db_type == DBType.psql else None,
             )
 
-        ret = DBEnvVars(
-            db_type=EnvVar(name="DB_TYPE", value=db_type.value),
-            name=EnvVar(
-                name="DB_NAME",
-                value="database",
-                service_name="POSTGRES_DB" if db_type == DBType.psql else None,
-            ),
-            host=EnvVar(name=host_var_name, value=host_var_value),
-            port=port,
-            user=user,
-            password=password,
-        )
+        ret = db_env_vars_class(host=host_var, **db_env_kwargs)
 
         logg.debug(f"Env vars for {db_type}: {ret}")
         # ret.display() # TODO: MyBaseModel

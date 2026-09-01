@@ -63,6 +63,14 @@ class DBType(str, enum.Enum):
         return ret
 
     @classmethod
+    def service(cls):
+        """
+        Service DBs
+        """
+        ret = [cls.psql, cls.mongo]
+        return ret
+
+    @classmethod
     def with_none(cls, db_types: list[str]) -> list[str]:
         """
         Include none (no DB) with given types
