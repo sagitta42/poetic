@@ -46,6 +46,7 @@ class DBSettings(SetupSettings):
 
     type: Literal[SetupType.db] = Field(default=SetupType.db, description="Setup type")
     db_type: DBType = Field(default=DBType.sqlite, description="Database type")
+    pydantic_table: bool = Field(default=False, description="Set up pydantic-table for alembic migrations")
     dev_sqlite: bool = Field(
         default=False, description="Development mode switch to SQLite"
     )

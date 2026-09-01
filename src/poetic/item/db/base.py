@@ -2,14 +2,11 @@ from abc import abstractmethod
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional
-
-from pydantic import BaseModel, Field
 
 
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
-from poetic.settings.item import DBSettings, DBType
+from poetic.settings.item import DBSettings
 from poetic.setup.poetry import BasePoetrySetup
 from poetic.utils.docker import DBEnvVars, EnvVar
 
@@ -104,7 +101,8 @@ class DBSetup(BaseDBSetup):
         super().setup_dependencies()
 
         self._poetry_add("alembic")
-        self._poetry_add("pydantic-table")
+        if self._settings.pydantic_table:
+            self._poetry_add("pydantic-table")
 
     def setup_alembic(self):
         """
@@ -140,19 +138,20 @@ class DBSetup(BaseDBSetup):
 
         self._add_vscode_launch_configurations("alembic.launch.json")
 
-        self._templates.copy(
-            "models.py",
-            package_path=self.path / alembic_dir,
-            template_subdir=template_subdir,
-        )
+        if self._settings.pydantic_table:
+            self._templates.copy(
+                "models.py",
+                package_path=self.path / alembic_dir,
+                template_subdir=template_subdir,
+            )
 
-        path_to_revisions = path_to_alembic / "versions"
-        os.makedirs(path_to_revisions, exist_ok=True)
-        self._templates.copy(
-            "2026_07_15_143709-36648a63d305-example.py",
-            package_path=path_to_revisions,
-            template_subdir=template_subdir,
-        )
+            path_to_revisions = path_to_alembic / "versions"
+            os.makedirs(path_to_revisions, exist_ok=True)
+            self._templates.copy(
+                "2026_07_15_143709-36648a63d305-example.py",
+                package_path=path_to_revisions,
+                template_subdir=template_subdir,
+            )
 
     def setup_dotenv_template(self):
         """

@@ -105,6 +105,7 @@ def add_db_arguments(
     )
 
     add_bool(parser, "dev-sqlite", help=DBSettings, exclusive=True)
+    add_bool(parser, "pydantic-table", help=DBSettings, exclusive=True)
 
 
 def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
