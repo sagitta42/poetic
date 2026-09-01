@@ -20,3 +20,8 @@ class MongoDBSetup(DockerDBSetup[ServiceDBEnvVars]):
         super().setup_db()
 
         logg.info("Here will be MongoDB setup", poetic=True)
+
+    def setup_dependencies(self) -> None:
+        super().setup_dependencies()
+
+        self._poetry_add("pymongo")

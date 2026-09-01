@@ -105,18 +105,37 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
         package_filename = "dummy.py"
 
+        core_templates = "core"
         path_to_core = self.path / "core"
         self._templates.copy(
             "core.py",
             package_path=path_to_core,
             package_filename=package_filename,
+            template_subdir=core_templates,
         )
         if self._db is not None:
-            self._templates.copy("db.py", package_path=path_to_core)
+            self._templates.copy(
+                "db.py", package_path=path_to_core, template_subdir=core_templates
+            )
             self._templates.copy(
                 "model.py",
                 package_path=path_to_core / "models",
                 package_filename="example.py",
+                template_subdir=core_templates,
+            )
+
+        if self._mongodb is not None:
+            for mongo_template in ["db_mongo.py", "mongo_config.py"]:
+                self._templates.copy(
+                    mongo_template,
+                    package_path=path_to_core,
+                    template_subdir=core_templates,
+                )
+
+            self._templates.copy(
+                "mongo_document.py",
+                package_path=path_to_core / "models",
+                template_subdir=core_templates,
             )
 
         path_to_app = self.path / "app"
@@ -183,7 +202,8 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         for subfolder in ["app", "core"]:
             os.makedirs(self.path / subfolder, exist_ok=True)
 
-        os.makedirs(self.path / "core" / "models", exist_ok=True)
+        if any(db is not None for db in [self._db, self._mongodb]):
+            os.makedirs(self.path / "core" / "models", exist_ok=True)
 
         for app_subfolder in ["api", "schemas", "services"]:
             os.makedirs(self.path / "app" / app_subfolder, exist_ok=True)
