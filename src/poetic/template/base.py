@@ -57,7 +57,9 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         self._gitignore = GitignoreSetup(self.path)
         self._env_settings_setup: EnvSettingsSetup | None = None
 
-        logg.info(f"Setting up {self._type.value}: {self.name}")
+    @property
+    def title(self) -> str:
+        return f"{super().title}: {self.name}"
 
     def launch(self) -> None:
         """
