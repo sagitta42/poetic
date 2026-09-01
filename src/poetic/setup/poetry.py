@@ -83,6 +83,8 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
 
         self.setup_dependencies()
 
+        self._gitignore_file.add_new_line("__pycache__")
+
     def _poetry_init(self):
         """
         Poetry init.
