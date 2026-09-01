@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Generic
 
-from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.base.base import BaseDBSetup
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings

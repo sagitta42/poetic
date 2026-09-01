@@ -1,4 +1,4 @@
-from poetic.item.db.docker import DockerDBSetup
+from poetic.item.db.base.docker import DockerDBSetup
 
 
 class MongoDBSetup(DockerDBSetup):

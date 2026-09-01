@@ -2,7 +2,7 @@ import enum
 from pathlib import Path
 
 from poetic.item.db.psql import PsqlDBSetup
-from poetic.item.db.single import SingleDBSetup
+from poetic.item.db.base.single import SingleDBSetup
 from poetic.item.db.sqlite import SQLiteSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType

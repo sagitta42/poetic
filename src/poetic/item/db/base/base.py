@@ -4,7 +4,6 @@ from pathlib import Path
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
 from poetic.setup.poetry import BasePoetrySetup
-from poetic.utils.db import DBEnvVars
 
 
 class BaseDBSetup(BasePoetrySetup[DBSettings]):

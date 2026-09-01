@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from poetic.item.db.base import BaseDBSetup
+from poetic.item.db.base.base import BaseDBSetup
 from poetic.item.db.builder import DBSetupBuilder
 from poetic.logger import logg
 from poetic.settings.item import DBSettings, DBType

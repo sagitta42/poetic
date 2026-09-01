@@ -1,8 +1,8 @@
 from pathlib import Path
 
 
-from poetic.item.db.docker import DockerDBSetup
-from poetic.item.db.sql import DBSqlSetup
+from poetic.item.db.base.docker import DockerDBSetup
+from poetic.item.db.base.sql import DBSqlSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
 from poetic.utils.db import DBEnvVars

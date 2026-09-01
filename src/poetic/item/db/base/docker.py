@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from poetic.item.db.single import SingleDBSetup
+from poetic.item.db.base.single import SingleDBSetup
 from poetic.logger import logg
 from poetic.settings.item import DBSettings
 from poetic.utils.db import DBEnvVars
@@ -34,8 +34,8 @@ class DockerDBSetup(SingleDBSetup):
         ret = DBEnvVars(**self._env_vars.model_dump(exclude={"port": True}))
         return ret
 
-    def setup_db(self):
-        super().setup_db()
+    def setup(self):
+        super().setup()
 
         self.setup_docker_compose()
 

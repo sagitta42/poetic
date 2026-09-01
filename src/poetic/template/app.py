@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from poetic.item.db.base import BaseDBSetup
-from poetic.item.db.docker import DockerDBSetup
+from poetic.item.db.base.base import BaseDBSetup
+from poetic.item.db.base.docker import DockerDBSetup
 from poetic.item.db.factory import DBSetupFactory
 from poetic.item.env_settings import EnvSettingsSetup
 from poetic.settings.item import DBSettings, DBType

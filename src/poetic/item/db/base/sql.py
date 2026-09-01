@@ -2,7 +2,7 @@ import json
 import os
 
 
-from poetic.item.db.single import SingleDBSetup
+from poetic.item.db.base.single import SingleDBSetup
 from poetic.logger import logg
 
 

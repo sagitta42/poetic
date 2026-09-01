@@ -3,7 +3,7 @@ from pathlib import Path
 import sqlite3
 
 
-from poetic.item.db.sql import DBSqlSetup
+from poetic.item.db.base.sql import DBSqlSetup
 from poetic.settings.item import DBSettings, DBType
 from poetic.utils.db import DBEnvVars
 from poetic.utils.path import File
