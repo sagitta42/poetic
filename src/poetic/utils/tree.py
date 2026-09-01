@@ -17,7 +17,7 @@ def tree(path: Path, prefix: str = ""):
 
     https://stackoverflow.com/questions/9727673/list-directory-tree-structure-in-python
     """
-    contents = list(path.iterdir())
+    contents = sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     pointers = [tee] * (len(contents) - 1) + [final]
     for pointer, path in zip(pointers, contents):
         yield prefix + pointer + path.name
