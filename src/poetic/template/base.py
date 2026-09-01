@@ -4,6 +4,7 @@ from typing import TypeVar
 
 from poetic.exceptions import PoeticException
 from poetic.item.env_settings import EnvSettingsSetup
+from poetic.item.gitignore import GitignoreSetup
 from poetic.settings.template import BaseTemplateSettings
 from poetic.logger import logg
 
@@ -53,6 +54,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
 
         # self._git_auto = Git(self._path_to_resources.parent.parent)
 
+        self._gitignore = GitignoreSetup(self.path)
         self._env_settings_setup: EnvSettingsSetup | None = None
 
         logg.info(f"Setting up {self._type.value}: {self.name}")
@@ -128,12 +130,15 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         Main setup.
 
+        Set up standard .gitignore.
         Set up source files.
         Set up pydantic-settings class for if requested.
         Set up .vscode launch and settings.
         Set up pyproject.toml.
         Set up poetic.toml.template.
         """
+        self._gitignore.setup()
+
         super().setup()
 
         self.setup_source_files()

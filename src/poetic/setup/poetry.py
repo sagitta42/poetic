@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from pathlib import Path
 
-from poetic.item.gitignore import GitignoreSetup
 from poetic.item.vscode import VSCodeSetup
 from poetic.logger import logg
 from poetic.settings.setup import T_SetupSettings
@@ -26,7 +25,6 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
         super().__init__(path, settings, core)
 
         self._vscode = VSCodeSetup(self.path, core=False)
-        self._gitignore = GitignoreSetup(self.path)
         self._pyproject_handler = PyProjectHandler(self.path)
         self._poetry = Poetry(self.path)
         self._pip = Pip(self.path)
@@ -82,8 +80,6 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
         """
 
         super().setup()
-
-        self._gitignore.setup()
 
         self.setup_dependencies()
 

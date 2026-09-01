@@ -5,6 +5,7 @@ from poetic.logger import logg
 from poetic.settings.setup import T_SetupSettings
 from poetic.setup.base import BaseSetup
 from poetic.utils.env import DotEnv
+from poetic.utils.path import File
 from poetic.utils.readme import Readme
 from poetic.utils.misc import POETIC_LINK
 
@@ -32,6 +33,7 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
 
         self._readme = Readme(self.path)
         self._env = DotEnv(self.path)
+        self._gitignore_file = File(self.path / ".gitignore")
 
     @abstractmethod
     def setup(self) -> None:
@@ -71,6 +73,7 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         """
         logg.info("...setting up .env template", header=True)
         self._env.set("DEBUG", 1)
+        self._gitignore_file.add_new_line(".env", prepend=True)
 
     def setup_readme(self):
         """
