@@ -1,12 +1,6 @@
-# Poetiq
+# poetiq
 
-A higher level wrapper for `poetry` that creates templates pre-filled with basic structure and setup that I find convenient as a starting point for my packages.
-
-- [Usage](#usage): command line usage with examples
-- [Examples](#examples): examples of templates and functionalities results
-- [development notes](#development-notes): notes on how to add new features to `poetiq`
-
-## Install
+Higher level wrapper for poetry for smart install operations and advanced package template creation
 
 ```bash
 pip install poetiq
@@ -17,6 +11,10 @@ or for most recent developments:
 ```bash
 pip install git+https://github.com/sagitta42/poetiq.git
 ```
+
+- [Usage](#usage): command line usage with examples
+- [Examples](#examples): examples of templates and functionalities results
+- [development notes](#development-notes): notes on how to add new features to `poetiq`
 
 ## Usage
 
