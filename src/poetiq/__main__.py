@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import sys
 from poetiq.action.add import AddAction
 from poetiq.cli.cli import (
     Subparser,
@@ -46,6 +47,10 @@ def main():
         Subparser.setup.value, help="setup functionality in existing repo/directory"
     )
     add_microfunctionality_arguments(micro_functionality_subparser)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
 
     args = parser.parse_args()
     logg.debug(vars(args))
