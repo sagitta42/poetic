@@ -4,13 +4,13 @@ from pathlib import Path
 import subprocess
 
 
+from poetiq.utils.poetry import Poetry
 from poetiq.action.poetiq import PoetiqAction
 from poetiq.exceptions import PoetiqException
 from poetiq.settings.install import InstallSettings
 
 from poetiq.logger import logg
 from poetiq.utils.pip import PackageInfo, Pip, get_package_source
-from poetiq.utils.toml import PyProjectHandler
 
 
 class InstallSource(str, enum.Enum):
@@ -35,9 +35,6 @@ class InstallAction(PoetiqAction):
     def __init__(self, path: Path, settings: InstallSettings) -> None:
         super().__init__(path, settings)
 
-        self._pyproject = PyProjectHandler(self.path)
-        self._pyproject.read()
-
         self._pip = Pip(self.path)
 
     def launch(self):
@@ -45,6 +42,7 @@ class InstallAction(PoetiqAction):
         Run poetry install handling dual dependencies.
 
         Determine if the --no-root flag is needed based on package mode in pyproject.toml.
+        Run "poetry lock" automatically if poetry.lock determined to be too old.
 
         If local flag was given in settings, perform local install:
             - perform full poetry install if no specific package was requested
@@ -67,11 +65,8 @@ class InstallAction(PoetiqAction):
             self._uninstall_dual_packages(InstallSource.pyproject)
 
         if self._settings.package == "":
-            try:
-                self._full_poetry_install()
-            except subprocess.CalledProcessError as e:
-                logg.info(f"-> Running poetry lock", poetiq=True)
-                self._poetry.run("lock")
+            self._full_poetry_install()
+
 
         if self._has_dual_packages() and self._settings.local:
             self._uninstall_dual_packages(InstallSource.local)
@@ -84,28 +79,31 @@ class InstallAction(PoetiqAction):
 
         Add --no-root flag if not in package mode.
         """
-        poetry_args = ["install"]
-        if not self._is_package_mode():
-            poetry_args.append("--no-root")
 
-        self._poetry.run(*poetry_args, check=True)
+        poetries = (
+            self._get_split_poetries() if self._settings.split else [self._poetry]
+        )
+
+        for poetry in poetries:
+            poetry_args = ["install"]
+
+            if not poetry.is_package_mode():
+                poetry_args.append("--no-root")
+
+            logg.info(f"Installing from {poetry.path}...", poetiq=True)
+            try:
+                poetry.run(*poetry_args, check=True)
+            except subprocess.CalledProcessError as e:
+                if "poetry.lock" in e.stderr:
+                    logg.info(f"-> Running poetry lock", poetiq=True)
+                    poetry.run("lock")
+                    poetry.run(*poetry_args, check=True)
 
     def _has_dual_packages(self) -> bool:
         """
         Determine if packages with dual dependencies are present.
         """
         return len(self._all_local_packages) > 0
-
-    def _is_package_mode(self) -> bool:
-        """
-        Determine if current pyproject is in package mode.
-        """
-        project = self._pyproject.get_section("project")
-
-        if "package-mode" not in project:
-            return False
-
-        return project["package-mode"]
 
     def _uninstall_dual_packages(self, install_source: InstallSource):
         """
@@ -157,6 +155,17 @@ class InstallAction(PoetiqAction):
             if self._settings.package != ""
             else self._all_local_packages
         )
+        return ret
+
+    def _get_split_poetries(self) -> list[Poetry]:
+        """
+        Get list of poetry obejcts for each split pyproject.toml directory in poetiq.toml
+        """
+        poetiq_settings = self._poetiq_toml.get_section("dependency-groups")
+        logg.debug(poetiq_settings)
+        split_deps_dirs = poetiq_settings.get("split", [])
+        logg.debug(split_deps_dirs)
+        ret = [Poetry(self.path / dir, venv_path=self.path) for dir in split_deps_dirs]
         return ret
 
     @cached_property

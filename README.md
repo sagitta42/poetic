@@ -152,14 +152,29 @@ See detailed examples in [Functionality setup examples](#functionalities)
 
 ```bash
 $ poetiq install -h
-usage: poetiq install [-h] [--local]
+usage: poetiq install [-h] [--split] [--local] [package]
+
+positional arguments:
+  package     Dual package to reinstall if local install; default all dual packages
 
 options:
   -h, --help  show this help message and exit
+  --split     Install from multiple split pyproject.toml files defined in poetiq.toml
   --local     Install local dependencies defined in poetiq.toml
 ```
 
 Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
+
+Add `--split` flag if you want to install dependencies from multiple `pyproject.toml` files that are part of your codebase (e.g. a web app with separate services). Provide paths to subfolders containing `pyproject.toml` files in `poetiq.toml` file:
+```toml
+[dependency-groups]
+split = [
+  "app",
+  "db",
+]
+```
+
+Note: running this way will generate a separate `poetry.lock` file in each provided subdirectory corresponding to each individual `pyproject.toml`, but install all dependencies into the `venv` of your repository (for development mode).
 
 Add `--local` flag if you want to install the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
 

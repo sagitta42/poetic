@@ -3,8 +3,6 @@ import tomlkit
 from typing import Any
 
 from poetiq.exceptions import PoetiqException
-from poetiq.settings.options import TemplateOptions
-from poetiq.settings.template import BaseTemplateSettings
 
 
 class TomlHandler:
