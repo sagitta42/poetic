@@ -22,20 +22,89 @@ pip install git+https://github.com/sagitta42/poetiq.git
 
 ```bash
 $ poetiq -h
-usage: poetiq [-h] {new,init,add,update,setup,install} ...
+usage: poetiq [-h] {install,add,init,new,update,setup} ...
 
 positional arguments:
-  {new,init,add,update,setup,install}
-    new                 create new template
-    init                basic no-interaction init
+  {install,add,init,new,update,setup}
+    install             poetry install with added options
     add                 poetry add with git+ auto-detect
+    init                basic no-interaction init
+    new                 create new template
     update              update current template as is with new poetiq updates
     setup               setup functionality in existing repo/directory
-    install             poetry install with added options
 
 options:
   -h, --help            show this help message and exit
 ```
+
+### Install
+
+```bash
+$ poetiq install -h
+usage: poetiq install [-h] [--split] [--local] [package]
+
+positional arguments:
+  package     Dual package to reinstall if local install; default all dual packages
+
+options:
+  -h, --help  show this help message and exit
+  --split     Install from multiple split pyproject.toml files defined in poetiq.toml
+  --local     Install local dependencies defined in poetiq.toml
+```
+
+Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
+
+Add `--split` flag if you want to install dependencies from multiple `pyproject.toml` files that are part of your codebase (e.g. a web app with separate services). Provide paths to subfolders containing `pyproject.toml` files in `poetiq.toml` file:
+```toml
+[dependency-groups]
+split = [
+  "app",
+  "db",
+]
+```
+
+Note: running this way will generate a separate `poetry.lock` file in each provided subdirectory corresponding to each individual `pyproject.toml`, but install all dependencies into the `venv` of your repository (for development mode).
+
+Add `--local` flag if you want to install the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
+
+Provide paths to local dependencies via `poetiq.toml` file. Format:
+```toml
+[dependency-groups]
+local = [
+  "my-package @ /path/to/my-package",
+  "python-module @ /path/to/my/fork/of/python-module",
+]
+```
+or by running `poetiq add my-package --local /path/to/my-package` (see [Add dependency](#add-dependency) section)
+
+Specify a packge to perform local install with `poetiq install --local my-package` or simply `--local` to perform local install for all dual packages.
+
+See detailed examples in [Install examples](#install-examples)
+
+
+### Add dependency
+
+```bash
+$ poetiq add -h
+usage: poetiq add [-h] [--local [LOCAL]] package
+
+positional arguments:
+  package          Package source (name, https, git)
+
+options:
+  -h, --help       show this help message and exit
+  --local [LOCAL]  Add local dependency to poetiq.toml
+```
+
+Running `poetiq add package-name` is equivalent to `poetry add package-name`.
+
+Adding package from a repository, running `poetiq add https://github.com/username/awesome-package` will automatically add `git+` (same for `ssh` hosted `git@...`)
+
+Use `--local` flag and path to a local clone/repository as `poetiq add package-name --local /path/to/awesome-package` to add local dependency to `poetiq.toml` - see [Install](#install) for `poetiq install --local` usage to handle dual dependencies.
+
+### Init template
+
+`poetiq init -h` to init a simple template in current direcotry with most basic no-interaction poetry pyproject init. Will treat current directory name as project name.
 
 ### Create template
 
@@ -86,30 +155,6 @@ Add `--progressbar` flag to set up a simple `ProgressBar` util class in a packag
 
 See detailed examples in [Template examples](#templates)
 
-### Init template
-
-`poetiq init -h` to init a simple template in current direcotry with most basic no-interaction poetry pyproject init. Will treat current directory name as project name.
-
-### Add dependency
-
-```bash
-$ poetiq add -h
-usage: poetiq add [-h] [--local [LOCAL]] package
-
-positional arguments:
-  package          Package source (name, https, git)
-
-options:
-  -h, --help       show this help message and exit
-  --local [LOCAL]  Add local dependency to poetiq.toml
-```
-
-Running `poetiq add package-name` is equivalent to `poetry add package-name`.
-
-Adding package from a repository, running `poetiq add https://github.com/username/awesome-package` will automatically add `git+` (same for `ssh` hosted `git@...`)
-
-Use `--local` flag and path to a local clone/repository as `poetiq add package-name --local /path/to/awesome-package` to add local dependency to `poetiq.toml` - see [Install](#install) for `poetiq install --local` usage to handle dual dependencies.
-
 ### Update template
 
 Run `poetiq update` inside an existing poetiq template to update it after poetiq itself was updated (new functionalities, bugfixes).
@@ -147,50 +192,6 @@ Single functionalities set up in current directory:
 If directory is a git repository, will commit changes unless `--no-commit` flag is provided.
 
 See detailed examples in [Functionality setup examples](#functionalities)
-
-### Install
-
-```bash
-$ poetiq install -h
-usage: poetiq install [-h] [--split] [--local] [package]
-
-positional arguments:
-  package     Dual package to reinstall if local install; default all dual packages
-
-options:
-  -h, --help  show this help message and exit
-  --split     Install from multiple split pyproject.toml files defined in poetiq.toml
-  --local     Install local dependencies defined in poetiq.toml
-```
-
-Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
-
-Add `--split` flag if you want to install dependencies from multiple `pyproject.toml` files that are part of your codebase (e.g. a web app with separate services). Provide paths to subfolders containing `pyproject.toml` files in `poetiq.toml` file:
-```toml
-[dependency-groups]
-split = [
-  "app",
-  "db",
-]
-```
-
-Note: running this way will generate a separate `poetry.lock` file in each provided subdirectory corresponding to each individual `pyproject.toml`, but install all dependencies into the `venv` of your repository (for development mode).
-
-Add `--local` flag if you want to install the dependences in `pyproject.toml` from filepath instead of pyproject information (e.g. a local clone of a dependency, which may be convenient during development)
-
-Provide paths to local dependencies via `poetiq.toml` file. Format:
-```toml
-[dependency-groups]
-local = [
-  "my-package @ /path/to/my-package",
-  "python-module @ /path/to/my/fork/of/python-module",
-]
-```
-or by running `poetiq add my-package --local /path/to/my-package` (see [Add dependency](#add-dependency) section)
-
-Specify a packge to perform local install with `poetiq install --local my-package` or simply `--local` to perform local install for all dual packages.
-
-See detailed examples in [Install examples](#install-examples)
 
 ## Examples
 

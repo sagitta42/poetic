@@ -19,17 +19,22 @@ def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
 
-    new_template_subparser = subparsers.add_parser(
-        Subparser.new.value, help="create new template"
+    install_subparser = subparsers.add_parser(
+        Subparser.install.value, help="poetry install with added options"
     )
-    add_new_template_arguments(new_template_subparser)
-
-    subparsers.add_parser(Subparser.init.value, help="basic no-interaction init")
+    add_install_arguments(install_subparser)
 
     add_subparser = subparsers.add_parser(
         Subparser.add.value, help="poetry add with git+ auto-detect"
     )
     add_poetiq_add_arguments(add_subparser)
+
+    subparsers.add_parser(Subparser.init.value, help="basic no-interaction init")
+
+    new_template_subparser = subparsers.add_parser(
+        Subparser.new.value, help="create new template"
+    )
+    add_new_template_arguments(new_template_subparser)
 
     update_subparser = subparsers.add_parser(
         Subparser.update.value,
@@ -41,11 +46,6 @@ def main():
         Subparser.setup.value, help="setup functionality in existing repo/directory"
     )
     add_microfunctionality_arguments(micro_functionality_subparser)
-
-    install_subparser = subparsers.add_parser(
-        Subparser.install.value, help="poetry install with added options"
-    )
-    add_install_arguments(install_subparser)
 
     args = parser.parse_args()
     logg.debug(vars(args))
