@@ -113,6 +113,7 @@ def add_install_arguments(parser: argparse.ArgumentParser):
     """
     Add arguments for install functionalities.
     """
+    add_bool(parser, "split", InstallSettings)
     add_bool(parser, "local", InstallSettings)
     add_str(parser, "package", help=InstallSettings, optional=True, flag=False)
 

@@ -4,6 +4,10 @@ from poetiq.settings.base import BaseSettings
 
 
 class InstallSettings(BaseSettings):
+    split: bool = Field(
+        default=False,
+        description="Install from multiple split pyproject.toml files defined in poetiq.toml",
+    )
     local: bool = Field(
         default=False, description="Install local dependencies defined in poetiq.toml"
     )
