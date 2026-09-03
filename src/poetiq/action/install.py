@@ -4,7 +4,6 @@ from pathlib import Path
 import subprocess
 
 
-from poetiq.utils.poetry import Poetry
 from poetiq.action.poetiq import PoetiqAction
 from poetiq.exceptions import PoetiqException
 from poetiq.settings.install import InstallSettings
@@ -58,7 +57,7 @@ class InstallAction(PoetiqAction):
         """
         if self._settings.local and not self._has_dual_packages():
             logg.warning(
-                f"Local install requested but no dual dependencies found in {self._toml_file}"
+                f"Local install requested but no dual dependencies found in {self._toml_name}"
             )
 
         if self._has_dual_packages() and not self._settings.local:
@@ -66,7 +65,6 @@ class InstallAction(PoetiqAction):
 
         if self._settings.package == "":
             self._full_poetry_install()
-
 
         if self._has_dual_packages() and self._settings.local:
             self._uninstall_dual_packages(InstallSource.local)
@@ -80,9 +78,7 @@ class InstallAction(PoetiqAction):
         Add --no-root flag if not in package mode.
         """
 
-        poetries = (
-            self._get_split_poetries() if self._settings.split else [self._poetry]
-        )
+        poetries = self._get_poetries_of_interest()
 
         for poetry in poetries:
             poetry_args = ["install"]
@@ -157,17 +153,6 @@ class InstallAction(PoetiqAction):
         )
         return ret
 
-    def _get_split_poetries(self) -> list[Poetry]:
-        """
-        Get list of poetry obejcts for each split pyproject.toml directory in poetiq.toml
-        """
-        poetiq_settings = self._poetiq_toml.get_section("dependency-groups")
-        logg.debug(poetiq_settings)
-        split_deps_dirs = poetiq_settings.get("split", [])
-        logg.debug(split_deps_dirs)
-        ret = [Poetry(self.path / dir, venv_path=self.path) for dir in split_deps_dirs]
-        return ret
-
     @cached_property
     def _local_package_map(self) -> dict[str, PackageInfo]:
         ret = {package.name: package for package in self._all_local_packages}
@@ -184,7 +169,7 @@ class InstallAction(PoetiqAction):
         for dep_str in local_deps_items:
             if not "@" in dep_str:
                 raise PoetiqException(
-                    f"Incorrect fromat in {self._toml_file} local dependency: {dep_str}! Use package @ path format"
+                    f"Incorrect fromat in {self._toml_name} local dependency: {dep_str}! Use package @ path format"
                 )
             package, path = get_package_source(dep_str)
             ret.append(PackageInfo(name=package, source=path, version=None))

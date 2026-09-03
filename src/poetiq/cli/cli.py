@@ -120,4 +120,5 @@ def add_install_arguments(parser: argparse.ArgumentParser):
 
 def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
     add_str(parser, "package", help=AddSettings, optional=False, flag=False)
+    add_str(parser, "split", help=AddSettings, optional=True, flag=True, informative=False)
     add_str(parser, "local", help=AddSettings, optional=True, flag=True)

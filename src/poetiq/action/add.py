@@ -1,6 +1,7 @@
 from poetiq.action.poetiq import PoetiqAction
 from poetiq.logger import logg
 from poetiq.settings.add import AddSettings
+from poetiq.utils.poetry import Poetry
 
 
 class AddAction(PoetiqAction[AddSettings]):
@@ -34,7 +35,20 @@ class AddAction(PoetiqAction[AddSettings]):
             ):
                 prepend += "ssh://"
 
-        self._poetry.add(prepend + package_source)
+        poetry = self._get_poetry_of_interest()
+        logg.info(f"Adding to {poetry.path}...", poetiq=True)
+        poetry.add(prepend + package_source)
+
+    def _get_poetry_of_interest(self) -> Poetry:
+        """
+        Get poetries of interest.
+
+        Specific subdirectory's poetry if split add was requested.
+        Otherwise main poetry.
+        """
+        if self._settings.split_requested:
+            return self._get_split_poetry(self._settings.split)
+        return self._poetry
 
     def _add_poetiq(self):
         dep_section = "dependency-groups"
@@ -45,6 +59,6 @@ class AddAction(PoetiqAction[AddSettings]):
 
         entry = f"{self._settings.package} @ {self._settings.local}"
         self._poetiq_toml._toml_dict[dep_section]["local"].append(entry)
-        logg.info(f"Added dependency to {self._toml_file}")
+        logg.info(f"Added dependency to {self._toml_name}")
         logg.info(entry, poetiq=True)
         self._poetiq_toml.write()

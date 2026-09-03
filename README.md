@@ -84,19 +84,22 @@ See detailed examples in [Install examples](#install-examples)
 
 ```bash
 $ poetiq add -h
-usage: poetiq add [-h] [--local [LOCAL]] package
+usage: poetiq add [-h] [--split [SPLIT]] [--local [LOCAL]] package
 
 positional arguments:
   package          Package source (name, https, git)
 
 options:
   -h, --help       show this help message and exit
+  --split SPLIT  Add split dependency to pyproject.toml of given directory
   --local [LOCAL]  Add local dependency to poetiq.toml
 ```
 
 Running `poetiq add package-name` is equivalent to `poetry add package-name`.
 
 Adding package from a repository, running `poetiq add https://github.com/username/awesome-package` will automatically add `git+` (same for `ssh` hosted `git@...`)
+
+Use `poetiq add awesome-package --split subdir` to add package to `pyproject.toml` and `poetry.lock` in subdirectory of the main project (see [Install](#install) on `poetiq.toml` split dependency group). Note that this will not install the dependency, run `poetiq install --split`.
 
 Use `--local` flag and path to a local clone/repository as `poetiq add package-name --local /path/to/awesome-package` to add local dependency to `poetiq.toml` - see [Install](#install) for `poetiq install --local` usage to handle dual dependencies.
 

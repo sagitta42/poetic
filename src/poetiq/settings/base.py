@@ -1,7 +1,8 @@
+from abc import abstractmethod
 import enum
 from typing import Any, TypeVar
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.fields import FieldInfo
 
 
@@ -58,4 +59,13 @@ class BaseSettings(BaseModel):
     def _get_field(cls, arg: str) -> FieldInfo:
         return cls.model_fields[arg.replace("-", "_")]
 
+
+class BaseActionSettings(BaseSettings):
+    @property
+    @abstractmethod
+    def split_requested(self) -> bool:
+        pass
+
+
 T_Settings = TypeVar("T_Settings", bound=BaseSettings)
+T_ActionSettings = TypeVar("T_ActionSettings", bound=BaseActionSettings)
