@@ -101,7 +101,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         if self._settings.my_base_model:
             source_file_path = self._templates.copy(
-                "models.py",
+                "base_model.py",
                 package_path=self._path_to_src,
                 template_location=TemplateLocation.common_ass,
             )
