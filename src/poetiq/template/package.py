@@ -93,13 +93,15 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         Create a dummy source file (convenient for tests).
         Add dummy function to __init__.py.
         Set up MyBaseModel if requested.
-        Set up __main__.py enabling python -m package running.
+        Set up __main__.py enabling python -m and CLI package running.
+        Set up __version__.py reading from pyproject.toml.
         Set up py.typed enabling package imports.
         """
 
         self._templates.copy("foo.py", package_path=self._path_to_src)
 
-        File(self._path_to_src / "__init__.py").add_new_line(
+        init_file = File(self._path_to_src / "__init__.py")
+        init_file.add_new_line(
             f"from {self._inner_name}.foo import is_answer as is_answer"
         )
 
@@ -111,10 +113,15 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             )
             self._replace_package_placeholder(source_file_path)
 
-        path_to_main = self._templates.copy(
-            "__main__.py", package_path=self._path_to_src
+        for src_file in ["__main__.py", "__version__.py"]:
+            path_to_file = self._templates.copy(
+                src_file, package_path=self._path_to_src
+            )
+            self._replace_package_placeholder(path_to_file)
+
+        init_file.add_new_line(
+            f"from {self._inner_name}.__version__ import __version__", prepend=True
         )
-        self._replace_package_placeholder(path_to_main)
 
         self._create_source_file("py.typed")
 
