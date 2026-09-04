@@ -14,7 +14,7 @@ class BaseDBSetup(BasePoetrySetup[DBSettings]):
     Encompasses single and dual DB setups.
     """
 
-    def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
+    def __init__(self, path: Path | None, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
         self.db_type = self._settings.db_type

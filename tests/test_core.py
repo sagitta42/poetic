@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from poetiq.core import install, launch, update
+from poetiq.core import install, launch_action, update
 
 test_path = Path.cwd().parent / "poetiq_test"
 
@@ -22,7 +22,7 @@ def test_launch(test_case_setup):
     if not test_dir.exists():
         os.makedirs(test_dir)
 
-    launch(settings, path=test_dir, overwrite=True)
+    launch_action(settings, path=test_dir, overwrite=True)
 
 
 def test_install(test_case_template):

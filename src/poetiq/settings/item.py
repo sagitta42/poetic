@@ -5,34 +5,34 @@ from typing import Literal, Self
 from pydantic import Field, model_validator
 
 from poetiq.logger import logg
-from poetiq.settings.setup import SetupSettings, SetupType
+from poetiq.settings.base import ActionType, BaseSetupSettings
 
 
-class ItemSetupSettings(SetupSettings):
+class ItemSetupSettings(BaseSetupSettings):
     subfolder: Path = Field(default=Path(""), description="Subfolder of setup")
 
 
-class VSCodeSetupSettings(SetupSettings):
-    type: Literal[SetupType.vscode] = Field(
-        default=SetupType.vscode, description="Setup type"
+class VSCodeSetupSettings(BaseSetupSettings):
+    type: Literal[ActionType.vscode] = Field(
+        default=ActionType.vscode, description="Setup type"
     )
 
 
-class GitignoreSetupSettings(SetupSettings):
-    type: Literal[SetupType.gitignore] = Field(
-        default=SetupType.gitignore, description="Setup type"
+class GitignoreSetupSettings(BaseSetupSettings):
+    type: Literal[ActionType.gitignore] = Field(
+        default=ActionType.gitignore, description="Setup type"
     )
 
 
 class ProgressBarSettings(ItemSetupSettings):
-    type: Literal[SetupType.progressbar] = Field(
-        default=SetupType.progressbar, description="Setup type"
+    type: Literal[ActionType.progressbar] = Field(
+        default=ActionType.progressbar, description="Setup type"
     )
 
 
 class LoggerSettings(ItemSetupSettings):
-    type: Literal[SetupType.logger] = Field(
-        default=SetupType.logger, description="Setup type"
+    type: Literal[ActionType.logger] = Field(
+        default=ActionType.logger, description="Setup type"
     )
 
 
@@ -87,12 +87,14 @@ class DBType(str, enum.Enum):
         return ret
 
 
-class DBSettings(SetupSettings):
+class DBSettings(BaseSetupSettings):
     """
     Settings for DB setup.
     """
 
-    type: Literal[SetupType.db] = Field(default=SetupType.db, description="Setup type")
+    type: Literal[ActionType.db] = Field(
+        default=ActionType.db, description="Setup type"
+    )
     db_type: DBType = Field(default=DBType.sqlite, description="Database type")
     pydantic_table: bool = Field(
         default=False, description="Set up pydantic-table for alembic migrations"
@@ -108,8 +110,10 @@ class DBSettings(SetupSettings):
         """
         # TODO: improve - separate subclasses with settings for each DB type, discriminator db_type
         if self.db_type == DBType.mongo and (self.pydantic_table or self.dev_sqlite):
-            raise ValueError("pydantic-table or dev-sqlite settings are not applicable for MongoDB!")
-        
+            raise ValueError(
+                "pydantic-table or dev-sqlite settings are not applicable for MongoDB!"
+            )
+
         if self.dev_sqlite and self.db_type == DBType.sqlite:
             logg.warning(
                 f"Development mode with switch to SQLite requested but main DB type requested is SQLite; ignoring"
@@ -124,6 +128,6 @@ class DotenvSettings(ItemSetupSettings):
     Settings for .env Settings class setup
     """
 
-    type: Literal[SetupType.dotenv] = Field(
-        default=SetupType.dotenv, description="Setup type"
+    type: Literal[ActionType.dotenv] = Field(
+        default=ActionType.dotenv, description="Setup type"
     )

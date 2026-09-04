@@ -3,17 +3,17 @@ from pathlib import Path
 from poetiq.action.base import BaseAction
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
-from poetiq.settings.base import T_ActionSettings
+from poetiq.settings.base import T_PoetiqActionSettings
 from poetiq.utils.poetry import Poetry
 from poetiq.utils.toml import TomlHandler
 
 
-class PoetiqAction(BaseAction[T_ActionSettings]):
+class PoetiqAction(BaseAction[T_PoetiqActionSettings]):
     """
     Action that involves poetry and poetiq.toml
     """
 
-    def __init__(self, path: Path, settings: T_ActionSettings) -> None:
+    def __init__(self, path: Path, settings: T_PoetiqActionSettings) -> None:
         super().__init__(path, settings)
 
         self._toml_name = "poetiq.toml"

@@ -1,17 +1,17 @@
-from typing import Literal, Self
+from typing import Literal, Self, TypeVar
 
 from pydantic import Field, model_validator
 
+from poetiq.settings.base import ActionType, BaseSetupSettings
 from poetiq.settings.item import DBSettings, DBType
-from poetiq.settings.setup import SetupSettings, SetupType
 
 
-class BaseTemplateSettings(SetupSettings):
+class BaseTemplateSettings(BaseSetupSettings):
     """
     Common settings for any template.
     """
 
-    type: SetupType = Field(default=SetupType.package, description="Template type")
+    type: ActionType = Field(default=ActionType.package, description="Template type")
     name: str = Field(description="Template/repository name")
 
     def core_settings(self) -> dict:
@@ -26,8 +26,8 @@ class PackageTemplateSettings(BaseTemplateSettings):
     Include option to set up .env pydantic settings.
     """
 
-    type: Literal[SetupType.package] = Field(
-        default=SetupType.package, description="Template type"
+    type: Literal[ActionType.package] = Field(
+        default=ActionType.package, description="Template type"
     )
     settings: bool = Field(default=False, description="Set up .env Settings class")
     progressbar: bool = Field(
@@ -48,8 +48,8 @@ class AppTemplateSettings(BaseTemplateSettings, DBSettings):
     NOTE: SQL-type DB arrives via --db-type flag while mongodb with separate bool.
     """
 
-    type: Literal[SetupType.app] = Field(
-        default=SetupType.app, description="Template type"
+    type: Literal[ActionType.app] = Field(
+        default=ActionType.app, description="Template type"
     )
     db_type: DBType = Field(default=DBType.none, description="Database type")
     mongodb: bool = Field(default=False, description="Add MongoDB service")
@@ -73,3 +73,5 @@ class AppTemplateSettings(BaseTemplateSettings, DBSettings):
                 "Not accepting MongoDB as DB type in app settings - reserved for the mongodb setting"
             )
         return self
+
+T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)

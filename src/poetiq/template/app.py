@@ -5,34 +5,34 @@ from poetiq.item.db.base.base import BaseDBSetup
 from poetiq.item.db.base.docker import DockerDBSetup
 from poetiq.item.db.factory import DBSetupFactory
 from poetiq.item.env_settings import EnvSettingsSetup
+from poetiq.settings.base import ActionType
 from poetiq.settings.item import DBSettings, DBType
-from poetiq.settings.setup import SetupType
 from poetiq.settings.template import AppTemplateSettings
 from poetiq.template.base import BaseTemplate
 from poetiq.utils.docker import DockerComposeServiceHandler
 
 
 class AppTemplate(BaseTemplate[AppTemplateSettings]):
-    def __init__(self, settings: AppTemplateSettings, path: Path | None) -> None:
-        super().__init__(settings, path)
+    def __init__(self, path: Path | None, settings: AppTemplateSettings) -> None:
+        super().__init__(path, settings)
 
         self._env_settings_setup = EnvSettingsSetup(
-            self.path, template_setup=SetupType.db, core=False
+            self.path, template_setup=ActionType.db, core=False
         )
         db_setup_factory = DBSetupFactory()
         self._db: BaseDBSetup | None = (
             None
             if settings.db_type == DBType.none
             else db_setup_factory.build(
-                DBSettings(db_type=settings.db_type, dev_sqlite=settings.dev_sqlite),
                 self.path,
+                DBSettings(db_type=settings.db_type, dev_sqlite=settings.dev_sqlite),
                 core=False,
             )
         )
 
         self._mongodb: BaseDBSetup | None = (
             db_setup_factory.build(
-                DBSettings(db_type=DBType.mongo), self.path, core=False
+                self.path, DBSettings(db_type=DBType.mongo), core=False
             )
             if self._settings.mongodb
             else None

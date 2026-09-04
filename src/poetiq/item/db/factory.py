@@ -4,15 +4,14 @@ from poetiq.item.db.base.base import BaseDBSetup
 from poetiq.item.db.builder import DBSetupBuilder
 from poetiq.item.db.dual import DualDBSetup
 from poetiq.settings.item import DBSettings
-from poetiq.setup.builder import BaseSetupBuilder
 
 
-class DBSetupFactory(BaseSetupBuilder[DBSettings]):
+class DBSetupFactory:
     """
     Factory for general DB setup.
     """
 
-    def build(self, settings: DBSettings, path: Path, core: bool) -> BaseDBSetup:
+    def build(self, path: Path | None, settings: DBSettings, core: bool) -> BaseDBSetup:
         """
         Build DB setup based on DB type.
 
@@ -22,5 +21,5 @@ class DBSetupFactory(BaseSetupBuilder[DBSettings]):
             return DualDBSetup(path, settings, core)
 
         db_setup_builder = DBSetupBuilder()
-        ret = db_setup_builder.build(settings, path, core)
+        ret = db_setup_builder.build(path, settings, core)
         return ret

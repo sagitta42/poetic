@@ -9,10 +9,11 @@ from poetiq.cli.cli import (
     add_poetiq_add_arguments,
     add_template_arguments,
 )
-from poetiq.core import install, launch, update
+from poetiq.core import install, launch_action, update
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
-from poetiq.settings.action import AddSettings
+from poetiq.settings.base import ActionType
+from poetiq.settings.poetiq_action import AddSettings
 from poetiq.utils.poetry import Poetry
 
 
@@ -56,21 +57,18 @@ def main():
 
     settings_args = vars(args).copy()
     command = Subparser(settings_args.pop("command"))
+    if command.name in ActionType:
+        settings_args["type"] = command
 
     # TODO: attach exec() to parser, define elsewhere
     try:
         if command == Subparser.init:
             poetry = Poetry(Path.cwd())
             poetry.init_basic()
-        elif command == Subparser.add:
-            add_action = AddAction(Path.cwd(), AddSettings(**settings_args))
-            add_action.launch()
         elif command == Subparser.update:
             update()
-        elif command == Subparser.install:
-            install(settings_args)
         else:
-            launch(settings_args)
+            launch_action(settings_args)
 
     except PoetiqException as e:
         logg.error(str(e))

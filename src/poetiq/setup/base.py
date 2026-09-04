@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 from poetiq.action.base import BaseAction
-from poetiq.settings.setup import SetupType, T_SetupSettings
+from poetiq.settings.base import ActionType, T_SetupSettings
 from poetiq.utils.git import Git
 
 from poetiq.logger import logg
@@ -25,11 +25,13 @@ class BaseSetup(BaseAction[T_SetupSettings]):
         - copying templates
     """
 
-    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
+    def __init__(
+        self, path: Path | None, settings: T_SetupSettings, core: bool
+    ) -> None:
         super().__init__(path, settings)
 
         self._core = core
-        self._type: SetupType = settings.type
+        self._type: ActionType = settings.type
 
         self._templates = TemplateManager(self._type, self.path)
         self._git = Git(self.path)

@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 from poetiq.logger import logg
-from poetiq.settings.setup import SetupType
+from poetiq.settings.base import ActionType
 
 
 class TemplateLocation(str, enum.Enum):
@@ -22,7 +22,7 @@ class TemplateManager:
     path: path of the setup
     """
 
-    def __init__(self, setup_type: SetupType, path: Path) -> None:
+    def __init__(self, setup_type: ActionType, path: Path) -> None:
         self.path = path
         self._setup_type = setup_type
 

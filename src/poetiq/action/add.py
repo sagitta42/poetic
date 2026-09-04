@@ -1,6 +1,6 @@
 from poetiq.action.poetiq import PoetiqAction
 from poetiq.logger import logg
-from poetiq.settings.action import AddSettings
+from poetiq.settings.poetiq_action import AddSettings
 from poetiq.utils.poetry import Poetry
 
 

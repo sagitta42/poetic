@@ -1,11 +1,18 @@
 from pydantic import Field, model_validator
-from typing import Self
+from typing import Literal, Self
 
 from poetiq.exceptions import PoetiqException
-from poetiq.settings.base import BaseActionSettings, BaseSplitActionSettings
+from poetiq.settings.base import (
+    ActionType,
+    BasePoetiqActionSettings,
+    BaseSplitActionSettings,
+)
 
 
-class InstallSettings(BaseActionSettings):
+class InstallSettings(BasePoetiqActionSettings):
+    type: Literal[ActionType.install] = Field(
+        default=ActionType.install, description="Action type"
+    )
     split: bool = Field(
         default=False,
         description="Install from multiple split pyproject.toml files defined in poetiq.toml",
@@ -24,6 +31,9 @@ class InstallSettings(BaseActionSettings):
 
 
 class AddSettings(BaseSplitActionSettings):
+    type: Literal[ActionType.add] = Field(
+        default=ActionType.add, description="Action type"
+    )
     package: str = Field(description="Package source (name, https, git)")
     split: str = Field(
         default="",
@@ -45,3 +55,9 @@ class AddSettings(BaseSplitActionSettings):
                 "Provide either --split or --local argument, not both!"
             )
         return self
+
+
+class LockSettings(BaseSplitActionSettings):
+    type: Literal[ActionType.lock] = Field(
+        default=ActionType.lock, description="Action type"
+    )

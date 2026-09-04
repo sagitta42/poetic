@@ -7,7 +7,6 @@ from poetiq.item.db.base.single import SingleDBSetup
 from poetiq.item.db.sqlite import SQLiteSetup
 from poetiq.logger import logg
 from poetiq.settings.item import DBSettings, DBType
-from poetiq.setup.builder import BaseSetupBuilder
 from poetiq.utils.db import (
     DBEnvVars,
     EnvVar,
@@ -46,12 +45,12 @@ class DBEnvVarsClass(enum.Enum):
         return cls[db_type.name]
 
 
-class DBSetupBuilder(BaseSetupBuilder[DBSettings]):
+class DBSetupBuilder:
     """
     Builder for DB setup of specific DB type.
     """
 
-    def build(self, settings: DBSettings, path: Path, core: bool) -> SingleDBSetup:
+    def build(self, path: Path, settings: DBSettings, core: bool) -> SingleDBSetup:
         """
         Build DB setup based on DB type.
 

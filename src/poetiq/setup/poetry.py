@@ -3,7 +3,7 @@ from pathlib import Path
 
 from poetiq.item.vscode import VSCodeSetup
 from poetiq.logger import logg
-from poetiq.settings.setup import T_SetupSettings
+from poetiq.settings.base import T_SetupSettings
 from poetiq.setup.venv import BaseVenvSetup
 from poetiq.utils.pip import Pip
 from poetiq.utils.poetry import Poetry
@@ -21,7 +21,9 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
         - set up dependencies with poetry
     """
 
-    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
+    def __init__(
+        self, path: Path | None, settings: T_SetupSettings, core: bool
+    ) -> None:
         super().__init__(path, settings, core)
 
         self._vscode = VSCodeSetup(self.path, core=False)

@@ -2,13 +2,13 @@
 import argparse
 from typing import Any, Type
 
-from poetiq.settings.base import BaseSettings
+from poetiq.settings.base import BaseActionSettings
 
 
 def add_bool(
     parser: argparse.ArgumentParser,
     name: str,
-    help: Type[BaseSettings],
+    help: Type[BaseActionSettings],
     exclusive: bool = False,
     optional: bool = True,
 ):
@@ -31,7 +31,7 @@ def add_bool(
 def add_str(
     parser: argparse.ArgumentParser,
     name: str,
-    help: Type[BaseSettings],
+    help: Type[BaseActionSettings],
     optional: bool,
     flag: bool = True,
     informative: bool = False,
@@ -55,7 +55,7 @@ def add_str(
         type=str,
         default=help.default(name) if optional else None,
         choices=choices or help.options(name),
-        nargs="?" if informative else None,
+        nargs="?" if optional or informative else None,
         const=help.const(name) if flag and informative else None,
         help=help.description(name, exclusive=exclusive),
     )

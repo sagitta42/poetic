@@ -6,14 +6,33 @@ from pydantic import BaseModel, ConfigDict, Field
 from pydantic.fields import FieldInfo
 
 
-class BaseSettings(BaseModel):
+class ActionType(str, enum.Enum):
+    package = "package"
+    app = "app"
+    db = "db"
+    dotenv = "dotenv"
+    vscode = "vscode"
+    gitignore = "gitignore"
+    progressbar = "progressbar"
+    logger = "logger"
+    install = "install"
+    add = "add"
+    lock = "lock"
+
+    @classmethod
+    def values(cls) -> list[str]:
+        return [item.value for item in cls]
+
+
+class BaseActionSettings(BaseModel):
     """
-    Base class for settings.
+    Base class for settings for any action.
 
     Adaptor utils to argparse.
     """
 
     model_config = ConfigDict(extra="ignore")
+    type: ActionType = Field(description="Action type; discriminator")
 
     @classmethod
     def options(cls, arg: str) -> list | None:
@@ -60,16 +79,26 @@ class BaseSettings(BaseModel):
         return cls.model_fields[arg.replace("-", "_")]
 
 
-class BaseActionSettings(BaseSettings):
+class BasePoetiqActionSettings(BaseActionSettings):
     @property
     @abstractmethod
     def split_requested(self) -> bool:
         pass
 
 
-class BaseSplitActionSettings(BaseActionSettings):
+class BaseSplitActionSettings(BasePoetiqActionSettings):
     split: str = Field(default="", description="Split pyproject.toml directory")
 
 
-T_Settings = TypeVar("T_Settings", bound=BaseSettings)
+class BaseSetupSettings(BaseActionSettings):
+    """
+    Base class for settings for any type of setup.
+    """
+
+    type: ActionType = Field(description="Setup type")
+    no_commit: bool = Field(default=False, description="Do not commit changes")
+
+
 T_ActionSettings = TypeVar("T_ActionSettings", bound=BaseActionSettings)
+T_PoetiqActionSettings = TypeVar("T_PoetiqActionSettings", bound=BasePoetiqActionSettings)
+T_SetupSettings = TypeVar("T_SetupSettings", bound=BaseSetupSettings)

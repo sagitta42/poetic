@@ -8,7 +8,7 @@ from poetiq.action.poetiq import PoetiqAction
 from poetiq.exceptions import PoetiqException
 
 from poetiq.logger import logg
-from poetiq.settings.action import InstallSettings
+from poetiq.settings.poetiq_action import InstallSettings
 from poetiq.utils.pip import PackageInfo, Pip, get_package_source
 
 

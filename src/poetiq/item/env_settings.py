@@ -1,7 +1,7 @@
 from pathlib import Path
 
+from poetiq.settings.base import ActionType
 from poetiq.settings.item import DotenvSettings
-from poetiq.settings.setup import SetupType
 from poetiq.setup.poetry import BasePoetrySetup
 from poetiq.utils.template import TemplateManager
 
@@ -18,7 +18,7 @@ class EnvSettingsSetup(BasePoetrySetup[DotenvSettings]):
         self,
         path: Path,
         settings: DotenvSettings = DotenvSettings(),
-        template_setup: SetupType | None = None,
+        template_setup: ActionType | None = None,
         core: bool = True,
     ) -> None:
         super().__init__(path, settings, core)
@@ -31,7 +31,9 @@ class EnvSettingsSetup(BasePoetrySetup[DotenvSettings]):
         """
         super().setup()
 
-        self._templates.copy("settings.py", package_path = self.path / self._settings.subfolder)
+        self._templates.copy(
+            "settings.py", package_path=self.path / self._settings.subfolder
+        )
         self.setup_dotenv_template()
 
     def setup_dependencies(self) -> None:

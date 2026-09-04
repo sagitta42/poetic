@@ -3,7 +3,7 @@ from pathlib import Path
 
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
-from poetiq.settings.setup import T_SetupSettings
+from poetiq.settings.base import T_SetupSettings
 from poetiq.setup.base import BaseSetup
 from poetiq.utils.env import DotEnv
 from poetiq.utils.path import File
@@ -29,7 +29,9 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         - .env template setup and update
     """
 
-    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
+    def __init__(
+        self, path: Path | None, settings: T_SetupSettings, core: bool
+    ) -> None:
         super().__init__(path, settings, core)
 
         self._readme = Readme(self.path)

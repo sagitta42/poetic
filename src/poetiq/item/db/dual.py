@@ -14,16 +14,16 @@ class DualDBSetup(BaseDBSetup):
     Set up of given DB type with development mode switch to SQLite.
     """
 
-    def __init__(self, path: Path, settings: DBSettings, core: bool) -> None:
+    def __init__(self, path: Path | None, settings: DBSettings, core: bool) -> None:
         super().__init__(path, settings, core)
 
         db_setup_builder = DBSetupBuilder()
         db_settings = settings.model_copy()
         db_settings.dev_sqlite = False
 
-        self._db_main = db_setup_builder.build(db_settings, self.path, core=False)
+        self._db_main = db_setup_builder.build(self.path, db_settings, core=False)
         self._sqlite_setup = db_setup_builder.build(
-            DBSettings(db_type=DBType.sqlite), self.path, core=False
+            self.path, DBSettings(db_type=DBType.sqlite), core=False
         )
 
     @property

@@ -2,6 +2,7 @@ from typing import Annotated, Union
 
 from pydantic import BaseModel, Field
 
+from poetiq.settings.poetiq_action import AddSettings, InstallSettings, LockSettings
 from poetiq.settings.item import (
     DBSettings,
     GitignoreSetupSettings,
@@ -10,23 +11,26 @@ from poetiq.settings.item import (
 )
 from poetiq.settings.template import AppTemplateSettings, PackageTemplateSettings
 
-AcceptedSetupSettings = Annotated[
+AcceptedActionSettings = Annotated[
     PackageTemplateSettings
     | AppTemplateSettings
     | VSCodeSetupSettings
     | GitignoreSetupSettings
     | DBSettings
-    | LoggerSettings,
+    | LoggerSettings
+    | InstallSettings
+    | AddSettings
+    | LockSettings,
     Field(discriminator="type"),
 ]
 
 
-class SetupOptions(BaseModel):
+class ActionOptions(BaseModel):
     """
-    Exists for convenience of constructing and validating accepted setup settings.
+    Exists for convenience of constructing and validating accepted action settings.
     """
 
-    settings: AcceptedSetupSettings
+    settings: AcceptedActionSettings
 
 
 AcceptedTemplateSettings = Annotated[
@@ -43,4 +47,4 @@ class TemplateOptions(BaseModel):
     settings: AcceptedTemplateSettings
 
 
-SettingsOptions = Union[SetupOptions, TemplateOptions]
+SettingsOptions = Union[ActionOptions, TemplateOptions]

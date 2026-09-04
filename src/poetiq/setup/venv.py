@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-from poetiq.settings.setup import T_SetupSettings
+from poetiq.settings.base import T_SetupSettings
 from poetiq.setup.functionality import BaseFunctionalitySetup
 from poetiq.utils.venv import Venv
 
@@ -11,8 +11,10 @@ class BaseVenvSetup(BaseFunctionalitySetup[T_SetupSettings]):
     General functionality setup with pip and venv.
     """
 
-    def __init__(self, path: Path, settings: T_SetupSettings, core: bool) -> None:
-        BaseFunctionalitySetup.__init__(self, path, settings, core)
+    def __init__(
+        self, path: Path | None, settings: T_SetupSettings, core: bool
+    ) -> None:
+        super().__init__(path, settings, core)
 
         self._venv = Venv(self.path)
 

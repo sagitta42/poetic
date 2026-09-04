@@ -2,12 +2,12 @@ import argparse
 from typing import Type
 
 from poetiq.cli.args import add_bool, add_str
-from poetiq.settings.setup import SetupSettings
+from poetiq.settings.base import BaseSetupSettings
 
 
 def add_db_arguments(
     parser: argparse.ArgumentParser,
-    help: Type[SetupSettings],
+    help: Type[BaseSetupSettings],
     choices: list[str],
     optional: bool,
 ):

@@ -3,9 +3,9 @@ import enum
 
 from poetiq.cli.args import add_bool, add_str
 from poetiq.cli.db import add_db_arguments
-from poetiq.settings.action import AddSettings, InstallSettings
+from poetiq.settings.poetiq_action import AddSettings, InstallSettings
+from poetiq.settings.base import ActionType, BaseSetupSettings
 from poetiq.settings.item import DBSettings, DBType, LoggerSettings
-from poetiq.settings.setup import SetupSettings, SetupType
 from poetiq.settings.template import (
     AppTemplateSettings,
     BaseTemplateSettings,
@@ -38,7 +38,9 @@ def add_template_arguments(parser: argparse.ArgumentParser):
         help=BaseTemplateSettings,
         optional=True,
         informative=False,
-        choices=[setup_type.value for setup_type in [SetupType.package, SetupType.app]],
+        choices=[
+            setup_type.value for setup_type in [ActionType.package, ActionType.app]
+        ],
     )
 
     add_db_arguments(
@@ -69,10 +71,10 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         choices=[
             setup_type.value
             for setup_type in [
-                SetupType.vscode,
-                SetupType.gitignore,
-                SetupType.db,
-                SetupType.logger,
+                ActionType.vscode,
+                ActionType.gitignore,
+                ActionType.db,
+                ActionType.logger,
             ]
         ],
         help="Type of functionality",
@@ -88,7 +90,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         exclusive=True,
     )
 
-    add_bool(parser, "no-commit", SetupSettings)
+    add_bool(parser, "no-commit", BaseSetupSettings)
 
 
 def add_install_arguments(parser: argparse.ArgumentParser):
@@ -106,4 +108,3 @@ def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
         parser, "split", help=AddSettings, optional=True, flag=True, informative=False
     )
     add_str(parser, "local", help=AddSettings, optional=True, flag=True)
-

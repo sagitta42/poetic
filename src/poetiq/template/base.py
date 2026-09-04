@@ -1,11 +1,10 @@
 from abc import abstractmethod
 from pathlib import Path
-from typing import TypeVar
 
 from poetiq.exceptions import PoetiqException
 from poetiq.item.env_settings import EnvSettingsSetup
 from poetiq.item.gitignore import GitignoreSetup
-from poetiq.settings.template import BaseTemplateSettings
+from poetiq.settings.template import T_TemplateSettings
 from poetiq.logger import logg
 
 from poetiq.setup.poetry import BasePoetrySetup
@@ -13,8 +12,6 @@ from poetiq.utils.path import Dir, File
 from poetiq.utils.template import TemplateLocation
 from poetiq.utils.tree import display
 from poetiq.utils.misc import POETIQ_LINK
-
-T_TemplateSettings = TypeVar("T_TemplateSettings", bound=BaseTemplateSettings)
 
 
 class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
@@ -37,7 +34,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
     Repository update: updating existing template with poetiq updates.
     """
 
-    def __init__(self, settings: T_TemplateSettings, path: Path | None) -> None:
+    def __init__(self, path: Path | None, settings: T_TemplateSettings) -> None:
         """
         Initialize template setup with given settings.
 
