@@ -1,0 +1,21 @@
+import argparse
+
+from $PACKAGE.foo import is_answer
+from $PACKAGE.logger import logg
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="command")
+
+    foo_subparser = subparsers.add_parser(
+        "foo", help="foo functionalities"
+    )
+    foo_subparser.add_argument("answer", type=int, help="Answer to check")
+
+    args = parser.parse_args()
+
+    output = is_answer(args.answer)
+    logg.info(f"Is {args.answer} the answer to the question of life, universe, and everything? - {output}")
+
+if __name__ == "__main__":
+    main()

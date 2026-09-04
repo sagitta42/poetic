@@ -64,6 +64,8 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         if self._progressbar_setup is not None:
             self._progressbar_setup.setup()
 
+        self.setup_main_script()
+
     def _poetry_init(self):
         """
         Initialize package with poetry.
@@ -88,8 +90,10 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         Set up source files.
 
-        Create a dummy source file (convenient for tests)
-        Set up MyBaseModel.
+        Create a dummy source file (convenient for tests).
+        Add dummy function to __init__.py.
+        Set up MyBaseModel if requested.
+        Set up __main__.py enabling python -m package running.
         Set up py.typed enabling package imports.
         """
 
@@ -106,6 +110,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
                 template_location=TemplateLocation.common_ass,
             )
             self._replace_package_placeholder(source_file_path)
+
+        path_to_main = self._templates.copy("__main__.py", package_path=self._path_to_src)
+        self._replace_package_placeholder(path_to_main)
 
         self._create_source_file("py.typed")
 
@@ -146,6 +153,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             "test_unit.py", package_path=path_to_tests
         )
         self._replace_package_placeholder(test_unit_filepath)
+
+    def setup_main_script(self):
+        pass
 
     def _create_source_file(self, filepath: str | Path):
         """
