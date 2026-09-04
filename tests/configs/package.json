@@ -1,7 +1,7 @@
 {
     "settings": {
         "type": "package",
-        "name": "package",
+        "name": "my-package",
         "settings": true,
         "progressbar": false
     }
