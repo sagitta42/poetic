@@ -67,5 +67,9 @@ class BaseActionSettings(BaseSettings):
         pass
 
 
+class BaseSplitActionSettings(BaseActionSettings):
+    split: str = Field(default="", description="Split pyproject.toml directory")
+
+
 T_Settings = TypeVar("T_Settings", bound=BaseSettings)
 T_ActionSettings = TypeVar("T_ActionSettings", bound=BaseActionSettings)

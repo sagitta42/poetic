@@ -6,8 +6,8 @@ from time import sleep
 from poetiq.factory import PoetiqFactory
 from poetiq.action.install import InstallAction
 from poetiq.logger import logg
+from poetiq.settings.action import InstallSettings
 from poetiq.settings.builder import SettingsBuilder
-from poetiq.settings.install import InstallSettings
 from poetiq.template.builder import TemplateBuilder
 from poetiq.utils.path import Dir
 from poetiq.utils.toml import PyProjectHandler

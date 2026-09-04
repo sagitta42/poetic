@@ -3,8 +3,7 @@ import enum
 
 from poetiq.cli.args import add_bool, add_str
 from poetiq.cli.db import add_db_arguments
-from poetiq.settings.add import AddSettings
-from poetiq.settings.install import InstallSettings
+from poetiq.settings.action import AddSettings, InstallSettings
 from poetiq.settings.item import DBSettings, DBType, LoggerSettings
 from poetiq.settings.setup import SetupSettings, SetupType
 from poetiq.settings.template import (
@@ -15,12 +14,16 @@ from poetiq.settings.template import (
 
 
 class Subparser(str, enum.Enum):
-    init = "init"
-    add = "add"
     new = "new"
-    setup = "setup"
-    install = "install"
     update = "update"
+    setup = "setup"
+    init = "init"
+    install = "install"
+    add = "add"
+
+    def descr(self) -> str:
+        ret = f"poetry {self.value} with advanced options"
+        return ret
 
 
 def add_template_arguments(parser: argparse.ArgumentParser):
@@ -103,3 +106,4 @@ def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
         parser, "split", help=AddSettings, optional=True, flag=True, informative=False
     )
     add_str(parser, "local", help=AddSettings, optional=True, flag=True)
+

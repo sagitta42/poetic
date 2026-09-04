@@ -1,12 +1,29 @@
+from pydantic import Field, model_validator
 from typing import Self
 
-from pydantic import Field, model_validator
-
 from poetiq.exceptions import PoetiqException
-from poetiq.settings.base import BaseActionSettings
+from poetiq.settings.base import BaseActionSettings, BaseSplitActionSettings
 
 
-class AddSettings(BaseActionSettings):
+class InstallSettings(BaseActionSettings):
+    split: bool = Field(
+        default=False,
+        description="Install from multiple split pyproject.toml files defined in poetiq.toml",
+    )
+    local: bool = Field(
+        default=False, description="Install local dependencies defined in poetiq.toml"
+    )
+    package: str = Field(
+        default="",
+        description="Package to install in split or local mode",
+    )
+
+    @property
+    def split_requested(self) -> bool:
+        return self.split
+
+
+class AddSettings(BaseSplitActionSettings):
     package: str = Field(description="Package source (name, https, git)")
     split: str = Field(
         default="",

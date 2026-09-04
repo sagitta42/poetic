@@ -12,7 +12,7 @@ from poetiq.cli.cli import (
 from poetiq.core import install, launch, update
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
-from poetiq.settings.add import AddSettings
+from poetiq.settings.action import AddSettings
 from poetiq.utils.poetry import Poetry
 
 
@@ -21,12 +21,12 @@ def main():
     subparsers = parser.add_subparsers(dest="command")
 
     install_subparser = subparsers.add_parser(
-        Subparser.install.value, help="poetry install with added options"
+        Subparser.install.value, help=Subparser.install.descr()
     )
     add_install_arguments(install_subparser)
 
     add_subparser = subparsers.add_parser(
-        Subparser.add.value, help="poetry add with git+ auto-detect"
+        Subparser.add.value, help=Subparser.add.descr()
     )
     add_poetiq_add_arguments(add_subparser)
 
