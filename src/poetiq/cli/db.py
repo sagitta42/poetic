@@ -1,17 +1,15 @@
-
 import argparse
 from typing import Type
 
 from poetiq.cli.args import add_bool, add_str
-from poetiq.settings.item import DBSettings
 from poetiq.settings.setup import SetupSettings
 
 
 def add_db_arguments(
     parser: argparse.ArgumentParser,
     help: Type[SetupSettings],
-    informative: bool,
     choices: list[str],
+    optional: bool,
 ):
     """
     Add arguments for DB setup to given parser.
@@ -23,9 +21,9 @@ def add_db_arguments(
         parser,
         "db-type",
         help=help,
-        optional=True,
+        optional=optional,
         exclusive=True,
-        informative=informative,
+        informative=False,
         choices=choices,
     )
 

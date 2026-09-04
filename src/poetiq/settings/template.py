@@ -33,6 +33,10 @@ class PackageTemplateSettings(BaseTemplateSettings):
     progressbar: bool = Field(
         default=False, description="Set up progress bar source code"
     )
+    my_base_model: bool = Field(
+        default=False,
+        description="Set up MyBaseModel class with tree display() + logger",
+    )
 
 
 class AppTemplateSettings(BaseTemplateSettings, DBSettings):
@@ -65,5 +69,7 @@ class AppTemplateSettings(BaseTemplateSettings, DBSettings):
     @model_validator(mode="after")
     def check_db_type(self) -> Self:
         if self.db_type == DBType.mongo:
-            raise ValueError("Not accepting MongoDB as DB type in app settings - reserved for the mongodb setting")
+            raise ValueError(
+                "Not accepting MongoDB as DB type in app settings - reserved for the mongodb setting"
+            )
         return self

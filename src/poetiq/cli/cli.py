@@ -23,58 +23,37 @@ class Subparser(str, enum.Enum):
     update = "update"
 
 
-def add_template_arguments(parser: argparse.ArgumentParser, informative: bool):
+def add_template_arguments(parser: argparse.ArgumentParser):
     """
-    Add arguments for template creation/update to given parser.
+    Add arguments for new template creation.
     """
-    parser.add_argument(
-        "--type",
-        type=str,
+    add_str(parser, "name", help=BaseTemplateSettings, optional=False, flag=False)
+
+    add_str(
+        parser,
+        "type",
+        help=BaseTemplateSettings,
+        optional=True,
+        informative=False,
         choices=[setup_type.value for setup_type in [SetupType.package, SetupType.app]],
-        nargs="?",
-        default=SetupType.package,
-        help="Type of functionality",
     )
 
     add_db_arguments(
         parser,
         AppTemplateSettings,
-        informative=informative,
+        optional=True,
         choices=DBType.with_none(DBType.sql()),
     )
 
     add_bool(parser, "mongodb", AppTemplateSettings, exclusive=True)
 
+    add_bool(parser, "settings", PackageTemplateSettings, exclusive=True, optional=True)
     add_bool(
-        parser,
-        "settings",
-        PackageTemplateSettings,
-        exclusive=True,
-        optional=informative,
+        parser, "progressbar", PackageTemplateSettings, exclusive=True, optional=True
     )
     add_bool(
-        parser,
-        "progressbar",
-        PackageTemplateSettings,
-        exclusive=True,
-        optional=informative,
+        parser, "my_base_model", PackageTemplateSettings, optional=True, exclusive=True
     )
-
-
-def add_new_template_arguments(parser: argparse.ArgumentParser):
-    """
-    Add arguments for new template creation.
-    """
-    add_str(
-        parser,
-        "name",
-        help=BaseTemplateSettings,
-        optional=False,
-        flag=False,
-        informative=False,
-    )
-
-    add_template_arguments(parser, informative=True)
 
 
 def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
@@ -96,7 +75,7 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
         help="Type of functionality",
     )
 
-    add_db_arguments(parser, DBSettings, informative=True, choices=DBType.sql())
+    add_db_arguments(parser, DBSettings, optional=False, choices=DBType.sql())
     add_str(
         parser,
         "subfolder",
@@ -120,5 +99,7 @@ def add_install_arguments(parser: argparse.ArgumentParser):
 
 def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
     add_str(parser, "package", help=AddSettings, optional=False, flag=False)
-    add_str(parser, "split", help=AddSettings, optional=True, flag=True, informative=False)
+    add_str(
+        parser, "split", help=AddSettings, optional=True, flag=True, informative=False
+    )
     add_str(parser, "local", help=AddSettings, optional=True, flag=True)

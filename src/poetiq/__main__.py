@@ -6,8 +6,8 @@ from poetiq.cli.cli import (
     Subparser,
     add_install_arguments,
     add_microfunctionality_arguments,
-    add_new_template_arguments,
     add_poetiq_add_arguments,
+    add_template_arguments,
 )
 from poetiq.core import install, launch, update
 from poetiq.exceptions import PoetiqException
@@ -35,13 +35,12 @@ def main():
     new_template_subparser = subparsers.add_parser(
         Subparser.new.value, help="create new template"
     )
-    add_new_template_arguments(new_template_subparser)
+    add_template_arguments(new_template_subparser)
 
-    update_subparser = subparsers.add_parser(
+    subparsers.add_parser(
         Subparser.update.value,
         help="update current template as is with new poetiq updates",
     )
-    # add_update_arguments(update_subparser)
 
     micro_functionality_subparser = subparsers.add_parser(
         Subparser.setup.value, help="setup functionality in existing repo/directory"

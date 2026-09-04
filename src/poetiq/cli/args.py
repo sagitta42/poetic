@@ -34,8 +34,8 @@ def add_str(
     help: Type[BaseSettings],
     optional: bool,
     flag: bool = True,
+    informative: bool = False,
     exclusive: bool = False,
-    informative: bool = True,
     choices: list[Any] | None = None,
 ):
     """
