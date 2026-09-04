@@ -20,6 +20,7 @@ class Subparser(str, enum.Enum):
     init = "init"
     install = "install"
     add = "add"
+    lock = "lock"
 
     def descr(self) -> str:
         ret = f"poetry {self.value} with advanced options"
@@ -108,3 +109,7 @@ def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
         parser, "split", help=AddSettings, optional=True, flag=True, informative=False
     )
     add_str(parser, "local", help=AddSettings, optional=True, flag=True)
+
+
+def add_poetiq_lock_arguments(parser: argparse.ArgumentParser):
+    pass

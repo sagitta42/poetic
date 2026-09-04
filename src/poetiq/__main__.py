@@ -7,6 +7,7 @@ from poetiq.cli.cli import (
     add_install_arguments,
     add_microfunctionality_arguments,
     add_poetiq_add_arguments,
+    add_poetiq_lock_arguments,
     add_template_arguments,
 )
 from poetiq.core import install, launch_action, update
@@ -30,6 +31,11 @@ def main():
         Subparser.add.value, help=Subparser.add.descr()
     )
     add_poetiq_add_arguments(add_subparser)
+
+    lock_subparser = subparsers.add_parser(
+        Subparser.lock.value, help=Subparser.lock.descr()
+    )
+    add_poetiq_lock_arguments(lock_subparser)
 
     subparsers.add_parser(Subparser.init.value, help="basic no-interaction init")
 
