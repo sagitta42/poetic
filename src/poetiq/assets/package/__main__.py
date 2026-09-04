@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from $PACKAGE.foo import is_answer
 from $PACKAGE.logger import logg
@@ -11,6 +12,10 @@ def main():
         "foo", help="foo functionalities"
     )
     foo_subparser.add_argument("answer", type=int, help="Answer to check")
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
 
     args = parser.parse_args()
 

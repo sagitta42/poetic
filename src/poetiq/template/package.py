@@ -111,7 +111,9 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             )
             self._replace_package_placeholder(source_file_path)
 
-        path_to_main = self._templates.copy("__main__.py", package_path=self._path_to_src)
+        path_to_main = self._templates.copy(
+            "__main__.py", package_path=self._path_to_src
+        )
         self._replace_package_placeholder(path_to_main)
 
         self._create_source_file("py.typed")
@@ -155,7 +157,15 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         self._replace_package_placeholder(test_unit_filepath)
 
     def setup_main_script(self):
-        pass
+        """
+        Set up main script in pyproject.toml based on __main__.py
+        """
+        self._pyproject_handler.add_section(
+            "project.scripts", {self.name: f"{self._inner_name}.__main__:main"}
+        )
+        # TODO: consistency between whether each singular add writes as in some utils
+        # VS must call final write
+        self._pyproject_handler.write()
 
     def _create_source_file(self, filepath: str | Path):
         """
