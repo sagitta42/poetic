@@ -63,6 +63,7 @@ class InstallAction(PoetiqAction):
         if self._has_dual_packages() and not self._settings.local:
             self._uninstall_dual_packages(InstallSource.pyproject)
 
+        # FIXME: #39 launch single package pip install in else case
         if self._settings.package == "":
             self._full_poetry_install()
 
@@ -117,11 +118,17 @@ class InstallAction(PoetiqAction):
             if pip_freeze_info is None:
                 continue
 
+            # NOTE: currently with package==1.2.3 source is None
             assert (
                 pip_freeze_info.source is not None
-            ), "how is there no source in pip freeze"
+                or pip_freeze_info.version is not None
+            ), f"neither source nor version in pip freeze info on {local_package.name}"
 
-            pip_source = pip_freeze_info.source.removeprefix("file://")
+            pip_source = (
+                None
+                if pip_freeze_info.source is None
+                else pip_freeze_info.source.removeprefix("file://")
+            )
 
             if install_source == InstallSource.local:
                 if local_package.source == pip_source:
