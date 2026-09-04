@@ -9,7 +9,8 @@ from poetiq.item.db.factory import DBSetupFactory
 from poetiq.item.gitignore import GitignoreSetup
 from poetiq.item.logger import LoggerSetup
 from poetiq.item.vscode import VSCodeSetup
-from poetiq.settings.base import ActionType, BaseActionSettings
+from poetiq.settings.base import ActionType, BaseActionSettings, BaseSetupSettings
+from poetiq.settings.template import BaseTemplateSettings
 from poetiq.template.app import AppTemplate
 from poetiq.template.package import PackageTemplate
 
@@ -36,12 +37,17 @@ class ActionBuilder:
     """
 
     def build(
-        self, path: Path | None, settings: BaseActionSettings, **kwargs
+        self, path: Path | None, settings: BaseActionSettings, core: bool
     ) -> BaseAction:
         """
         Build item setup based on item type.
         """
         action_class = self._get_action_class(settings)
+        kwargs = {}
+        if isinstance(settings, BaseSetupSettings) and not isinstance(
+            settings, BaseTemplateSettings
+        ):
+            kwargs["core"] = core
         ret = action_class(path, settings, **kwargs)
         return ret
 
@@ -65,8 +71,10 @@ class PoetiqFactory:
         Create builder based on settings type.
         Build setup in provided path. Default (None): build in current path
         """
-        builder_class = DBSetupFactory if settings.type == ActionType.db else ActionBuilder
-
+        builder_class = (
+            DBSetupFactory if settings.type == ActionType.db else ActionBuilder
+        )
         builder = builder_class()
+
         ret = builder.build(path, settings, core=True)
         return ret
