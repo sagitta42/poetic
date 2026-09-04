@@ -124,6 +124,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         # )
         # message = f"{self._poetiq_link} update\ncommit: {last_poetiq_commit}\nmessage: {last_poetiq_commit_message}"
 
+        self._add_poetiq_line()
         message = f"latest {POETIQ_LINK} update"
         self._git.commit_all(message)
 
