@@ -37,9 +37,11 @@ class AddSettings(BaseSplitActionSettings):
     package: str = Field(description="Package source (name, https, git)")
     split: str = Field(
         default="",
-        description="Add split dependency to pyproject.toml of given directory",
+        description="Add to split pyproject.toml (specified directory or all)",
     )
-    local: str = Field(default="", description="Add local dependency to poetiq.toml")
+    local: str = Field(
+        default="", description="Add local dependency to poetiq.toml in given path"
+    )
 
     @property
     def split_requested(self) -> bool:

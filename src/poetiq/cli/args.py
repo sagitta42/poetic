@@ -37,6 +37,7 @@ def add_str(
     informative: bool = False,
     exclusive: bool = False,
     choices: list[Any] | None = None,
+    **kwargs
 ):
     """
     Add string argument.
@@ -55,7 +56,8 @@ def add_str(
         type=str,
         default=help.default(name) if optional else None,
         choices=choices or help.options(name),
-        nargs="?" if optional or informative else None,
+        nargs="?" if informative else None,
         const=help.const(name) if flag and informative else None,
         help=help.description(name, exclusive=exclusive),
+        **kwargs
     )
