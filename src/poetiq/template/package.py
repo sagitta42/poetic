@@ -68,19 +68,16 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         """
         Set up source files.
 
-        Set up core.py: contains core routines to be imported directly from package.
         Create a dummy source file (convenient for tests)
         Set up MyBaseModel.
         Set up py.typed enabling package imports.
         """
-        self._create_source_file("core.py")
-
-        # TODO: phase out
-        File(self._path_to_src / "__init__.py").add_new_line(
-            f"from {self._inner_name}.core import *", prepend=True
-        )
 
         self._templates.copy("foo.py", package_path=self._path_to_src)
+
+        File(self._path_to_src / "__init__.py").add_new_line(
+            f"from {self._inner_name}.foo import is_answer as is_answer"
+        )
 
         source_file_path = self._templates.copy(
             "models.py",

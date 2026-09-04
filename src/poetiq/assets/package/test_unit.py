@@ -1,13 +1,12 @@
-import $PACKAGE.foo as foo
+from $PACKAGE.foo import is_answer
 from $PACKAGE.logger import logg
 
 from tests.conftest import PATH_TO_CONFIGS
 
 def test_foo():
-    input = 21
-    output = foo.answer(input)
-    the_answer = 42
-    assert output == the_answer, f"Test failed because answer not {the_answer}"
+    input = 42
+    output = is_answer(input)
+    assert output, f"Test failed because {input} is not the answer"
 
 
 def test_model(test_case_example):
