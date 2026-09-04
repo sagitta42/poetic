@@ -13,8 +13,8 @@ class Readme:
 
     def __init__(self, path: Path) -> None:
         self.path = path
-        self._path_to_readme = self.path / "README.md"
-        self._file = File(self._path_to_readme)
+        self.path_to_readme = self.path / "README.md"
+        self._file = File(self.path_to_readme)
 
     def add_new_section(self, title: str, header: int):
         """
@@ -81,8 +81,8 @@ class Readme:
         Get README lines
         """
         ret = []
-        if self._path_to_readme.exists():
-            with open(self._path_to_readme) as f:
+        if self.path_to_readme.exists():
+            with open(self.path_to_readme) as f:
                 ret = f.readlines()
         return ret
 
@@ -90,12 +90,12 @@ class Readme:
         """
         Write README lines.
         """
-        with open(self._path_to_readme, "w") as f:
+        with open(self.path_to_readme, "w") as f:
             f.writelines(lines)
 
     def clean(self):
         """
         Delete README.md if exists.
         """
-        if self._path_to_readme.exists():
-            send2trash(self._path_to_readme)
+        if self.path_to_readme.exists():
+            send2trash(self.path_to_readme)

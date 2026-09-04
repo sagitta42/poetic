@@ -44,6 +44,26 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             else None
         )
 
+    def setup(self):
+        """
+        Package template setup.
+
+        In addition to base template setup:
+            Set up .env template
+            Set up tests (conftest, dummy test)
+            Set up Logger
+            Set up ProgressBar if requested
+        """
+        super().setup()
+
+        self.setup_dotenv_template()
+        self.setup_tests()
+
+        self._logger_setup.setup()
+
+        if self._progressbar_setup is not None:
+            self._progressbar_setup.setup()
+
     def _poetry_init(self):
         """
         Initialize package with poetry.
@@ -93,25 +113,16 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
         self._poetry_add("pytest", "dev")
 
-    def setup(self):
+    def setup_readme(self):
         """
-        Package template setup.
+        Set up README.md.
 
-        In addition to base template setup:
-            Set up .env template
-            Set up tests (conftest, dummy test)
-            Set up Logger
-            Set up ProgressBar if requested
+        Set up README from template.
+        Replace instances of $PACKAGE and $package.
         """
-        super().setup()
+        super().setup_readme()
 
-        self.setup_dotenv_template()
-        self.setup_tests()
-
-        self._logger_setup.setup()
-
-        if self._progressbar_setup is not None:
-            self._progressbar_setup.setup()
+        self._replace_package_placeholder(self._readme.path_to_readme)
 
     def setup_tests(self):
         """
@@ -144,6 +155,10 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
 
     def _replace_package_placeholder(self, filepath: Path):
         """
-        Replace $PACKAGE with package name in given source file.
+        Replace package placeholer in file in given file.
+
+        Replace $package with package-name
+        Replace $PACKAGE with package_name.
         """
+        File(filepath).replace_str("$package", self.name)
         File(filepath).replace_str("$PACKAGE", self._inner_name)

@@ -1,0 +1,32 @@
+
+## Usage
+
+```bash
+>>> from $PACKAGE import is_answer
+>>> is_answer(42)
+True
+>>> is_answer(43)
+False
+```
+
+## For dummies / development notes
+
+Local install
+
+```bash
+pip install /path/to/$package
+```
+
+Run tests
+```bash
+cd /path/to/$package
+source venv/bin/activate
+pytest
+```
+
+Note: `poetiq` has already fully set up `venv` for you, including installing `pytest`.
+
+Add remote
+```bash
+git remote add origin https://...
+```
