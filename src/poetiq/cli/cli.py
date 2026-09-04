@@ -52,7 +52,7 @@ def add_template_arguments(parser: argparse.ArgumentParser):
         parser, "progressbar", PackageTemplateSettings, exclusive=True, optional=True
     )
     add_bool(
-        parser, "my_base_model", PackageTemplateSettings, optional=True, exclusive=True
+        parser, "my-base-model", PackageTemplateSettings, optional=True, exclusive=True
     )
 
 

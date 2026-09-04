@@ -9,6 +9,7 @@ def test_foo():
     assert output, f"Test failed because {input} is not the answer"
 
 
-def test_model(test_case_example):
-    logg.info("Example model")
-    test_case_example.display()
+def test_example(test_case_example):
+    input = test_case_example.answer
+    output = is_answer(input)
+    assert output, f"Test failed because {input} is not the answer"

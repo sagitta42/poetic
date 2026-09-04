@@ -99,12 +99,13 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
             f"from {self._inner_name}.foo import is_answer as is_answer"
         )
 
-        source_file_path = self._templates.copy(
-            "models.py",
-            package_path=self._path_to_src,
-            template_location=TemplateLocation.common_ass,
-        )
-        self._replace_package_placeholder(source_file_path)
+        if self._settings.my_base_model:
+            source_file_path = self._templates.copy(
+                "models.py",
+                package_path=self._path_to_src,
+                template_location=TemplateLocation.common_ass,
+            )
+            self._replace_package_placeholder(source_file_path)
 
         self._create_source_file("py.typed")
 
@@ -139,7 +140,7 @@ class PackageTemplate(BaseTemplate[PackageTemplateSettings]):
         conftest_filepath = self._templates.copy("conftest.py", path_to_tests)
         self._replace_package_placeholder(conftest_filepath)
 
-        self._templates.copy("test_model.json", package_path=path_to_configs)
+        self._templates.copy("test_case.json", package_path=path_to_configs)
 
         test_unit_filepath = self._templates.copy(
             "test_unit.py", package_path=path_to_tests

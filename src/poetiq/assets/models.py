@@ -80,7 +80,3 @@ class MyBaseModel(BaseModel):
             else:
                 ret += f"{level_indent}{field_allias}{value}{field}\n"
         return ret
-
-class ExampleModel(MyBaseModel):
-    answer: int
-    message: str
