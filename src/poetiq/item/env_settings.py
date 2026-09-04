@@ -31,7 +31,7 @@ class EnvSettingsSetup(BasePoetrySetup[DotenvSettings]):
         """
         super().setup()
 
-        self._templates.copy("settings.py")
+        self._templates.copy("settings.py", package_path = self.path / self._settings.subfolder)
         self.setup_dotenv_template()
 
     def setup_dependencies(self) -> None:
