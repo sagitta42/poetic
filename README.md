@@ -52,7 +52,9 @@ options:
   --local     Install local dependencies defined in poetiq.toml
 ```
 
-Perform smart poetry install: automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
+Perform smart poetry install:
+- automatically add `--no-root` flag if current directory `pyproject.toml` states `package-mode=false`
+- automatically run `poetry lock` if "pyproject.toml changed significantly since poetry.lock was last generated"
 
 Add `--split` flag if you want to install dependencies from multiple `pyproject.toml` files that are part of your codebase (e.g. a web app with separate services). Provide paths to subfolders containing `pyproject.toml` files in `poetiq.toml` file:
 ```toml
@@ -107,7 +109,20 @@ Use `--local` flag and path to a local clone/repository as `poetiq add package-n
 
 ### (Split) poetry lock
 
-TBI
+```bash
+$ poetiq lock -h
+usage: poetiq lock [-h] [--split [DIR]]
+
+options:
+  -h, --help     show this help message and exit
+  --split [DIR]  Update split poetry.lock(s) (all or specified DIR)
+```
+
+Running `poetiq lock` is equivalent to `poetry lock`.
+
+Adding `--split` will perform `poetry lock` for each split directory listed in `poetiq.toml` (see above sections for examples).
+
+Specifying directory `--split DIR` will `poetry lock` only in that directory.
 
 ### Init template
 
