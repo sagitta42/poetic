@@ -128,6 +128,6 @@ class DotenvSettings(ItemSetupSettings):
     Settings for .env Settings class setup
     """
 
-    type: Literal[ActionType.dotenv] = Field(
-        default=ActionType.dotenv, description="Setup type"
+    type: Literal[ActionType.envsettings] = Field(
+        default=ActionType.envsettings, description="Setup type"
     )

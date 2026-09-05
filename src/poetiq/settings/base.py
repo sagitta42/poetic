@@ -10,7 +10,7 @@ class ActionType(str, enum.Enum):
     package = "package"
     app = "app"
     db = "db"
-    dotenv = "dotenv"
+    envsettings = "envsettings"
     vscode = "vscode"
     gitignore = "gitignore"
     progressbar = "progressbar"
@@ -100,5 +100,7 @@ class BaseSetupSettings(BaseActionSettings):
 
 
 T_ActionSettings = TypeVar("T_ActionSettings", bound=BaseActionSettings)
-T_PoetiqActionSettings = TypeVar("T_PoetiqActionSettings", bound=BasePoetiqActionSettings)
+T_PoetiqActionSettings = TypeVar(
+    "T_PoetiqActionSettings", bound=BasePoetiqActionSettings
+)
 T_SetupSettings = TypeVar("T_SetupSettings", bound=BaseSetupSettings)
