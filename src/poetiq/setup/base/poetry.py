@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from pathlib import Path
 
-from poetiq.item.vscode import VSCodeSetup
+from poetiq.setup.vscode import VSCodeSetup
 from poetiq.logger import logg
 from poetiq.settings.base import T_SetupSettings
-from poetiq.setup.venv import BaseVenvSetup
+from poetiq.setup.base.venv import BaseVenvSetup
 from poetiq.utils.pip import Pip
 from poetiq.utils.poetry import Poetry
 from poetiq.utils.toml import PyProjectHandler

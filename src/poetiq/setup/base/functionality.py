@@ -4,7 +4,7 @@ from pathlib import Path
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
 from poetiq.settings.base import T_SetupSettings
-from poetiq.setup.base import BaseSetup
+from poetiq.setup.base.base import BaseSetup
 from poetiq.utils.env import DotEnv
 from poetiq.utils.path import File
 from poetiq.utils.readme import Readme

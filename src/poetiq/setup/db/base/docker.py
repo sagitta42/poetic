@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from poetiq.item.db.base.single import SingleDBSetup
+from poetiq.setup.db.base.single import SingleDBSetup
 from poetiq.logger import logg
-from poetiq.settings.item import DBSettings
+from poetiq.settings.setup import DBSettings
 from poetiq.utils.db import ServiceDBEnvVars, T_ServiceDBEnvVars
 from poetiq.utils.docker import DockerComposeServiceHandler
 

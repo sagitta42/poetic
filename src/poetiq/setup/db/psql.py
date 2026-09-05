@@ -1,5 +1,5 @@
-from poetiq.item.db.base.docker import DockerDBSetup
-from poetiq.item.db.base.sql import DBSqlSetup
+from poetiq.setup.db.base.docker import DockerDBSetup
+from poetiq.setup.db.base.sql import DBSqlSetup
 from poetiq.utils.db import PsqlDBEnvVars
 
 

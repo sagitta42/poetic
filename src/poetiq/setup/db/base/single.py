@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import Generic, Self
 
-from poetiq.item.db.base.base import BaseDBSetup
-from poetiq.item.env_settings import EnvSettingsSetup
+from poetiq.setup.db.base.base import BaseDBSetup
+from poetiq.setup.env_settings import EnvSettingsSetup
 from poetiq.logger import logg
-from poetiq.settings.item import DBSettings
+from poetiq.settings.setup import DBSettings
 from poetiq.utils.db import DBEnvVars, T_DBEnvVars
 
 

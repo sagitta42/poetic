@@ -5,7 +5,7 @@ from poetiq.cli.args import add_bool, add_str
 from poetiq.cli.db import add_db_arguments
 from poetiq.settings.poetiq_action import AddSettings, InstallSettings
 from poetiq.settings.base import ActionType, BaseSetupSettings
-from poetiq.settings.item import DBSettings, DBType, LoggerSettings
+from poetiq.settings.setup import DBSettings, DBType, LoggerSettings
 from poetiq.settings.template import (
     AppTemplateSettings,
     BaseTemplateSettings,

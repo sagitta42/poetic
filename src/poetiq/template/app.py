@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 
-from poetiq.item.db.base.base import BaseDBSetup
-from poetiq.item.db.base.docker import DockerDBSetup
-from poetiq.item.db.factory import DBSetupFactory
-from poetiq.item.env_settings import EnvSettingsSetup
+from poetiq.setup.db.base.base import BaseDBSetup
+from poetiq.setup.db.base.docker import DockerDBSetup
+from poetiq.setup.db.factory import DBSetupFactory
+from poetiq.setup.env_settings import EnvSettingsSetup
 from poetiq.settings.base import ActionType
-from poetiq.settings.item import DBSettings, DBType
+from poetiq.settings.setup import DBSettings, DBType
 from poetiq.settings.template import AppTemplateSettings
 from poetiq.template.base import BaseTemplate
 from poetiq.utils.docker import DockerComposeServiceHandler

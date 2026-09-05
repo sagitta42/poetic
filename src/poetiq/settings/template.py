@@ -3,7 +3,7 @@ from typing import Literal, Self, TypeVar
 from pydantic import Field, model_validator
 
 from poetiq.settings.base import ActionType, BaseSetupSettings
-from poetiq.settings.item import DBSettings, DBType
+from poetiq.settings.setup import DBSettings, DBType
 
 
 class BaseTemplateSettings(BaseSetupSettings):

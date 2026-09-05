@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from poetiq.item.db.base.base import BaseDBSetup
-from poetiq.item.db.builder import DBSetupBuilder
-from poetiq.item.db.dual import DualDBSetup
-from poetiq.settings.item import DBSettings
+from poetiq.setup.db.base.base import BaseDBSetup
+from poetiq.setup.db.builder import DBSetupBuilder
+from poetiq.setup.db.dual import DualDBSetup
+from poetiq.settings.setup import DBSettings
 
 
 class DBSetupFactory:

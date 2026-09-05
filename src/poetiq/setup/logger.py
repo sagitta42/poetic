@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from poetiq.settings.item import LoggerSettings
-from poetiq.setup.poetry import BasePoetrySetup
+from poetiq.settings.setup import LoggerSettings
+from poetiq.setup.base.poetry import BasePoetrySetup
 from poetiq.utils.path import File
 from poetiq.utils.template import TemplateLocation
 

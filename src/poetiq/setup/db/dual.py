@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from poetiq.item.db.base.base import BaseDBSetup
-from poetiq.item.db.base.single import SingleDBSetup
-from poetiq.item.db.builder import DBSetupBuilder
+from poetiq.setup.db.base.base import BaseDBSetup
+from poetiq.setup.db.base.single import SingleDBSetup
+from poetiq.setup.db.builder import DBSetupBuilder
 from poetiq.logger import logg
-from poetiq.settings.item import DBSettings, DBType
+from poetiq.settings.setup import DBSettings, DBType
 
 
 class DualDBSetup(BaseDBSetup):

@@ -2,7 +2,7 @@ import json
 import os
 
 
-from poetiq.item.db.base.single import SingleDBSetup
+from poetiq.setup.db.base.single import SingleDBSetup
 from poetiq.logger import logg
 from poetiq.utils.db import T_SqlDBEnvVars
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 from poetiq.settings.base import T_SetupSettings
-from poetiq.setup.functionality import BaseFunctionalitySetup
+from poetiq.setup.base.functionality import BaseFunctionalitySetup
 from poetiq.utils.venv import Venv
 
 

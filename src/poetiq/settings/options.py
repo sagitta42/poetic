@@ -3,7 +3,7 @@ from typing import Annotated, Union
 from pydantic import BaseModel, Field
 
 from poetiq.settings.poetiq_action import AddSettings, InstallSettings, LockSettings
-from poetiq.settings.item import (
+from poetiq.settings.setup import (
     DBSettings,
     GitignoreSetupSettings,
     LoggerSettings,

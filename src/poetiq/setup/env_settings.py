@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from poetiq.settings.base import ActionType
-from poetiq.settings.item import DotenvSettings
-from poetiq.setup.poetry import BasePoetrySetup
+from poetiq.settings.setup import DotenvSettings
+from poetiq.setup.base.poetry import BasePoetrySetup
 from poetiq.utils.template import TemplateManager
 
 

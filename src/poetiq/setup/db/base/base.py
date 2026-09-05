@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Self
 
 from poetiq.logger import logg
-from poetiq.settings.item import DBSettings
-from poetiq.setup.poetry import BasePoetrySetup
+from poetiq.settings.setup import DBSettings
+from poetiq.setup.base.poetry import BasePoetrySetup
 
 
 class BaseDBSetup(BasePoetrySetup[DBSettings]):

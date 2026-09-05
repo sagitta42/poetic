@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from poetiq.logger import logg
-from poetiq.settings.item import GitignoreSetupSettings
-from poetiq.setup.functionality import BaseFunctionalitySetup
+from poetiq.settings.setup import GitignoreSetupSettings
+from poetiq.setup.base.functionality import BaseFunctionalitySetup
 from poetiq.utils.path import File
 from poetiq.utils.template import TemplateLocation
 

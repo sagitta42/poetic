@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from poetiq.settings.item import ProgressBarSettings
-from poetiq.setup.poetry import BasePoetrySetup
+from poetiq.settings.setup import ProgressBarSettings
+from poetiq.setup.base.poetry import BasePoetrySetup
 
 
 class ProgressBarSetup(

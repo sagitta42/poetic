@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from poetiq.settings.item import VSCodeSetupSettings
-from poetiq.setup.functionality import BaseFunctionalitySetup
+from poetiq.settings.setup import VSCodeSetupSettings
+from poetiq.setup.base.functionality import BaseFunctionalitySetup
 from poetiq.utils.template import TemplateLocation
 from poetiq.utils.tree import display
 

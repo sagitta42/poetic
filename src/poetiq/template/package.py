@@ -2,10 +2,10 @@ import os
 from pathlib import Path
 import subprocess
 
-from poetiq.item.env_settings import EnvSettingsSetup
-from poetiq.item.logger import LoggerSetup
-from poetiq.item.progress_bar import ProgressBarSetup
-from poetiq.settings.item import DotenvSettings, LoggerSettings, ProgressBarSettings
+from poetiq.setup.env_settings import EnvSettingsSetup
+from poetiq.setup.logger import LoggerSetup
+from poetiq.setup.progress_bar import ProgressBarSetup
+from poetiq.settings.setup import DotenvSettings, LoggerSettings, ProgressBarSettings
 from poetiq.settings.template import PackageTemplateSettings
 from poetiq.template.base import BaseTemplate
 from poetiq.utils.path import File

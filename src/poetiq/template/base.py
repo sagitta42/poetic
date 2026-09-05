@@ -2,12 +2,12 @@ from abc import abstractmethod
 from pathlib import Path
 
 from poetiq.exceptions import PoetiqException
-from poetiq.item.env_settings import EnvSettingsSetup
-from poetiq.item.gitignore import GitignoreSetup
+from poetiq.setup.env_settings import EnvSettingsSetup
+from poetiq.setup.gitignore import GitignoreSetup
 from poetiq.settings.template import T_TemplateSettings
 from poetiq.logger import logg
 
-from poetiq.setup.poetry import BasePoetrySetup
+from poetiq.setup.base.poetry import BasePoetrySetup
 from poetiq.utils.path import Dir, File
 from poetiq.utils.template import TemplateLocation
 from poetiq.utils.tree import display

@@ -385,7 +385,7 @@ local = [
 1. Add additional settings field if any under `FooSettings` e.g. `field`
 1. Create function adding those settings to given CLI parser in `cli/cli.py` e.g. `add_foo_arguments(parser)` utilizing `FooSettings` to translate them to CLI arguments. Append call to this function under `add_microfunctionality_arguments()`
 1. Add `FooSettings` to accepted setup settings ( `settings.options`)
-1. Create item setup class `FooSetup` in a new source file `poetiq.item.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if item includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
+1. Create item setup class `FooSetup` in a new source file `poetiq.setup.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if item includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
 1. Define `setup()` method, calling parent `setup()`, and adding specific setup actions for this item. This method must return `bool` representing whether this setup already existed before.
 1. In case of dependency setup, add dependencies in `setup_dependencies()` using `_poetry_add("package-name")`
 1. Add `FooSetup` under `ItemSetupClass` enum in `item.builder`, matching enum name with `SetupType` name (`foo`)
@@ -398,7 +398,7 @@ After this, this setup is now usable with `poetiq add foo`
 1. Create DB setup class `FooDBSetup` inheriting from `BaseDBSetup`
 1. Define its `setup_db()` method with actions for this DB setup. Return bool representing whether this setup existed before
 1. Define DB URL under `db_url` property
-1. Add `FooDBSetup` under `DBSetupClass` in `poetiq.item.db.builder` using the same enum name as defined `DBType` (`foo`)
+1. Add `FooDBSetup` under `DBSetupClass` in `poetiq.setup.db.builder` using the same enum name as defined `DBType` (`foo`)
 
 After this, this setup is now usable with
 - `poetiq new awesome-app --db psql`
