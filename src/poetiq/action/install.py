@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 
 
-from poetiq.action.base import BasePoetiqAction
+from poetiq.action.base import BaseSplitPoetiqAction
 from poetiq.exceptions import PoetiqException
 
 from poetiq.logger import logg
@@ -17,15 +17,12 @@ class InstallSource(enum.StrEnum):
     pyproject = "pyproject"
 
 
-class InstallAction(BasePoetiqAction):
+class InstallAction(BaseSplitPoetiqAction):
     """
     Install functionalities on top of standard poetry.
 
     Uses information in poetiq.toml file on dual dependencies.
     Checks information in pyproject.toml for install type.
-
-    TODO: add local dependency to poetiq.toml with e.g. poetiq install add
-    TODO: reinstall only a specific given dual dependency, not all in poetiq.toml
     """
 
     def __init__(self, path: Path, settings: InstallSettings) -> None:
@@ -38,6 +35,7 @@ class InstallAction(BasePoetiqAction):
         Run poetry install handling dual dependencies.
 
         Determine if the --no-root flag is needed based on package mode in pyproject.toml.
+        
         Run "poetry lock" automatically if poetry.lock determined to be too old.
 
         If local flag was given in settings, perform local install:
@@ -74,6 +72,8 @@ class InstallAction(BasePoetiqAction):
         Perform full poetry install.
 
         Add --no-root flag if not in package mode.
+        Determine poetries of interest (current dir, given split dir, all split dir).
+        Perform poetry install with each poetry of interest.
         """
 
         poetries = self._get_poetries_of_interest()

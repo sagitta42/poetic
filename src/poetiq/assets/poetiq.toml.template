@@ -4,6 +4,6 @@ local = [
   "python-module @ /path/to/my/fork/of/python-module",
 ]
 split=[
-  "path/to/pyproject/dir",
-  "path/to/another/dir"
+  "subdir_with_pyproject",
+  "another_subdir_with_owb_pyproject"
 ]

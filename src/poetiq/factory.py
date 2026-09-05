@@ -5,6 +5,7 @@ from typing import Type
 from poetiq.action.add import AddAction
 from poetiq.action.base import BaseAction
 from poetiq.action.install import InstallAction
+from poetiq.action.lock import LockAction
 from poetiq.enums import ActionType
 from poetiq.setup.db.factory import DBSetupFactory
 from poetiq.setup.gitignore import GitignoreSetup
@@ -24,6 +25,7 @@ class ActionSetupClass(enum.Enum):
     logger = LoggerSetup
     add = AddAction
     install = InstallAction
+    lock = LockAction
 
     @classmethod
     def from_action_type(cls, action_type: ActionType) -> Type[BaseAction]:

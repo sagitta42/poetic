@@ -16,7 +16,7 @@ def add_install_arguments(parser: argparse.ArgumentParser):
 
 
 def add_poetiq_split_arguments(
-    parser: argparse.ArgumentParser, help: Type[BaseSplitActionSettings]
+    parser: argparse.ArgumentParser, help: Type[BaseSplitActionSettings], informative: bool
 ):
     add_str(
         parser,
@@ -24,16 +24,16 @@ def add_poetiq_split_arguments(
         help=help,
         optional=True,
         flag=True,
-        informative=True,
+        informative=informative,
         metavar="DIR",
     )
 
 
 def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
     add_str(parser, "package", help=AddSettings, optional=False, flag=False)
-    add_poetiq_split_arguments(parser, AddSettings)
+    add_poetiq_split_arguments(parser, AddSettings, informative=False)
     add_str(parser, "local", help=AddSettings, optional=True, flag=True, metavar="PATH")
 
 
 def add_poetiq_lock_arguments(parser: argparse.ArgumentParser):
-    add_poetiq_split_arguments(parser, LockSettings)
+    add_poetiq_split_arguments(parser, LockSettings, informative=True)
