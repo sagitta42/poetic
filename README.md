@@ -20,12 +20,13 @@ pip install git+https://github.com/sagitta42/poetiq.git
 
 ```bash
 $ poetiq -h
-usage: poetiq [-h] {install,add,init,new,update,setup} ...
+usage: poetiq [-h] {install,add,lock,init,new,update,setup} ...
 
 positional arguments:
-  {install,add,init,new,update,setup}
-    install             poetry install with added options
-    add                 poetry add with git+ auto-detect
+  {install,add,lock,init,new,update,setup}
+    install             poetry install with advanced options
+    add                 poetry add with advanced options
+    lock                poetry lock with advanced options
     init                basic no-interaction init
     new                 create new template
     update              update current template as is with new poetiq updates
@@ -35,14 +36,15 @@ options:
   -h, --help            show this help message and exit
 ```
 
-### Install
+### Install [split/dev] dependencies
 
 ```bash
 $ poetiq install -h
 usage: poetiq install [-h] [--split] [--local] [package]
 
 positional arguments:
-  package     Dual package to reinstall if local install; default all dual packages
+  package     Specific package to install in split or local model; otherwise all
+              local/split
 
 options:
   -h, --help  show this help message and exit
@@ -80,19 +82,19 @@ Specify a packge to perform local install with `poetiq install --local my-packag
 See detailed examples in [Install examples](#install-examples)
 
 
-### Add dependency
+### Add [split/dev] dependency
 
 ```bash
 $ poetiq add -h
-usage: poetiq add [-h] [--split [SPLIT]] [--local [LOCAL]] package
+usage: poetiq add [-h] [--split [DIR]] [--local PATH] package
 
 positional arguments:
-  package          Package source (name, https, git)
+  package        Package source (name, https, git)
 
 options:
-  -h, --help       show this help message and exit
-  --split SPLIT  Add split dependency to pyproject.toml of given directory
-  --local [LOCAL]  Add local dependency to poetiq.toml
+  -h, --help     show this help message and exit
+  --split [DIR]  Add to split pyproject.toml (specified directory or all)
+  --local PATH   Add local dependency to poetiq.toml in given path
 ```
 
 Running `poetiq add package-name` is equivalent to `poetry add package-name`.
@@ -103,6 +105,10 @@ Use `poetiq add awesome-package --split subdir` to add package to `pyproject.tom
 
 Use `--local` flag and path to a local clone/repository as `poetiq add package-name --local /path/to/awesome-package` to add local dependency to `poetiq.toml` - see [Install](#install) for `poetiq install --local` usage to handle dual dependencies.
 
+### (Split) poetry lock
+
+TBI
+
 ### Init template
 
 `poetiq init -h` to init a simple template in current direcotry with most basic no-interaction poetry pyproject init. Will treat current directory name as project name.
@@ -111,22 +117,26 @@ Use `--local` flag and path to a local clone/repository as `poetiq add package-n
 
 ```bash
 $ poetiq new -h
-usage: poetiq new [-h] [--type [{package,app}]] [--db-type [{sqlite,psql,none}]] [--dev-sqlite] [--pydantic-table] [--mongodb] [--settings] [--progressbar] name
+usage: poetiq new [-h] [--type {package,app}] [--db-type {sqlite,psql,none}]
+                  [--dev-sqlite] [--pydantic-table] [--mongodb] [--settings]
+                  [--progressbar] [--my-base-model]
+                  name
 
 positional arguments:
   name                  Template/repository name
 
 options:
   -h, --help            show this help message and exit
-  --type [{package,app}]
-                        Type of functionality
-  --db-type [{sqlite,psql,none}]
+  --type {package,app}  Template type
+  --db-type {sqlite,psql,none}
                         Database type (app only)
   --dev-sqlite          Development mode switch to SQLite (app only)
   --pydantic-table      Set up pydantic-table for alembic migrations (app only)
   --mongodb             Add MongoDB service (app only)
   --settings            Set up .env Settings class (package only)
   --progressbar         Set up progress bar source code (package only)
+  --my-base-model       Set up MyBaseModel class with tree display() + logger (package
+                        only)
 ```
 
 Main note: `poetry new package-name` complains if directory `package-name` already exists; `poetiq new package-name` only complains if it is non-empty
@@ -168,7 +178,9 @@ See detailed examples in [Template examples](#templates)
 
 ```bash
 $ poetiq setup -h
-usage: poetiq setup [-h] [--db-type [{sqlite,psql}]] [--dev-sqlite] [--pydantic-table] [--subfolder [SUBFOLDER]] [--no-commit] {vscode,gitignore,db,logger}
+usage: poetiq setup [-h] [--db-type {sqlite,psql}] [--dev-sqlite] [--pydantic-table]
+                    [--subfolder SUBFOLDER] [--no-commit]
+                    {vscode,gitignore,db,logger}
 
 positional arguments:
   {vscode,gitignore,db,logger}
@@ -176,11 +188,11 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  --db-type [{sqlite,psql}]
+  --db-type {sqlite,psql}
                         Database type (db only)
   --dev-sqlite          Development mode switch to SQLite (db only)
   --pydantic-table      Set up pydantic-table for alembic migrations (db only)
-  --subfolder [SUBFOLDER]
+  --subfolder SUBFOLDER
                         Subfolder of setup (logger only)
   --no-commit           Do not commit changes
 ```

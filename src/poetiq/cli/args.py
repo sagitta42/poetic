@@ -56,7 +56,7 @@ def add_str(
         type=str,
         default=help.default(name) if optional else None,
         choices=choices or help.options(name),
-        nargs="?" if informative else None,
+        nargs="?" if (flag and informative) or (not flag and optional) else None,
         const=help.const(name) if flag and informative else None,
         help=help.description(name, exclusive=exclusive),
         **kwargs
