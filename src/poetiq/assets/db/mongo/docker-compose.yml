@@ -6,4 +6,4 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      - db_mongo:/mongodb
+      - db_mongo:/data/db

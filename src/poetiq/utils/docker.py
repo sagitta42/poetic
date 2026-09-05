@@ -35,7 +35,19 @@ class DockerComposeHandler:
         self.path = path
         self.docker_compose = self.path / "docker-compose.yml"
 
-    def _read(self) -> dict[str, Any]:
+    def add_volume(self, vol: str):
+        """
+        Add given volume to list of volumes.
+        """
+        yml_info = self._read(with_section="volumes")
+        volumes = yml_info["volumes"]
+
+        if vol not in volumes:
+            volumes[vol] = None
+
+        self._write(yml_info)
+
+    def _read(self, with_section: str | None = None) -> dict[str, Any]:
         """
         Get docker-compose from given path to .yml.
 
@@ -47,8 +59,8 @@ class DockerComposeHandler:
             with open(self.docker_compose) as f:
                 yml_info = yaml.safe_load(f)
 
-        if "services" not in yml_info:
-            yml_info["services"] = {}
+        if with_section is not None and with_section not in yml_info:
+            yml_info[with_section] = {}
 
         return yml_info
 
@@ -76,6 +88,14 @@ class DockerComposeServiceHandler(DockerComposeHandler):
 
         self._name = new_name
 
+    def get_volumes(self) -> list[str]:
+        """
+        Get volumes of given service, if specified
+        """
+        service = self._read(with_section="volumes", init=list)
+        ret = [volume_info.split(":")[0] for volume_info in service["volumes"]]
+        return ret
+
     def set_image(self, db_type: DBType):
         """
         Set service image for given DB type.
@@ -94,9 +114,7 @@ class DockerComposeServiceHandler(DockerComposeHandler):
 
         Sets given port and does not replace existing ports
         """
-        service_info = self._read()
-        if "ports" not in service_info:
-            service_info["ports"] = []
+        service_info = self._read(with_section="ports", init=list)
         ports = service_info["ports"]
 
         port_str = f"{port.dollar}:{port.value}"
@@ -120,10 +138,7 @@ class DockerComposeServiceHandler(DockerComposeHandler):
 
         Sets only given variable and does not replace existing environment.
         """
-        service_info = self._read()
-
-        if "environment" not in service_info:
-            service_info["environment"] = {}
+        service_info = self._read(with_section="environment")
         env = service_info["environment"]
 
         env[var] = value
@@ -178,20 +193,25 @@ class DockerComposeServiceHandler(DockerComposeHandler):
         service_info[name] = value
         self._write(service_info)
 
-    def _read(self) -> dict[str, Any]:
+    def _read(
+        self, with_section: str | None = None, init: type = dict
+    ) -> dict[str, Any]:
         """
         Get service info from docker-compose.
 
         If service not present, will add empty info.
         """
-        yml_info = super()._read()
-
+        yml_info = super()._read(with_section="services")
         services = yml_info["services"]
 
         if self._name not in services:
             services[self._name] = {}
 
         ret = services[self._name]
+
+        if with_section is not None and with_section not in ret:
+            ret[with_section] = init()
+
         return ret
 
     def _write(self, info: dict[str, Any]):
@@ -200,7 +220,7 @@ class DockerComposeServiceHandler(DockerComposeHandler):
 
         Will replace whatever info was there prior if any.
         """
-        yml_info = super()._read()
+        yml_info = super()._read(with_section="services")
 
         yml_info["services"][self._name] = info
         # TODO: store docker compose in member, update, write at the end

@@ -4,12 +4,13 @@ from pathlib import Path
 from poetiq.setup.db.base.base import BaseDBSetup
 from poetiq.setup.db.base.docker import DockerDBSetup
 from poetiq.setup.db.factory import DBSetupFactory
+from poetiq.setup.db.mongo import MongoDBSetup
 from poetiq.setup.env_settings import EnvSettingsSetup
 from poetiq.enums import ActionType, DBType
 from poetiq.settings.setup import DBSettings
 from poetiq.settings.template import AppTemplateSettings
 from poetiq.template.base import BaseTemplate
-from poetiq.utils.docker import DockerComposeServiceHandler
+from poetiq.utils.docker import DockerComposeHandler, DockerComposeServiceHandler
 
 
 class AppTemplate(BaseTemplate[AppTemplateSettings]):
@@ -30,7 +31,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
             )
         )
 
-        self._mongodb: BaseDBSetup | None = (
+        self._mongodb: MongoDBSetup | None = (
             db_setup_factory.build(
                 self.path, DBSettings(db_type=DBType.mongo), core=False
             )
@@ -39,6 +40,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         )
 
         self._service = DockerComposeServiceHandler(self.path, "app")
+        self._docker = DockerComposeHandler(self.path)
 
     def _poetry_init(self):
         """
@@ -58,16 +60,20 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         In addition to standard template setup:
             - docker compose file
             - DB if requested
+
+        Note: set up docker-compose file last to assign volumes.
+        TODO: set up other things like port and host based on existing docker file
+            rather than in-code (?)
         """
         super().setup()
-
-        self.setup_docker_compose()
 
         if self._db is not None:
             self._db.setup()
 
         if self._mongodb is not None:
             self._mongodb.setup()
+
+        self.setup_docker_compose()
 
     def setup_dependencies(self) -> None:
         """
@@ -170,6 +176,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         Set up dockerfile.
         Set up DB env variables in app service.
         Set app host env variable to db service name.
+        Set up volumes based on info in each service.
         """
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._service.set_from_template(path_to_template)
@@ -178,7 +185,7 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
         self._templates.copy("dockerfile")
         self._service.set_dockerfile("dockerfile")
 
-        docker_dbs = []
+        docker_dbs: list[DockerDBSetup] = []
         if self._db is not None and isinstance(self._db.main, DockerDBSetup):
             docker_dbs.append(self._db.main)
         if self._mongodb is not None:
@@ -191,6 +198,11 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
 
             db_host = db.docker_env_vars.host.model_copy()
             self._service.set_env_var(db_host.name, db.service_name)
+
+        all_services = [self._service] + [db._service for db in docker_dbs]
+        for service in all_services:
+            for vol in service.get_volumes():
+                self._docker.add_volume(vol)
 
     def _setup_subfolders(self):
         """
