@@ -2,8 +2,7 @@ import os
 from pathlib import Path
 import subprocess
 
-from poetiq.command_runner import BaseCommandRunner
-from poetiq.logger import logg
+from poetiq.utils.command_runner import BaseCommandRunner
 from poetiq.utils.misc import find_line, find_line_startswith
 from poetiq.utils.pip import Pip
 from poetiq.utils.toml import PyProjectHandler

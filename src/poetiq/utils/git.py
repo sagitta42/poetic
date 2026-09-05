@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import subprocess
 
-from poetiq.command_runner import BaseCommandRunner
+from poetiq.utils.command_runner import BaseCommandRunner
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
 

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import venv
 
-from poetiq.command_runner import BaseCommandRunner
+from poetiq.utils.command_runner import BaseCommandRunner
 from poetiq.logger import logg
 from poetiq.utils.misc import list_as_args
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from poetiq.command_runner import BaseCommandRunner
+from poetiq.utils.command_runner import BaseCommandRunner
 from poetiq.logger import logg
 from poetiq.utils.misc import list_as_args
 from poetiq.utils.venv import Venv
