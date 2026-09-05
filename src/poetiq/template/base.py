@@ -80,7 +80,10 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         """
         self._check_for_changes()
 
-        current_branch = self._git.get_active_branch()
+        try:
+            current_branch = self._git.get_active_branch()
+        except PoetiqException as e:
+            raise PoetiqException(f"Attempting to determine current branch, {str(e)}")
         logg.info(f"Active branch: {current_branch}")
 
         try:

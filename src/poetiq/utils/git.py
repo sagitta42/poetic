@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
+import subprocess
 
 from poetiq.command_runner import BaseCommandRunner
+from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
 
 
@@ -88,3 +90,10 @@ class Git(BaseCommandRunner):
         output = self.run("show", "--quiet", commit, check_output=True)
         ret = output[-1]
         return ret
+
+    def run(self, *args, check_output: bool = False, info: bool = False, **kwargs) -> list[str] | None:
+        try:
+            return super().run(*args, check_output=check_output, info=info, **kwargs)
+        except subprocess.CalledProcessError as e:
+            command_display = self._get_command_display(*args, detailed=False)
+            raise PoetiqException(f"poetiq failed running git command:\n$ {command_display}\nPlease handle and try again")

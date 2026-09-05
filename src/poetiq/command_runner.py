@@ -23,15 +23,16 @@ class BaseCommandRunner:
 
         check_output (bool): return command output with subprocess.check_output().
             NOTE: if running with checking output, it is not displayed in terminal
-        info (bool): display green poetiq info
+        info (bool): display poetiq info
+
+        Always display detailed info in debug mode.
+        Display trimmed version if requested with given logger.        
         """
-        full_args = self._full_args(*args)
-        if logg.is_debug:
-            logg.debug(f"{self.path} $ {list_as_args(full_args)}")
+        command_display = self._get_command_display(*args, detailed=logg.is_debug)
+        if logg.debug:
+            logg.debug(command_display)
         elif info:
-            if isinstance(full_args[0], Path):
-                full_args[0] = full_args[0].stem
-            logg.info(f"(poetiq) {list_as_args(full_args)}", poetiq=True)
+            logg.info(command_display, poetiq=True)
 
         command = self._get_command_list_output if check_output else self._run_command
         ret = command(*args, **kwargs)
@@ -63,6 +64,20 @@ class BaseCommandRunner:
     def _run_subprocess(self, subprocess_func: Callable, *args, **kwargs) -> str | None:
         ret = subprocess_func(self._full_args(*args), cwd=self.path, **kwargs)
         return ret
+
+    def _get_command_display(self, *args, detailed: bool) -> str:
+        """
+        Display command with given arguments.
+
+        detailed (bool): detailed path e.g. for debug mode
+        """
+        full_args = self._full_args(*args)
+        if detailed:
+            return f"{self.path} $ {list_as_args(full_args)}"
+        
+        if isinstance(full_args[0], Path):
+            full_args[0] = full_args[0].stem
+        return f"(poetiq) {list_as_args(full_args)}"
 
     def _full_args(self, *args) -> list[str]:
         """
