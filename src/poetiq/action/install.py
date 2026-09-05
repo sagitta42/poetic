@@ -12,12 +12,9 @@ from poetiq.settings.poetiq_action import InstallSettings
 from poetiq.utils.pip import PackageInfo, Pip, get_package_source
 
 
-class InstallSource(str, enum.Enum):
+class InstallSource(enum.StrEnum):
     local = "local"
     pyproject = "pyproject"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 class InstallAction(PoetiqAction):

@@ -105,7 +105,7 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
     def _check_for_changes(self):
         if self._git.is_git_repo and self._git.has_uncommitted_changes:
             raise PoetiqException(
-                f"Repository {self.path} has uncommitted changes! Commit or stash before proceeding with {self._type.value} setup."
+                f"Repository {self.path} has uncommitted changes! Commit or stash before proceeding with {self._type} setup."
             )
 
     def _commit_message(self, mod_type: str) -> str:

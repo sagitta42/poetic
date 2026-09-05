@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from $PACKAGE.logger import logg
 
 
-class Tree(str, enum.Enum):
+class Tree(enum.StrEnum):
     space = "    "
     branch = "|   "
     tee = "├── "

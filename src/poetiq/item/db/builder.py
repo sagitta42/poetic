@@ -1,5 +1,6 @@
 import enum
 from pathlib import Path
+from typing import Type
 
 from poetiq.item.db.mongo import MongoDBSetup
 from poetiq.item.db.psql import PsqlDBSetup
@@ -22,8 +23,8 @@ class DBSetupClass(enum.Enum):
     mongo = MongoDBSetup
 
     @classmethod
-    def from_db_type(cls, db_type: DBType):
-        return cls[db_type.name]
+    def from_db_type(cls, db_type: DBType) -> Type[SingleDBSetup]:
+        return cls[db_type.name].value
 
 
 class DBPort(int, enum.Enum):
@@ -41,8 +42,8 @@ class DBEnvVarsClass(enum.Enum):
     mongo = ServiceDBEnvVars
 
     @classmethod
-    def from_db_type(cls, db_type: DBType):
-        return cls[db_type.name]
+    def from_db_type(cls, db_type: DBType) -> Type[DBEnvVars]:
+        return cls[db_type.name].value
 
 
 class DBSetupBuilder:
@@ -56,7 +57,7 @@ class DBSetupBuilder:
 
         If SQLite development mode requested, build dual DB setup (given type + )
         """
-        setup_class = DBSetupClass.from_db_type(settings.db_type).value
+        setup_class = DBSetupClass.from_db_type(settings.db_type)
         env_vars = self._build_db_env_vars(settings.db_type)
         ret = setup_class(path, env_vars, settings, core)
         return ret
@@ -67,7 +68,7 @@ class DBSetupBuilder:
 
         In case of SQLite, host = directory of .db file, name = filename; otherwise host and name of database
         """
-        db_env_vars_class = DBEnvVarsClass.from_db_type(db_type).value
+        db_env_vars_class = DBEnvVarsClass.from_db_type(db_type)
 
         host_var_name = "MONGO_HOST" if db_type == DBType.mongo else "DB_HOST"
         host_var_value = "db" if db_type == DBType.sqlite else "localhost"

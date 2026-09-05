@@ -169,7 +169,7 @@ class BaseTemplate(BasePoetrySetup[T_TemplateSettings]):
         Include template if exists.
         """
         super().setup_readme()
-        logg.info(f"- creating {self._type.value} README.md")
+        logg.info(f"- creating {self._type} README.md")
 
         self._readme.clean()
         self._readme.add_new_section(self.name, header=1)

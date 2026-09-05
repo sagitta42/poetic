@@ -10,12 +10,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
 
 
-class DBType(str, enum.Enum):
+class DBType(enum.StrEnum):
     sqlite = "sqlite"
     psql = "psql"
 
 
-class DBDriver(str, enum.Enum):
+class DBDriver(enum.StrEnum):
     sqlite = "sqlite"
     psql = "postgresql+psycopg"
 
@@ -58,7 +58,7 @@ class DBSettings(Settings):
         """
         if self.db_type == DBType.sqlite and self.has_psql_components:
             logging.warning(
-                f"{self.db_type.value} driver is requested but extra psql components are found; ignoring"
+                f"{self.db_type} driver is requested but extra psql components are found; ignoring"
             )
 
         if self.db_type == DBType.psql:

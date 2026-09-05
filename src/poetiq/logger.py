@@ -6,18 +6,15 @@ from typing import Any
 from dotenv import dotenv_values
 
 
-class AnsiStyle(str, enum.Enum):
+class AnsiStyle(enum.StrEnum):
     normal = "0"
     bold = "1"
     start = "\033["
     end = "\033[0m"
     fg8bit = "38;5"
 
-    def __str__(self) -> str:
-        return self.value
 
-
-class AnsiColor(str, enum.Enum):
+class AnsiColor(enum.StrEnum):
     green = "32"
     grey = "90"
     red = "31"
@@ -36,7 +33,7 @@ class AnsiColor(str, enum.Enum):
         else:
             style = AnsiStyle.bold if bold else AnsiStyle.normal
 
-        ret = f"{AnsiStyle.start}{style};{self.value}m{message}{AnsiStyle.end}"
+        ret = f"{AnsiStyle.start}{style};{self}m{message}{AnsiStyle.end}"
         return ret
 
     def bold(self, message: Any) -> str:
@@ -49,9 +46,6 @@ class AnsiColor(str, enum.Enum):
     @property
     def is_8bit(self) -> bool:
         return self == AnsiColor.lila
-
-    def __str__(self) -> str:
-        return self.value
 
 
 class LevelFormatter(logging.Formatter):

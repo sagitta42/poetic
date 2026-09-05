@@ -40,7 +40,7 @@ class DualDBSetup(BaseDBSetup):
         Add SQLite notes to README.
         """
         logg.info(
-            f"@ Dual DB setup with {self.db_type.value} / SQLite .env switch",
+            f"@ Dual DB setup with {self.db_type} / SQLite .env switch",
             header=True,
         )
 

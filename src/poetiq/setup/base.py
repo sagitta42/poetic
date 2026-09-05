@@ -41,7 +41,7 @@ class BaseSetup(BaseAction[T_SetupSettings]):
         """
         Setup title
         """
-        return self._settings.type.value
+        return self._type.value
 
     @abstractmethod
     def setup(self) -> bool | None:

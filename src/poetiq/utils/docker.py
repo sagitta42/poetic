@@ -8,7 +8,7 @@ from poetiq.settings.item import DBType
 from poetiq.utils.db import EnvVar
 
 
-class DockerImage(str, enum.Enum):
+class DockerImage(enum.StrEnum):
     psql = "postgres:16-alpine"
     mongo = "mongo:8"
 
@@ -17,7 +17,7 @@ class DockerImage(str, enum.Enum):
         return cls[db_type.name].value
 
 
-class DockerHealthCheck(str, enum.Enum):
+class DockerHealthCheck(enum.StrEnum):
     psql = '[ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]'
     mongo = "mongosh --eval \"db.adminCommand('ping')\" --quiet"
 

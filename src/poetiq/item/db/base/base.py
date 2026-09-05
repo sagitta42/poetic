@@ -21,7 +21,7 @@ class BaseDBSetup(BasePoetrySetup[DBSettings]):
 
     @property
     def title(self) -> str:
-        return f"{super().title}-{self.db_type.value}"
+        return f"{super().title}-{self.db_type}"
 
     @property
     @abstractmethod
@@ -41,4 +41,4 @@ class BaseDBSetup(BasePoetrySetup[DBSettings]):
         """
         Set up DB.
         """
-        logg.info(f"@ Setting up {self.db_type.value} DB", header=True)
+        logg.info(f"@ Setting up {self.db_type} DB", header=True)

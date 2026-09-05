@@ -39,7 +39,7 @@ class BasePoetrySetup(BaseVenvSetup[T_SetupSettings]):
         Set up poetry into current environment.
             (the one from which poetiq is run, not project's venv)
         """
-        logg.info(f"- setting up dependencies for {self._type.value}")
+        logg.info(f"- setting up dependencies for {self._type}")
 
     def launch(self) -> None:
         """

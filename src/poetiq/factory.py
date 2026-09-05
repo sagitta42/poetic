@@ -25,8 +25,8 @@ class ActionSetupClass(enum.Enum):
     install = InstallAction
 
     @classmethod
-    def from_action_type(cls, action_type: ActionType):
-        return cls[action_type.name]
+    def from_action_type(cls, action_type: ActionType) -> Type[BaseAction]:
+        return cls[action_type.name].value
 
 
 class ActionBuilder:
@@ -52,7 +52,7 @@ class ActionBuilder:
         return ret
 
     def _get_action_class(self, settings: BaseActionSettings) -> Type[BaseAction]:
-        ret = ActionSetupClass.from_action_type(settings.type).value
+        ret = ActionSetupClass.from_action_type(settings.type)
         return ret
 
 

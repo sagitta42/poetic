@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from pydantic.fields import FieldInfo
 
 
-class ActionType(str, enum.Enum):
+class ActionType(enum.StrEnum):
     package = "package"
     app = "app"
     db = "db"

@@ -36,7 +36,7 @@ class LoggerSettings(ItemSetupSettings):
     )
 
 
-class DBType(str, enum.Enum):
+class DBType(enum.StrEnum):
     sqlite = "sqlite"
     psql = "psql"
     mongo = "mongo"

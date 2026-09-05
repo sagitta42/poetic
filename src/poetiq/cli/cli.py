@@ -13,7 +13,7 @@ from poetiq.settings.template import (
 )
 
 
-class Subparser(str, enum.Enum):
+class Subparser(enum.StrEnum):
     new = "new"
     update = "update"
     setup = "setup"
@@ -23,7 +23,7 @@ class Subparser(str, enum.Enum):
     lock = "lock"
 
     def descr(self) -> str:
-        ret = f"poetry {self.value} with advanced options"
+        ret = f"poetry {self} with advanced options"
         return ret
 
 
