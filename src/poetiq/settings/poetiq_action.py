@@ -22,7 +22,7 @@ class InstallSettings(BasePoetiqActionSettings):
     )
     package: str = Field(
         default="",
-        description="Package to install in split or local mode",
+        description="Specific package to install in split or local model; otherwise all local/split",
     )
 
     @property
