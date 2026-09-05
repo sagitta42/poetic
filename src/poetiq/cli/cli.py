@@ -3,9 +3,10 @@ import enum
 
 from poetiq.cli.args import add_bool, add_str
 from poetiq.cli.db import add_db_arguments
+from poetiq.enums import ActionType, DBType
 from poetiq.settings.poetiq_action import AddSettings, InstallSettings
-from poetiq.settings.base import ActionType, BaseSetupSettings
-from poetiq.settings.setup import DBSettings, DBType, LoggerSettings
+from poetiq.settings.base import BaseSetupSettings
+from poetiq.settings.setup import DBSettings, LoggerSettings
 from poetiq.settings.template import (
     AppTemplateSettings,
     BaseTemplateSettings,

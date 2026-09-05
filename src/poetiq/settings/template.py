@@ -2,8 +2,9 @@ from typing import Literal, Self, TypeVar
 
 from pydantic import Field, model_validator
 
-from poetiq.settings.base import ActionType, BaseSetupSettings
-from poetiq.settings.setup import DBSettings, DBType
+from poetiq.enums import ActionType, DBType
+from poetiq.settings.base import BaseSetupSettings
+from poetiq.settings.setup import DBSettings
 
 
 class BaseTemplateSettings(BaseSetupSettings):

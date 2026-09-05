@@ -377,24 +377,24 @@ local = [
 
 ## development notes
 
-### implement new independent functionality item setup (`setup`)
+### implement new independent functionality setup (`setup`)
 
-1. Create new `SetupType` e.g. `SetupType.foo` (`settings.setup`)
-1. Add `SetupType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli/cli.py`)
-1. Create item settings `FooSettings` in `poetiq.settings.item` inheriting from `SetupSettings` with `type` as `Literal[SetupType.foo]`
+1. Create new `ActionType` e.g. `ActionType.foo` in `enums`
+1. Add `ActionType.foo` to `choices` for `type` argument of the microfunctionality subparser in `add_microfunctionality_arguments()` (`cli/cli.py`)
+1. Create setup settings `FooSettings` in `poetiq.settings.setup` inheriting from `BaseSetupSettings` with `type` as `Literal[ActionType.foo]`
 1. Add additional settings field if any under `FooSettings` e.g. `field`
 1. Create function adding those settings to given CLI parser in `cli/cli.py` e.g. `add_foo_arguments(parser)` utilizing `FooSettings` to translate them to CLI arguments. Append call to this function under `add_microfunctionality_arguments()`
 1. Add `FooSettings` to accepted setup settings ( `settings.options`)
-1. Create item setup class `FooSetup` in a new source file `poetiq.setup.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if item includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
-1. Define `setup()` method, calling parent `setup()`, and adding specific setup actions for this item. This method must return `bool` representing whether this setup already existed before.
+1. Create setup class `FooSetup` in a new source file `poetiq.setup.foo` inheriting from a base setup (e.g. `BaseFunctionalitySetup`, `BaseVenvSetup`, or `BaseDependencySetup` )  with `[FooSettings]` (`Generic`) depending on if setup includes python library dependency setup etc. For convenience, define `__init__()` with `settings=FooSettings()`
+1. Define `setup()` method, calling parent `setup()`, and adding specific setup actions for this setup. This method must return `bool` representing whether this setup already existed before.
 1. In case of dependency setup, add dependencies in `setup_dependencies()` using `_poetry_add("package-name")`
-1. Add `FooSetup` under `ItemSetupClass` enum in `item.builder`, matching enum name with `SetupType` name (`foo`)
+1. Add `FooSetup` under `ActionSetupClass` enum in `factory`, matching enum name with `ActionType` name (`foo`)
 
 After this, this setup is now usable with `poetiq add foo`
 
 ### implement new DB setup
 
-1. Define new DB type in `DBType` e.g. `DBType.foo`
+1. Define new `DBType` in `enums` e.g. `DBType.foo`
 1. Create DB setup class `FooDBSetup` inheriting from `BaseDBSetup`
 1. Define its `setup_db()` method with actions for this DB setup. Return bool representing whether this setup existed before
 1. Define DB URL under `db_url` property

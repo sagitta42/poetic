@@ -4,7 +4,7 @@ from typing import Any
 
 import yaml
 
-from poetiq.settings.setup import DBType
+from poetiq.enums import DBType
 from poetiq.utils.db import EnvVar
 
 

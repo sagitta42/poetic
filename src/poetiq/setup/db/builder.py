@@ -2,12 +2,13 @@ import enum
 from pathlib import Path
 from typing import Type
 
+from poetiq.enums import DBType
 from poetiq.setup.db.mongo import MongoDBSetup
 from poetiq.setup.db.psql import PsqlDBSetup
 from poetiq.setup.db.base.single import SingleDBSetup
 from poetiq.setup.db.sqlite import SQLiteSetup
 from poetiq.logger import logg
-from poetiq.settings.setup import DBSettings, DBType
+from poetiq.settings.setup import DBSettings
 from poetiq.utils.db import (
     DBEnvVars,
     EnvVar,

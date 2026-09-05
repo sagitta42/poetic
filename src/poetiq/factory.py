@@ -5,11 +5,12 @@ from typing import Type
 from poetiq.action.add import AddAction
 from poetiq.action.base import BaseAction
 from poetiq.action.install import InstallAction
+from poetiq.enums import ActionType
 from poetiq.setup.db.factory import DBSetupFactory
 from poetiq.setup.gitignore import GitignoreSetup
 from poetiq.setup.logger import LoggerSetup
 from poetiq.setup.vscode import VSCodeSetup
-from poetiq.settings.base import ActionType, BaseActionSettings, BaseSetupSettings
+from poetiq.settings.base import BaseActionSettings, BaseSetupSettings
 from poetiq.settings.template import BaseTemplateSettings
 from poetiq.template.app import AppTemplate
 from poetiq.template.package import PackageTemplate

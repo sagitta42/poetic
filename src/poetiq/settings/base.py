@@ -5,23 +5,7 @@ from typing import Any, TypeVar
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.fields import FieldInfo
 
-
-class ActionType(enum.StrEnum):
-    package = "package"
-    app = "app"
-    db = "db"
-    envsettings = "envsettings"
-    vscode = "vscode"
-    gitignore = "gitignore"
-    progressbar = "progressbar"
-    logger = "logger"
-    install = "install"
-    add = "add"
-    lock = "lock"
-
-    @classmethod
-    def values(cls) -> list[str]:
-        return [item.value for item in cls]
+from poetiq.enums import ActionType
 
 
 class BaseActionSettings(BaseModel):

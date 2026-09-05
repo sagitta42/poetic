@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 import sys
-from poetiq.action.add import AddAction
 from poetiq.cli.cli import (
     Subparser,
     add_install_arguments,
@@ -10,11 +9,10 @@ from poetiq.cli.cli import (
     add_poetiq_lock_arguments,
     add_template_arguments,
 )
-from poetiq.core import install, launch_action, update
+from poetiq.core import launch_action, update
 from poetiq.exceptions import PoetiqException
 from poetiq.logger import logg
-from poetiq.settings.base import ActionType
-from poetiq.settings.poetiq_action import AddSettings
+from poetiq.enums import ActionType
 from poetiq.utils.poetry import Poetry
 
 

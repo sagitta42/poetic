@@ -1,11 +1,11 @@
-import enum
 from pathlib import Path
 from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
+from poetiq.enums import ActionType, DBType
 from poetiq.logger import logg
-from poetiq.settings.base import ActionType, BaseSetupSettings
+from poetiq.settings.base import BaseSetupSettings
 
 
 class ItemSetupSettings(BaseSetupSettings):
@@ -35,56 +35,6 @@ class LoggerSettings(ItemSetupSettings):
         default=ActionType.logger, description="Setup type"
     )
 
-
-class DBType(enum.StrEnum):
-    sqlite = "sqlite"
-    psql = "psql"
-    mongo = "mongo"
-    none = "none"
-
-    @classmethod
-    def all(cls) -> list[str]:
-        """
-        All DB types.
-
-        None (no DB) is excluded (not a DB type, a flag to set up no DB)
-        """
-        all_types = [db_type for db_type in cls if not db_type == cls.none]
-        ret = cls._values(all_types)
-        return ret
-
-    @classmethod
-    def sql(cls) -> list[str]:
-        """
-        SQL based DB types.
-        """
-        sql_types = [cls.sqlite, cls.psql]
-        ret = cls._values(sql_types)
-        return ret
-
-    @classmethod
-    def service(cls):
-        """
-        Service DBs
-        """
-        ret = [cls.psql, cls.mongo]
-        return ret
-
-    @classmethod
-    def with_none(cls, db_types: list[str]) -> list[str]:
-        """
-        Include none (no DB) with given types
-        """
-        ret = db_types + [cls.none.value]
-        return ret
-
-    @classmethod
-    def _values(cls, db_types: list) -> list[str]:
-        """
-        Return str values of list of given db types.
-        """
-        ret = [db.value for db in db_types]
-        return ret
 
 
 class DBSettings(BaseSetupSettings):

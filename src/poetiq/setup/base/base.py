@@ -3,7 +3,8 @@ from pathlib import Path
 
 
 from poetiq.action.base import BaseAction
-from poetiq.settings.base import ActionType, T_SetupSettings
+from poetiq.enums import ActionType
+from poetiq.settings.base import T_SetupSettings
 from poetiq.utils.git import Git
 
 from poetiq.logger import logg

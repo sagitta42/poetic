@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 from poetiq.logger import logg
-from poetiq.settings.base import ActionType
+from poetiq.enums import ActionType
 
 
 class TemplateLocation(str, enum.Enum):

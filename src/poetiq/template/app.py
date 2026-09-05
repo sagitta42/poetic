@@ -5,8 +5,8 @@ from poetiq.setup.db.base.base import BaseDBSetup
 from poetiq.setup.db.base.docker import DockerDBSetup
 from poetiq.setup.db.factory import DBSetupFactory
 from poetiq.setup.env_settings import EnvSettingsSetup
-from poetiq.settings.base import ActionType
-from poetiq.settings.setup import DBSettings, DBType
+from poetiq.enums import ActionType, DBType
+from poetiq.settings.setup import DBSettings
 from poetiq.settings.template import AppTemplateSettings
 from poetiq.template.base import BaseTemplate
 from poetiq.utils.docker import DockerComposeServiceHandler

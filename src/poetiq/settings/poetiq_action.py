@@ -1,12 +1,9 @@
 from pydantic import Field, model_validator
 from typing import Literal, Self
 
+from poetiq.enums import ActionType
 from poetiq.exceptions import PoetiqException
-from poetiq.settings.base import (
-    ActionType,
-    BasePoetiqActionSettings,
-    BaseSplitActionSettings,
-)
+from poetiq.settings.base import BasePoetiqActionSettings, BaseSplitActionSettings
 
 
 class InstallSettings(BasePoetiqActionSettings):

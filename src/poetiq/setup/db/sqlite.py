@@ -3,8 +3,9 @@ from pathlib import Path
 import sqlite3
 
 
+from poetiq.enums import DBType
 from poetiq.setup.db.base.sql import DBSqlSetup
-from poetiq.settings.setup import DBSettings, DBType
+from poetiq.settings.setup import DBSettings
 from poetiq.utils.db import SqlDBEnvVars
 from poetiq.utils.path import File
 
