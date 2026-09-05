@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 
 
-from poetiq.action.poetiq import PoetiqAction
+from poetiq.action.base import BasePoetiqAction
 from poetiq.exceptions import PoetiqException
 
 from poetiq.logger import logg
@@ -17,7 +17,7 @@ class InstallSource(enum.StrEnum):
     pyproject = "pyproject"
 
 
-class InstallAction(PoetiqAction):
+class InstallAction(BasePoetiqAction):
     """
     Install functionalities on top of standard poetry.
 

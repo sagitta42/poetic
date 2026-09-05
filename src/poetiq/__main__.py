@@ -3,11 +3,13 @@ from pathlib import Path
 import sys
 from poetiq.cli.cli import (
     Subparser,
-    add_install_arguments,
     add_microfunctionality_arguments,
+    add_template_arguments,
+)
+from poetiq.cli.poetiq_action import (
+    add_install_arguments,
     add_poetiq_add_arguments,
     add_poetiq_lock_arguments,
-    add_template_arguments,
 )
 from poetiq.core import launch_action, update
 from poetiq.exceptions import PoetiqException

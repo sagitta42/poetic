@@ -4,7 +4,6 @@ import enum
 from poetiq.cli.args import add_bool, add_str
 from poetiq.cli.db import add_db_arguments
 from poetiq.enums import ActionType, DBType
-from poetiq.settings.poetiq_action import AddSettings, InstallSettings
 from poetiq.settings.base import BaseSetupSettings
 from poetiq.settings.setup import DBSettings, LoggerSettings
 from poetiq.settings.template import (
@@ -93,30 +92,3 @@ def add_microfunctionality_arguments(parser: argparse.ArgumentParser):
     )
 
     add_bool(parser, "no-commit", BaseSetupSettings)
-
-
-def add_install_arguments(parser: argparse.ArgumentParser):
-    """
-    Add arguments for install functionalities.
-    """
-    add_bool(parser, "split", InstallSettings)
-    add_bool(parser, "local", InstallSettings)
-    add_str(parser, "package", help=InstallSettings, optional=True, flag=False)
-
-
-def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
-    add_str(parser, "package", help=AddSettings, optional=False, flag=False)
-    add_str(
-        parser,
-        "split",
-        help=AddSettings,
-        optional=True,
-        flag=True,
-        informative=True,
-        metavar="DIR",
-    )
-    add_str(parser, "local", help=AddSettings, optional=True, flag=True, metavar="PATH")
-
-
-def add_poetiq_lock_arguments(parser: argparse.ArgumentParser):
-    pass

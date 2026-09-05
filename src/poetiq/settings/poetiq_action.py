@@ -7,6 +7,14 @@ from poetiq.settings.base import BasePoetiqActionSettings, BaseSplitActionSettin
 
 
 class InstallSettings(BasePoetiqActionSettings):
+    """
+    poetiq install settings
+
+    Note that install action is not a true split poetiq action.
+    The --local flag is a boolean that installs from all split directoreis or none.
+    TODO: similar to add/lock, accept optional DIR name to install from only specific split dir.
+    """
+
     type: Literal[ActionType.install] = Field(
         default=ActionType.install, description="Action type"
     )
@@ -34,15 +42,11 @@ class AddSettings(BaseSplitActionSettings):
     package: str = Field(description="Package source (name, https, git)")
     split: str = Field(
         default="",
-        description="Add to split pyproject.toml (specified directory or all)",
+        description="Add to split pyproject.toml file(s) (all or specified DIR)",
     )
     local: str = Field(
         default="", description="Add local dependency to poetiq.toml in given path"
     )
-
-    @property
-    def split_requested(self) -> bool:
-        return self.split != ""
 
     @model_validator(mode="after")
     def check_split_local(self) -> Self:
@@ -59,4 +63,8 @@ class AddSettings(BaseSplitActionSettings):
 class LockSettings(BaseSplitActionSettings):
     type: Literal[ActionType.lock] = Field(
         default=ActionType.lock, description="Action type"
+    )
+    split: str = Field(
+        default="",
+        description="Update split poetry.lock(s) (all or specified DIR)",
     )

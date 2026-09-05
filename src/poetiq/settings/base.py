@@ -64,6 +64,13 @@ class BaseActionSettings(BaseModel):
 
 
 class BasePoetiqActionSettings(BaseActionSettings):
+    """
+    Base class for poetiq action settings.
+
+    Handle common and different settings between different actions.
+    E.g. --split in install is a bool (install from all split directories or none)
+        while for add/lock it accepts an optional DIR to add/lock specific DIR pyproject/lock
+    """
     @property
     @abstractmethod
     def split_requested(self) -> bool:
@@ -71,8 +78,17 @@ class BasePoetiqActionSettings(BaseActionSettings):
 
 
 class BaseSplitActionSettings(BasePoetiqActionSettings):
-    split: str = Field(default="", description="Split pyproject.toml directory")
+    """
+    Common settings for a split poetiq action.
 
+    True split poetiq action, if requested, can be performed on all split directories
+        or a specific given one.
+    """
+    split: str = Field(default="", description="Split directory")
+
+    @property
+    def split_requested(self) -> bool:
+        return self.split != ""
 
 class BaseSetupSettings(BaseActionSettings):
     """

@@ -1,10 +1,10 @@
-from poetiq.action.poetiq import PoetiqAction
+from poetiq.action.base import BasePoetiqAction
 from poetiq.logger import logg
 from poetiq.settings.poetiq_action import AddSettings
 from poetiq.utils.poetry import Poetry
 
 
-class AddAction(PoetiqAction[AddSettings]):
+class AddAction(BasePoetiqAction[AddSettings]):
 
     def launch(self) -> None:
         """
