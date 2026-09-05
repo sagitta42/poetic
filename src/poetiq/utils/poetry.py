@@ -41,12 +41,12 @@ class Poetry(BaseCommandRunner):
         Determine if current pyproject is in package mode.
         """
         project = self._pyproject.get_section("project")
+        tool_poetry = self._pyproject.get_section("tool.poetry")
 
-        # TODO: look under [tool.poetry] as well
-        if "package-mode" not in project:
-            return False
+        project_package_mode = project.get("package-mode", True)
+        tool_package_mode = tool_poetry.get("package-mode", True)
 
-        return project["package-mode"]
+        return project_package_mode or tool_package_mode
 
     def run(self, *args, **kwargs) -> list[str] | None:
         """
