@@ -123,6 +123,8 @@ class AppTemplate(BaseTemplate[AppTemplateSettings]):
                 template_subdir=core_templates,
             )
 
+        # TODO: #44 part of mongod setup to enable standalone poetiq setup db --db-type mongodb
+        # (source files in given subdir)
         if self._mongodb is not None:
             for mongo_template in ["db_mongo.py", "mongo_config.py"]:
                 self._templates.copy(

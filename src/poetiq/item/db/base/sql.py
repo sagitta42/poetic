@@ -45,7 +45,7 @@ class DBSqlSetup(SingleDBSetup[T_SqlDBEnvVars]):
         Set up example alembdantic model.
         Set up example migration for alembdantic usage.
         """
-        logg.info("...setting up alembic", header=True)
+        logg.info(f"- setting up alembic migrations")
         template_subdir = "alembic"
 
         self._templates.copy(

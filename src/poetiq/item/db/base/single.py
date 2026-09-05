@@ -59,7 +59,7 @@ class SingleDBSetup(BaseDBSetup, Generic[T_DBEnvVars]):
         """
         super().setup_readme()
 
-        logg.info("...setting up README.md")
+        logg.info(f"- setting up README.md for {self.title}")
 
         self._readme.add_new_section("DB", header=2)
         path_to_db_readme = self._templates.get_filepath(

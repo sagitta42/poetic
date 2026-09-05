@@ -31,7 +31,7 @@ class BaseSetup(BaseAction[T_SetupSettings]):
         super().__init__(path, settings)
 
         self._core = core
-        self._type: ActionType = settings.type
+        self._type: ActionType = self._settings.type
 
         self._templates = TemplateManager(self._type, self.path)
         self._git = Git(self.path)
@@ -45,14 +45,22 @@ class BaseSetup(BaseAction[T_SetupSettings]):
 
     @abstractmethod
     def setup(self) -> bool | None:
-        """
-        Main setup.
+        if not self._core:
+            logg.info(f"@ Setting up {self.title}", header=True)
 
-        Optionally return a flag representing whether this setup existed before.
+    @abstractmethod
+    def launch(self) -> None:
         """
-        line = "-" * 60
+        Launch action for generic setup.
+
+        Announce the setup title at launch rather than setup beginning if core.
+        """
         if self._core:
+            line = "-" * 60
+            title = f"Setting up {self.title}"
+            char_diff = len(line) - len(title)
+            char_space = char_diff - 4
+            filler = " " * int(char_space / 2)
             logg.info(line, header=True)
-        logg.info(f"@ Setting up {self.title}", header=True)
-        if self._core:
+            logg.info(f"| {filler}{title}{filler} |", header=True)
             logg.info(line, header=True)

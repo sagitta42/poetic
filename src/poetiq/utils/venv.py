@@ -15,7 +15,7 @@ class Venv(BaseCommandRunner):
 
     def setup(self):
         if not self.venv.exists():
-            logg.info("...creating venv", header=True)
+            logg.info("- creating venv")
             venv.create(self.venv, with_pip=True)
 
     def run(self, command: str, *args, **kwargs) -> list[str] | None:

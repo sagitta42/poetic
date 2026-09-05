@@ -50,7 +50,7 @@ class DockerDBSetup(SingleDBSetup[T_ServiceDBEnvVars]):
         Set up environment variables in service environment.
         Set up port.
         """
-        logg.info(f"...setting up {self.db_type} docker-compose", header=True)
+        logg.info(f"- setting up {self.db_type.value} docker-compose.yml")
 
         path_to_template = self._templates.get_filepath("docker-compose.yml")
         self._service.set_from_template(path_to_template)

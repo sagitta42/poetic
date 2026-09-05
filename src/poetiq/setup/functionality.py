@@ -57,6 +57,8 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         Commit setup if in git repository and files did not exist before.
         Add "made with poetiq" at the end of readme if does not exist.
         """
+        super().launch()
+        
         self._check_for_changes()
 
         self.setup()
@@ -76,7 +78,7 @@ class BaseFunctionalitySetup(BaseSetup[T_SetupSettings]):
         """
         Set up .env.template.
         """
-        logg.info("...setting up .env template", header=True)
+        logg.info(f"- setting up {self.title} .env template")
         self._env.set("DEBUG", 1)
         self._gitignore_file.add_new_line(".env", prepend=True)
 
