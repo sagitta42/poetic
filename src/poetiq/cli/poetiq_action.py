@@ -6,17 +6,10 @@ from poetiq.settings.base import BaseSplitActionSettings
 from poetiq.settings.poetiq_action import AddSettings, InstallSettings, LockSettings
 
 
-def add_install_arguments(parser: argparse.ArgumentParser):
-    """
-    Add arguments for install functionalities.
-    """
-    add_bool(parser, "split", InstallSettings)
-    add_bool(parser, "local", InstallSettings)
-    add_str(parser, "package", help=InstallSettings, optional=True, flag=False)
-
-
 def add_poetiq_split_arguments(
-    parser: argparse.ArgumentParser, help: Type[BaseSplitActionSettings], informative: bool
+    parser: argparse.ArgumentParser,
+    help: Type[BaseSplitActionSettings],
+    informative: bool,
 ):
     add_str(
         parser,
@@ -27,6 +20,15 @@ def add_poetiq_split_arguments(
         informative=informative,
         metavar="DIR",
     )
+
+
+def add_install_arguments(parser: argparse.ArgumentParser):
+    """
+    Add arguments for install functionalities.
+    """
+    add_poetiq_split_arguments(parser, InstallSettings, informative=True)
+    add_bool(parser, "local", InstallSettings)
+    add_str(parser, "package", help=InstallSettings, optional=True, flag=False)
 
 
 def add_poetiq_add_arguments(parser: argparse.ArgumentParser):
