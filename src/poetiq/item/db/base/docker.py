@@ -21,8 +21,8 @@ class DockerDBSetup(SingleDBSetup[T_ServiceDBEnvVars]):
     ) -> None:
         super().__init__(path, env_vars, settings, core)
 
-        self.service_name: str = f"db_{self._settings.db_type.value}"
-        self._service = DockerComposeServiceHandler(self.path, "db")
+        self.service_name: str = f"db_{self.db_type.value}"
+        self._service = DockerComposeServiceHandler(self.path, self.service_name)
 
     @property
     def docker_env_vars(self) -> ServiceDBEnvVars:
@@ -52,11 +52,13 @@ class DockerDBSetup(SingleDBSetup[T_ServiceDBEnvVars]):
         """
         logg.info(f"- setting up {self.db_type.value} docker-compose.yml")
 
-        path_to_template = self._templates.get_filepath("docker-compose.yml")
+        path_to_template = self._templates.get_filepath(
+            "docker-compose.yml", subdir=self.db_type.value
+        )
         self._service.set_from_template(path_to_template)
 
         self._service.rename(self.service_name)
-        self._service.set_container_name(f"db_{self._settings.db_type.value}")
+        self._service.set_container_name(self.service_name)
 
         self._service.set_image(self.db_type)
 

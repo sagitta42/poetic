@@ -1,5 +1,5 @@
 services:
-  mongodb:
+  db_mongo:
     healthcheck:
       test: mongosh --eval "db.adminCommand('ping')" --quiet
       interval: 30s
