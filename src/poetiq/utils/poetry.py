@@ -63,7 +63,7 @@ class Poetry(BaseCommandRunner):
             return self._run(*args, **kwargs)
         except subprocess.CalledProcessError:
             try:
-                return self._run(*args, capture_output=True, text=True, **kwargs)
+                return self._run(*args, info=False, capture_output=True, text=True, **kwargs)
             except subprocess.CalledProcessError as e:
                 if "externally-managed-environment" in e.stdout:
                     self._rerun_poetry_pip(e)
@@ -71,10 +71,10 @@ class Poetry(BaseCommandRunner):
                 else:
                     raise e
 
-    def _run(self, *args, **kwargs) -> list[str] | None:
+    def _run(self, *args, info: bool = True, **kwargs) -> list[str] | None:
         return super().run(
             *args,
-            info=True,
+            info=info,
             env={
                 **os.environ,
                 "POETRY_VIRTUALENVS_CREATE": "false",
