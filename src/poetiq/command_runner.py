@@ -29,7 +29,7 @@ class BaseCommandRunner:
         Display trimmed version if requested with given logger.        
         """
         command_display = self._get_command_display(*args, detailed=logg.is_debug)
-        if logg.debug:
+        if logg.is_debug:
             logg.debug(command_display)
         elif info:
             logg.info(command_display, poetiq=True)
